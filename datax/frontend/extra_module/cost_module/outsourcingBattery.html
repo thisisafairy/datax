@@ -1,0 +1,199 @@
+ {% extends 'base_portal.html' %} {% load staticfiles %} {% block title %}财务数据采集管理{% endblock %}
+{% block content %}
+<link href="{% static 'css/Ext/css/ext-all.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'css/Ext/ax-all.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'css/ext/ux/css/LockingGridView.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'js/ext/ux/fileuploadfield/css/fileuploadfield.css'  %}" rel="stylesheet" type="text/css" />
+<style>
+</style>
+{% verbatim %}
+    <div id="form">
+    </div>
+    <div id="cumgrid"></div>
+{% endverbatim %}
+    <script src="{% static 'js/ext/adapter/jquery/ext-jquery-adapter.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ext-all.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ax-all.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/pgfunc-ext.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/locale/ext-lang-zh_CN.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ux/LockingGridView.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ux/fileuploadfield/fileuploadfield.js'%}" type="text/javascript"></script>
+
+    <script>
+        Ext.BLANK_IMAGE_URL = "{% static 'js/ext/s.gif' %}";
+        Ext.Ajax.defaultHeaders = {'X-CSRFToken' : getCookie('csrftoken')};
+        //后台数据URL
+        var listdataurl = '/cost/outsourcingBatteryList' ; //后台返回列表数据 {total:1:rows:[{name:'name1',code:'code1'}]}
+
+
+        Ext.onReady(function(){
+
+            //定义所展示的列
+            var cols = [
+                 new Ext.grid.RowNumberer(),
+                new Ext.grid.CheckboxSelectionModel({singleSelect:false}),
+                { header: "产品尺寸",width:110,dataIndex: "productsize",editor:{xtype:'textfield'}},
+                {header: "采购成本",dataIndex: "price", editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer},
+
+           ];
+            function colRenderer(val) {return Ext.util.Format.number(val,'0.0000');}
+            //查询所需的store
+            var store =new Ext.data.Store({
+                autoLoad : true,  
+                idProperty: 'id',
+                url: listdataurl,  
+                reader : new Ext.data.JsonReader({totalProperty: 'total',root: 'rows'}, 
+                    [{ name : 'id'},{name : 'productsize'}, {name:'price'}]),  
+                // sortInfo: {field: 'createtime', direction: 'ASC'},
+                  listeners:{
+                         beforeload:function(){
+                               Ext.getBody().mask('页面加载刷新中,请稍后......');
+                          },load:function(){Ext.getBody().unmask();}
+                   }
+            });  
+
+           var toolbar = new Ext.Toolbar(['-', {
+                    text: '添加',
+                    handler: function(){
+                        var Record = grid.getStore().recordType;
+                        var date = new Date()
+                        var p = new Record({"productsize":"","price":0});
+                        grid.stopEditing();
+                        var insRowIdx = store.data.length;
+                        store.insert(insRowIdx, p);
+                        grid.startEditing(insRowIdx, 2);
+                    }
+                }, '-', {
+                    text: '删除',
+                    handler: function(){
+                        Ext.Msg.confirm('信息', '确定要删除？', function(btn){
+                            if (btn == 'yes') {
+                               var recs = grid.getSelectionModel().getSelections();
+                                var ids='';
+                                for (var i = 0; i < recs.length; i++) {
+                                        if (recs[i] && (recs[i].get("id") == null || recs[i].get("id") == "")) {
+                                            grid.getStore().remove(recs[i]);
+                                            grid.getStore().commitChanges();
+                                        }
+                                        else if(recs[i])
+                                        {
+                                            ids+="'" + recs[i].get("id")+"',";
+                                        }
+                                    }
+                                $.ajax({
+                                    url: '/cost/deletesourcingBattery',
+                                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                                    type: 'post',
+                                    data: { 'datas':ids }
+                                }).then(function (rs) {
+                                    if (rs.code == '1') {
+                                        Ext.getBody().unmask();
+                                        Reload(true);
+                                    }
+                                    else {
+                                        alert(rs.data);
+                                        Ext.getBody().unmask();
+                                    }
+                                    store.commitChanges();
+                                    Reload();
+                                });
+                            }
+                        });
+                    }
+                }, '-',{
+                    text: '保存',
+                    handler: function(){
+                        recs = store.getModifiedRecords();
+                        var dt=[];
+                        $.each(recs, function() {
+                            dt.push(this.data);
+                        });
+                        if(dt.length===0){
+                            return;
+                        }
+                        Ext.getBody().mask("保存中...");
+                        $.ajax({
+                            url: '/cost/savesourcingBattery',
+                            headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                            type: 'post',
+                            data: { 'datas': JSON.stringify(dt)}
+                        }).then(function (rs) {
+                            if (rs.code == '1') {
+                                Ext.getBody().unmask();
+                                Reload(true)
+                            }
+                            else {
+                                alert(rs.data);
+                                Ext.getBody().unmask();
+                            }
+                            store.commitChanges();
+                            Reload();
+                        });
+
+                    }
+                },'-',{
+                    text: 'excel导出',
+                    handler: function(){
+                        ExtGridExportExcel(grid, { store: null, title: '外购电池' });
+                    }
+
+
+                }
+           ]);
+
+            var schBar = new Ext.ux.AimSchPanel({
+                store: store,
+                padding: '3 0 0 0',
+                collapsed:false,
+                columns:2,
+                items: []
+            });
+           var titPanel = new Ext.ux.AimPanel({
+                    tbar: toolbar,
+                    items: [schBar]
+                });
+           var grid = new Ext.ux.grid.AimEditorGridPanel({
+               title:'外购电池',
+                lockable: true,
+                clicksToEdit: 1,
+                height:document.body.clientHeight-40,
+                renderTo: 'cumgrid',
+                enableColumnHide: false,
+                store: store,
+                columns: cols,
+                tbar: titPanel,
+                width:document.body.clientWidth-$("#silderApp").width(),
+                columnLines: true,
+
+            });
+           //需要锁定到最左边的列
+
+           //构建需要填报的周信息
+           //ReBuildCols();
+           //加载数据
+           Reload();
+           //加载后台数据
+           function Reload(flag) {
+               if (flag!==true&&store.getModifiedRecords().length > 0)
+               {
+                   Ext.Msg.confirm('信息', '存在未保存的记录，确定要重新加载新数据？', function(btn){
+                        if (btn == 'yes') {
+                            Reload(true);
+                        }
+                    });
+               }
+               else
+               {
+                   //传递到后台的参数
+                   store.load({
+                       params:{
+                       }
+                   });
+               }
+
+           }
+        });
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}表格管理{% endblock %}
+
+{% block content %}
+<!-- <link rel="stylesheet" href="{% static 'plugin/datatables-bootstrap/dataTables.bootstrap.css' %}">
+<link rel="stylesheet" href="{% static 'plugin/datatables-bootstrap/fixedColumns.dataTables.css' %}"> -->
+<link rel="stylesheet" href="{% static 'css/jquery.mloading.css' %}"><!--遮罩层-->
+    <link rel="stylesheet" href="{% static 'css/add.css'  %}">
+<!-- <link rel="stylesheet" href="{% static 'plugin/xspreadsheet/xspreadsheet.css'  %}"> -->
+<script src="{% static 'plugin/xspreadsheet/xspreadsheet.js' %}"></script>
+<link rel="stylesheet" href="{% static 'componets/groupselect/group-select.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'componets/multi-select/multi-select.css' %}?v={{ nowversion }}1">
+    {% verbatim %}
+<div ng-app="datatablesapp">
+        <div ui-view></div>
+</div>
+{% endverbatim %}
+<script type="text/javascript" src="{% static 'plugin/moment/moment.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/moment/locale/zh-cn.js' %}"></script>
+<script>
+        moment.locale('zh-cn');
+</script>
+
+<script src="{% static 'plugin/datatables/js/jquery.dataTables.js' %}"></script>
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/jquery/jquery.mloading.js' %}"></script><!--遮罩层-->
+<script src="{% static 'plugin/datatables-bootstrap/dataTables.bootstrap.js' %}"></script>
+<script src="{% static 'plugin/datatables/js/dataTables.fixedColumns.js' %}"></script>
+<script src="{% static 'plugin/datalib/datalib.js' %}"></script>
+<script src="{% static 'js/ngDraggable.js' %}"></script>
+<script src="{% static 'plugin/html2canvas/html2canvas.min.js' %}"></script>
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/groupselect/group-select.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/multi-select/multi-select.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'dashboard/datatables/index.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'dashboard/directives/table.js' %}"></script>
+{% endblock %}

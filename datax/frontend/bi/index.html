@@ -1,0 +1,259 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/daterangepicker/daterangepicker.css'  %}">
+    <link rel="stylesheet" href="{% static 'plugin/datatables-bootstrap/dataTables.bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/datatables-bootstrap/fixedColumns.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/layoutit.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/jquery/pagination.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bi.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashthemes/default/default.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-combined.min.css'  %}">
+    <link rel="stylesheet" href="{% static 'plugin/jquery/canvas/jQuery.canvas.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery.mloading.css' %}"><!--遮罩层-->
+    <link rel="stylesheet" href="{% static 'plugin/summernote/summernote.css' %}"><!--文本编辑框-->
+
+    <script src="{% static 'plugin/jquery/jquery-2.2.3.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular.min.js'%}"></script>
+    <script src="{% static 'plugin/angular/angular-ui-bootstrap/ui-bootstrap-tpls.js'%}"></script>
+    <script src="{% static 'plugin/lodash/lodash.min.js' %}"></script>
+    <script src="{% static 'plugin/html2canvas/html2canvas.js' %}"></script>
+    <script src="{% static 'plugin/jquery/jquery.mloading.js' %}"></script><!--遮罩层-->
+    <script>
+        window.themeid = '{{ pk }}';
+        window.type = '{{ type }}';
+    </script>
+
+    <style type="text/css">
+        body {
+            background-color: #eef2f5;
+        }
+
+        div#toolbar {
+            line-height: normal;
+        }
+
+        .downBar {
+            position: fixed;
+            top: 10px;
+            right: 75px;
+            z-index: 9999;
+        }
+
+        .downBar .fa {
+            padding: 8px;
+            margin: -4px;
+            z-index: 10;
+        }
+
+        .fa {
+            font-size: 1.2em;
+        }
+
+        .faHover {
+            font-size: 1.5em;
+        }
+
+        .share-window .modal {
+            width: 96% !important;
+            height: 96% !important;
+            top: 0px !important;
+            left: 2% !important;
+            margin-left: 0px !important;
+        }
+
+        .share-window .modal .modal-lg {
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0px !important;
+        }
+
+        /*.chart-content {
+            border-radius: 7px;
+        }*/
+
+        .cell-box {
+            /*background: none !important;*/
+            /*margin: 5px 0;*/
+            padding-left: 3px;
+            padding-right: 3px;
+            /*update 0403*/
+            border: none;
+        }
+
+        .row-fluid {
+            background-color: transparent !important;
+        }
+
+        .share-window .modal-backdrop {
+            background: rgba(0, 0, 0, 0);
+        }
+
+        .demo .row-fluid {
+            border: none !important;
+        }
+
+        .col-md-2 {
+            padding: 9px 0px 0px 0px;
+        }
+
+        .carousel {
+            margin-bottom: 0px !important;
+        }
+
+        .table-embed .row {/*预览时候table重写margin-left:0*/
+            margin-left: 0px;
+        }
+
+        .table-embed .table-bordered {/*预览的时候table显示左边border*/
+            border: 1px solid #dddddd;
+        }
+        /*update 0403*/
+
+        /*.column {
+            background-color: #FFFFFF;
+            border: 0px solid #DDDDDD;!important;
+            border-radius: 4px 4px 4px 4px;
+            margin: 15px 0;
+            padding: 5px 0px 5px;!important;
+            position: relative;
+        }*/
+        .tabbable .nav{/*tab标签头和标签体相聚太高*/
+            margin-bottom: 0px !important;
+        }
+        .filterFrameStyle{
+            min-height: 60px;
+            padding: 5px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        .staticFrameStyle{
+            border-radius: 4px;
+            padding: 5px;
+            margin-top: 5px;
+            min-height: 60px;
+        }
+        .chart-content{
+            margin-top: 5px;
+        }
+        .addChartTagBtnDiv{/*场景预览按钮需要fixed浮动，给类addChartTagBtnDiv多添加了一个属性*/
+            position: fixed;
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body ng-app="biApp" ng-controller="biController">
+    {% verbatim %}
+    <div id="downBar" ng-mouseover="downBar=true" ng-if="downBar" class="downBar" ng-style="btGroupStyle">
+        <i class="fa fa-share-alt" ng-click="downTheme('share')" ng-mouseover="showIconDown('fa-share-alt', 'share')" ng-mouseleave="showIconCancel('fa-share-alt')"></i>
+        <i class="fa fa-file-image-o" ng-click="downTheme('pic')" ng-mouseover="showIconDown('fa-file-image-o', '图片')" ng-mouseleave="showIconCancel('fa-file-image-o')"></i>
+        <i class="fa fa-file-excel-o" ng-click="downTheme('excel')" ng-mouseover="showIconDown('fa-file-excel-o', 'excel')" ng-mouseleave="showIconCancel('fa-file-excel-o')"></i>
+        <i class="fa fa-file-word-o" ng-click="downTheme('word')" ng-mouseover="showIconDown('fa-file-word-o', 'word')" ng-mouseleave="showIconCancel('fa-file-word-o')"></i>
+        <i class="fa fa-file-powerpoint-o" ng-click="downTheme('powerpoint')" ng-mouseover="showIconDown('fa-file-powerpoint-o', 'ppt')"
+            ng-mouseleave="showIconCancel('fa-file-powerpoint-o')"></i>
+        <i class="fa fa-file-pdf-o" ng-click="downTheme('pdf')" ng-mouseover="showIconDown('fa-file-pdf-o', 'pdf')" ng-mouseleave="showIconCancel('fa-file-pdf-o')"></i>
+    </div>
+    <!--鼠标移入移出显示隐藏downBar-->
+    <div style="opacity: 0;position: fixed;height: 10px;width: 300px;right: 0px;z-index: 999;background-color: red" ng-mouseover="downBar=true"></div>
+    <div style="opacity: 0;position: fixed;height: 300px;width: 10px;right: 0px;z-index: 999;background-color: green" ng-mouseleave="downBar=false"></div>
+    <!--结束-->
+    <div id="downIconTip" style="position: absolute;"></div>
+    <div id="canvas">
+        <div resize ng-style="style()">
+            <div uib-carousel  interval="interval" active="active" no-wrap="false">
+                <div uib-slide ng-repeat="(key,slide) in scenelists track by key" index="key" class="scene-content">
+                    <div class="demo">
+                        <div class="container-fluid" ng-bind-html="slide.formatHtml">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center" ng-if="isfail">
+
+        </div>
+    </div>
+
+    <div class="modal fade" role="dialog" id="editorModal" style="height:455px;">
+        <div class="modal-header open-header">
+            <h3 class="modal-title open-header-title modal-title-padding">编辑</h3>
+            <!--弹出框的关闭按钮-->
+            <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>
+                <textarea id="contenteditor" style="visibility: hidden; display: none;"></textarea>
+            </p>
+        </div>
+        <div class="modal-footer">
+            <a id="savecontent" class="btn btn-primary btn-ok" data-dismiss="modal">保存</a>
+            <a class="btn btn-cancel" data-dismiss="modal">关闭</a>
+        </div>
+    </div>
+
+    {% endverbatim %}
+    <script>
+        $.ajaxSetup({
+            //data: {csrfmiddlewaretoken: '{{ csrf_token }}' },jnpedit屏蔽 会影响api post提交
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));//jnp add post需要
+            }
+        });
+    </script>
+    <script src="{% static 'plugin/bootstrap/js/bootstrap.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-sanitize/angular-sanitize.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-animate/angular-animate.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-sortable-view/angular-sortable-view.js' %}"></script>
+    <script src="{% static 'plugin/datalib/datalib.js' %}"></script>
+    <script src="{% static 'plugin/echarts/echarts.min.js' %}"></script>
+    <script src="{% static 'plugin/echarts/echarts-wordcloud.min.js' %}"></script>
+    <script src="{% static 'js/vecharts.js' %}"></script>
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=Wuh7Oy6carflwquDvNZ3lGzY"></script>
+    <!-- 主组件包 -->
+    <!-- 生成地图所需其他包 -->
+    <script src="{% static 'js/map/china.js' %}"></script>
+    <!-- 百度地图扩展包 -->
+    <script src="{% static 'js/map/bmap.min.js' %}"></script>
+    <!-- 各省市的地理坐标 -->
+    <script src="{% static 'js/map/coordinate.js' %}"></script>
+    <script src="{% static 'js/echart.tool.js' %}"></script>
+
+    <script src="{% static 'plugin/datatables/js/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'plugin/datatables-bootstrap/dataTables.bootstrap.js' %}"></script>
+    <script src="{% static 'plugin/datatables/js/dataTables.fixedColumns.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'plugin/moment/moment.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugin/moment/locale/zh-cn.js' %}"></script>
+    <script>
+        moment.locale('zh-cn');
+    </script>
+    <script src="{% static 'plugin/jquery/canvas/jQuery.canvas.js' %}"></script>
+    <script src="{% static 'plugin/daterangepicker/daterangepicker.js' %}"></script>
+    <script src="{% static 'dashboard/directives/chartdraggroup_after.js' %}"></script>
+    <script src="{% static 'plugin/jquery/pagination.min.js' %}"></script>
+
+    <!--<script src="{% static 'plugin/ckeditor/ckeditor.js' %}"></script>
+    <script src="{% static 'plugin/jquery/zh-cn.js' %}"></script>-->
+    <script src="{% static 'plugin/summernote/summernote.js' %}"></script>
+    <script src="{% static 'plugin/summernote/summernote-zh-CN.js' %}"></script>
+
+
+    <script src="{% static 'js/table.js' %}"></script>
+    <script src="{% static 'js/tools.js' %}"></script>
+    <script src="{% static 'js/relation.js' %}"></script>
+    <script src="{% static 'bi/index.js' %}"></script>
+</body>
+
+</html>

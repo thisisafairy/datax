@@ -1,0 +1,164 @@
+<div class="modal-header open-header" style="height: 40px;">
+    <h3 class="modal-title open-header-title" ng-if="terminalType != 'phone'" id="modal-title">编辑分享</h3>
+    {# 弹出框的关闭按钮 #}
+    <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<style type="text/css">
+    .modal-body {
+        background-color: rgba(245, 245, 245, 1);
+    }
+
+    .my-canvas-mobile {
+        border: 2px solid rgba(56, 78, 118, 1) !important;
+    }
+    .canvas-tools-mobile {
+        width: calc(80% - 4px) !important;
+        top: 2px !important;
+        right: 2px !important;
+        background-color: #eeeeee !important;
+        height: 25px !important;
+    }
+
+    .canvas-tools-mobile span {
+        padding: 5px !important;
+        background: none !important;
+    }
+</style>
+<div id="shareCanvas">
+{% verbatim %}
+<div class="modal-body open-body" style="padding: 5px 10px;">
+    <img class="myCanvas" ng-src="{{ themePic }}" style="width:100%;">
+</div>
+<style type="text/css">
+    .user-select-content {
+        position: absolute;
+        width: 240px;
+        min-height: 270px;
+        max-height: 380px;
+        display: none;
+        top: 40px;
+        left: 120px;
+        z-index: 99999;
+        background-color: rgba(255, 255, 255, 1);
+        -webkit-box-shadow: 0px 0px 13px 2px rgba(0,0,0,0.27);
+        -moz-box-shadow: 0px 0px 13px 2px rgba(0,0,0,0.27);
+        box-shadow: 0px 0px 13px 2px rgba(0,0,0,0.27);
+    }
+
+    .user-select-content .content-title {
+        height: 40px;
+        background-color: rgba(248, 248, 248, 1);
+        border-bottom: 1px solid rgba(231, 231, 231, 1);
+    }
+
+    .content-title .user-list-title {
+        width: 50%;
+        float: left;
+        height: 100%;
+        padding-left: 15px;
+        line-height: 40px;
+    }
+
+    .user-select-content .select-content{
+        width: 100%;
+        min-height: 200px;
+        max-height: 300px;
+        overflow: hidden;
+        background-color: rgba(255, 255, 255, 1);
+    }
+
+    .select-content .user-list {
+        float: left;
+        width: 50%;
+        min-height: 200px;
+        max-height: 300px;
+        overflow: auto;
+    }
+
+    .user-list:nth-child(2) {
+        background-color: rgba(248, 246, 246, 1);
+    }
+
+    .user-select-content .content-footer {
+        height: 40px;
+        text-align: center;
+        padding: 2px;
+    }
+
+    .select-person-btn {
+        position: absolute;
+        top: 5px;
+        left: 120px;
+        z-index: 1;
+        background-color: rgb(30, 136, 229);
+        border-radius: 20px;
+        padding: 6px 7px;
+    }
+
+    .select-person-btn:hover {
+        cursor: pointer;
+    }
+
+    .wechart-btn {
+        display: none;
+        position: absolute;
+        left: 20px;
+        top: 5px;
+        background-color: rgb(61, 181, 61);
+        border-radius: 20px;
+        padding: 6px 7px;
+    }
+
+    .wechart-btn:hover {
+        cursor: pointer;
+    }
+
+    .panel-show {
+        display: block;
+    }
+
+</style>
+<div class="wechart-btn">
+    <i class="fa fa-wechat" style="color: rgba(255, 255, 255, 1);"></i>
+</div><div ng-if="terminalType=='phone'" style="position: absolute; top: 10px; left: 60px; font-size: 18px; font-weight: 400;">微信</div>
+<div class="select-person-btn" ng-click="sendMailPanel('open')">
+    <i class="fa fa-envelope" style="color: rgba(255, 255, 255, 1);"></i>
+</div><div style="position: absolute; top: 10px; left: 160px; font-size: 18px; font-weight: 400;">邮件</div>
+<div class="user-select-content">
+    <div class="content-title">
+        <div class="user-list-title">收件人:</div>
+        <div class="user-list-title">抄送人:</div>
+    </div>
+    <div class="select-content">
+        <div class="user-list">
+            <div class="checkbox">
+                <label>
+                    <input ng-change="selectAll('recipient')" ng-model="selectAllUser" type="checkbox">全选
+                </label>
+            </div>
+            <div class="checkbox" ng-repeat="user1 in userlist">
+                <label>
+                    <input ng-model="user1.checked" type="checkbox">{{ user1.username }}
+                </label>
+            </div>
+        </div>
+        <div class="user-list">
+            <div class="checkbox">
+                <label>
+                    <input ng-change="selectAll('cc')" ng-model="selectAllCCUser" type="checkbox">全选
+                </label>
+            </div>
+            <div class="checkbox" ng-repeat="user2 in ccUserlist">
+                <label>
+                    <input ng-model="user2.checked" type="checkbox">{{ user2.username }}
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="content-footer"><div class="submit-btn btn btn-primary" ng-click="sendCharts()">确定</div></div>
+</div>
+
+{% endverbatim %}
+</div>

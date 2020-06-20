@@ -1,0 +1,123 @@
+ {% extends 'base.html' %} {% load staticfiles %} {% block title %}场景管理{% endblock %} {% block content %}
+<style>
+    .btn-group{
+        width: 100% !important;
+    }
+</style>
+<link rel="stylesheet" href="{% static 'plugin/bootstrap-select/bootstrap-select.min.css' %}"/>
+<div>
+
+    <section class="content-header cont-head">
+        <h1>
+            场景管理
+        </h1>
+    </section>
+
+    <section class="content" ng-app="grouplist">
+        <div ng-controller="roleManagerListCtrl" class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <!--<div class="box-header">
+                        <div class="row">
+                            <div class="form-group col-lg-3 col-md-4">
+                                <label for="firstname" class="col-md-5 col control-label">场景名称：</label>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="name" ng-model="param.name" ng-change="queryList(1)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>-->
+        <div class="box-body">
+            <div  class="col-md-3">
+                <a class="btn btn-default btn-usermanage" ng-click="add()" >
+                    <i class="fa fa-plus"></i> 新增
+                </a>
+            </div>
+                    <div class="col-md-offset-6 col-md-3">
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                                <select selectpicker ng-model="param.dtype" onchange="angular.element(this).scope().selChange()" multiple ng-options="ty.id as ty.name for ty in dtypes">
+                                </select>
+                            </div>
+                            <!--<label for="firstname" class="col-sm-2 control-label cont-body-labelid">场景名</label>-->
+                            <div class="col-sm-6 cont-body-idinput" style="margin-left: 0px;">
+                                <input type="text" class="form-control cont-bodyfrom-input" id="name" ng-model="param.name" ng-change="queryList(1)" placeholder="搜索名称">
+                            </div>
+                            <!--<button class="btn btn-search" type="button" ng-click=""><i class="fa fa-search icon-fa"></i>查询</button>-->
+                        </div>
+                    </div>
+                        <div class="dataTables_wrapper form-inline dt-bootstrap col-md-12 olaplist">
+                            <table class="table table-bordered table-hover" id="gridData">
+                                <thead class="table-head">
+                                    <tr>
+                                        <th style="text-align: center;">场景名称</th>
+                                        <th style="text-align: center;">类型</th>
+                                        <th style="text-align: center;">关键字</th>
+                                        <th style="text-align: center;">创建人</th>
+                                        <th style="text-align: center;">创建时间</th>
+                                        <th style="text-align: center;min-width: 211px;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in pagination.data">
+                                        <td style="text-align: center;" ng-bind="item.name"></td>
+                                        <td style="text-align: center;" ng-bind="item.kind"></td>
+                                        <td style="text-align: center;" ><label title="{[{ item.keywords }]}" ng-bind="item.keywords | limitTo : 15"></label></td>
+                                        <td style="text-align: center;" ng-bind="item.createname"></td>
+                                        <td style="text-align: center;" ng-bind="item.createtime"></td>
+                                        <td>
+                                            <div class="buttons" style="text-align: center;">
+                                                <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="editInfo(item)">编辑/查看</button>
+                                                <button class="btn btn-primary editable-table-button btn-xs" ng-click="personSet(item)">预览</button>
+                                                <button class="btn btn-danger editable-table-button btn-xs btn-buttons" ng-click="removeRow(item)">删除</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="dataTables_info">
+                                        <label>每页显示条数：
+                                                <select  data-ng-model="count"
+                                                    name="count" id="count" ng-change="queryList(1)">
+                                                    <option class="form-control" value="7">7</option>
+                                                    <option class="form-control" value="10" selected="selected">10</option>
+                                                    <option class="form-control" value="20">20</option>
+                                                    <option class="form-control" value="50">50</option>
+                                                </select>
+                                            </label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-7">
+                                    <div class="dataTables_paginate paging_simple_numbers right">
+                                        <ul style="margin: 0px;" uib-pagination total-items="totalItems" first-text="«" rotate="false" last-text="»" previous-text="上一页"
+                                            next-text="下一页" ng-change="queryList(page)" ng-model="page" items-per-page="count"
+                                            class="pagination-sm" boundary-links="true" boundary-link-numbers="true" max-size="currentPageNum">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            </div>
+            <script type="text/ng-template" id="myModalSetP.html">
+                <div class="modal-header">
+                    <h3 class="modal-title">预览</h3>
+                </div>
+                <div class="modal-body" id="viewbody" ng-bind-html="htmlSnippet()">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+                </div>
+            </script>
+        </div>
+    </section>
+</div>
+</div>
+<script src="{% static 'plugin/bootstrap-select/bootstrap-select.min.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-bootstrap-select/angular-bootstrap-select.min.js' %}"></script>
+<script src="{% static 'dashboard/scene/index.js' %}?v={{ nowversion }}1"></script>
+
+{% endblock %}

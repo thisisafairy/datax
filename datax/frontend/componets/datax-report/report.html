@@ -1,0 +1,9 @@
+<div class="report-table-content">
+    <table ng-style="tableStyle" class="report-table">
+        <tr ng-repeat="row in tableData">
+            <td ng-repeat="col in row.col" ng-style="col.style" rowspan="{{ col.rowspan }}" colspan="{{ col.colspan }}">
+                <div class="text-not-wrap" ng-style="col.textContentStyle" title="{{ col.value }}">{{ col.value }}</div>
+            </td>
+        </tr>
+    </table>
+</div>

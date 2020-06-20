@@ -1,0 +1,277 @@
+{% verbatim %}
+<style>
+    [ng-drag] {
+        width: auto;
+        text-align: center;
+        display: block;
+        cursor: move;
+    }
+    [ng-drag].dragging {
+        opacity: 0.7;
+    }
+
+    [ng-drop] {
+        text-align: center;
+        display: block;
+        position: relative;
+        width: auto;
+        height: auto;
+        float: left;
+    }
+    [ng-drop].drag-enter {
+        border: solid 0px red;
+        border-left-width: 2px;
+    }
+
+    [ng-drop] div {
+        position: relative;
+        z-index: 2;
+    }
+
+    div.dataTables_scrollHeadInner > table.table{
+        margin-bottom:0px !important;
+    }
+    /*设置添加表头标题弹出框的宽度*/
+    /*.modal-dialog{
+        width: 450px;
+    }*/
+    .theTableCaptionStyle{
+        font-size: 16px;
+        padding-left: 10px;
+    }
+</style>
+<div class="main-block" ng-style="style()" resize>
+        <div class="left-block">
+            <div class="left-card">
+                <div class="left-select">
+                    <select class="col-md-12" ng-model="selectolap" ng-change="getData();" ng-options="row.name for row in  olaplist ">
+                        <option value="">请选择元数据</option>
+                    </select>
+                </div>
+                <div class=" left-block-list">
+                    <div class="left-block-list-header">
+                        <span>字段</span>
+                    </div>
+                    <div class="left-block-column-list tablesList">
+                        <div class="loadding" ng-if="loadding">
+                            <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="schema-item" ng-class="{true:'selected',false:''}[column.isSelected]" ng-click="toData(column);" ng-repeat="(columnkey,column) in selectColumns track by columnkey">
+                            <span class="field-item full-width">
+                                <span class="field-row" title="{{ column.title }}">
+                                    <span class="type-target">
+                                        <i class="fa fa-font" ng-if="column.type == 'string'"></i>
+                                        <i class="fa fa-hashtag" ng-if="column.type == 'number'"></i>
+                                        <i class="fa fa-calendar" ng-if="column.type == 'date'"></i>
+                                    </span>
+                                    <span class="field-name">
+                                        <span class="field-text">
+                                                {{ column.title }}
+                                        </span>
+                                    </span>
+                                    <span class="field-action" ng-if="column.isSelected" ng-click="cancelColumn(column,$event)">
+                                       <i class="fa  fa-times"></i>
+                                    </span>
+                                </span>
+                            </span>
+                        </div>
+                        <!-- <ul >
+                            <li class="cursor-click border" ng-class="{true:'selected',false:''}[column.isSelected]" ng-click="toData(column);" ng-repeat="(columnkey,column) in selectColumns track by columnkey">
+                                <i class="fa fa-font" ng-if="column.type == 'string'"></i>
+                                <i class="fa fa-hashtag" ng-if="column.type == 'number'"></i>
+                                <i class="fa fa-calendar" ng-if="column.type == 'date'"></i>
+                                <div class="div-span">{{ column.title }}</div>
+                                <div class="close" ng-if="column.isSelected" ng-click="cancelColumn(column,$event)">x</div>
+                                <div class="clearfix"></div>
+                            </li>
+                        </ul> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="right-block">
+            <!-- <div class="thead"></div> -->
+            <div class="btn-header">
+                <button type="button" onclick="window.history.go(-1)" class="btn btn-primary">返回</button>
+                <button type="button" class="btn btn-primary" ng-disabled="!option.columns || option.columns.length == 0||showEditBtn=='0'" ng-click="editThead();">{{ btnText }}</button>
+                <button type="button" class="btn btn-primary" ng-disabled="!option.columns || option.columns.length == 0" ng-if="isEdit=='0'" ng-click="save();">保存</button>
+                <button type="button" class="btn btn-primary" ng-disabled="!option.columns || option.columns.length == 0" ng-if="isEdit=='0'" ng-click="loadData();">更新数据</button>
+                <button type="button" class="btn btn-primary" ng-disabled="!option.columns || option.columns.length == 0||showDragBtn=='0'" ng-click="dragThead();">{{ dragBtnText }}</button>
+                <button type="button" class="btn btn-primary" ng-disabled="!option.columns || option.columns.length == 0||showDragBtn=='0'" ng-click="addTableTitle();">添加表格标题</button>
+                <button type="button" class="btn btn-primary" ng-disabled="!option.columns || option.columns.length == 0||showDragBtn=='0'" ng-click="updateTBHead();">修改表头</button>
+                <button type="button" class="btn btn-info" ng-if="isEdit=='1'" ng-click="addThead();">增加表头</button>
+                <button type="button" class="btn btn-danger" ng-if="isEdit=='1'" ng-click="deleteThead();">删除模式</button>
+                <button type="button" class="btn btn-info" ng-if="deleting && isEdit=='1'" ng-click="cancelDelete();">关闭删除模式</button>
+                <button type="button" class="btn btn-success" ng-if="isEdit=='1'" ng-click="saveThead();">保存修改</button>
+                <button type="button" class="btn btn-success" ng-if="isEdit=='1'" ng-click="cancelThead();">撤销修改</button>
+                <button type="button" class="btn btn-success" ng-if="combineAry.length>1" ng-click="doCombine();">合并表头</button>
+                数据条数:
+                <input type="text" ng-model="option.length" style="width: 60px;"/>
+                是否聚合:
+                <input type="checkbox" ng-false-value="'false'" ng-true-value="'true'" ng-model="option.merge" ng-init="option.merge='false'" ng-click="selMergeColFun()"/>
+                是否分页
+                <input type="checkbox" ng-true-value="'1'" ng-false-value="'0'" ng-model="option.pagin" />
+            </div>
+            <div class="table-content" ng-show="isDragHead=='1'" ng-style="tableStyle()" tableheight>
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th ng-repeat="theadrow in option.theads[option.theads.length-1].rows track by $index" ng-drop="true" ng-drop-success="onDropComplete($index, $data,$event)">
+                                <div ng-drag="true" ng-drag-data="theadrow">
+                                    {{ theadrow.title }}
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="table-content" ng-show="isEdit=='0'" ng-style="tableStyle()" tableheight id="outdiv">
+                <table id="demodiv" class="table table-striped table-bordered">
+                    <!--<thead>
+                        <tr ng-repeat="(theadkeys,theadrows) in option.theads track by theadkeys">
+                            <th  ng-repeat="(theadkey,theadrow) in theadrows.rows track by theadkey" rowspan="{{ theadrow.rowspan }}" colspan="{{ theadrow.colspan }}">{{ theadrow.title }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(dataskey,datarow) in tabledata track by dataskey">
+                            <td  ng-repeat="(columnkey,columnrow) in option.columns track by columnkey">{{ datarow[columnrow] }}</td>
+                        </tr>
+                    </tbody>-->
+                </table>
+            </div>
+            <div class="table-content" ng-show="isEdit=='1'" ng-style="tableStyle()" tableheight>
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr ng-mouseover="showadd();" ng-click="deleteItem(editColumnkey);" ng-class="{true:'delete-row',false:''}[deleting && editColumnkey != editTheadAry.length - 1]"
+                            ng-mouseleave="hideadd();" ng-repeat="(editColumnkey,editColumnval) in editTheadAry track by editColumnkey">
+                            <th class="" ng-class="{'0':'','1':'combine-th'}[editval.iscombine]" ng-click="combine(editColumnkey,editkey);" ng-repeat="(editkey,editval) in editColumnval.rows track by editkey"
+                                ng-dblclick="editText(editColumnkey,editkey);" rowspan="{{ editval.rowspan }}" colspan="{{ editval.colspan }}">
+                                <span ng-if="editval.isedit == '0'">{{ editval.title }}</span>
+                                <input type="text" ng-model="editval.title" ng-if="editval.isedit =='1'" ng-blur="cancelEdit(editColumnkey,editkey)">
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+</div>
+<!--添加表格标题-->
+<script type="text/ng-template" id="addTableTitle.html">
+    <div class="modal-header open-header">
+        <h3 class="modal-title open-header-title">添加表格标题</h3>
+        <!--弹出框的关闭按钮-->
+        <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body open-body">
+        <form class="form-horizontal">
+            <div class="form-group clearfix">
+                <label for="colheight" class="col-sm-2 control-label colheight">表格标题</label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" id="tableTitle" name="tableTitle" ng-model="tableTitle" placeholder="请填写表格标题">
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer footer-btn">
+        <a id="saveTableTitle" class="btn btn-primary" style="width:72px" data-dismiss="modal" ng-click="saveTableTitle()">保存</a>
+        <a class="btn btn-cancel" data-dismiss="modal" ng-click="cancel()">关闭</a>
+    </div>
+</script>
+<!--修改表头-->
+<script type="text/ng-template" id="updateTBHead.html">
+    <div class="modal-header open-header">
+        <h3 class="modal-title open-header-title">修改表头名称</h3>
+        <!--弹出框的关闭按钮-->
+        <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body open-body">
+        <form class="form-horizontal">
+            <div class="form-group clearfix ">
+                    <label  class="col-sm-1 checkbox-row"></label>
+                    <label 	class="col-sm-4 ">表头</label>
+                    <label  class="col-sm-3 ">修改表头</label>
+                    <label  class="col-sm-2 ">格式化</label>
+                    <label  class="col-sm-2 ">隐藏条件</label>
+            </div>
+            <div style="margin-left: 10px" class="form-group clearfix" ng-repeat="(key3, tbheadrow) in tableHead.rows track by key3">
+                <label for="title" class="col-sm-5 ">{{tbheadrow.title}}</label>
+                <div class="col-sm-3">
+                    <input type="text" ng-model="tbheadrow.title" class="col-sm-12">
+                </div>
+                <div class="col-sm-2">
+                    <input type="text" ng-model="tbheadrow.format" class="col-sm-12">
+                </div>
+                <div class="col-sm-2">
+                    <input type="text" ng-model="tbheadrow.hidecondition" class="col-sm-12">
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer footer-btn">
+        <a id="saveTableTitle" class="btn btn-primary" style="width:72px" data-dismiss="modal" ng-click="ok()">保存</a>
+        <a class="btn btn-cancel" data-dismiss="modal" ng-click="cancel()">关闭</a>
+    </div>
+</script>
+<!--选择merge字段-->
+<script type="text/ng-template" id="mergeColSel.html">
+    <div class="modal-header open-header">
+        <h3 class="modal-title open-header-title">聚合字段选择</h3>
+        <!--  弹出框的关闭按钮  -->
+        <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    </div>
+    <div class="modal-body open-body" style="padding-left: 30px">
+        <form class="form-horizontal" id="mergeSel" name="mergeSel">
+        <div class="form-group">
+            <div class="col-sm-10 form-input-add">
+                <div style="float:left;width:200px;">
+                    <p class="form-lable-p">group字段</p>
+                    <select style="width:200px;height:200px;" id="mergeGroupCol" multiple="multiple" size="0" name="mergeGroupCol"
+                      ng-model="mergeGroupCol" ng-options="groupCol as groupCol.title for groupCol in mergeGroupCols">
+                    </select>
+                </div>
+                <div style="float:left;width:50px;padding-left: 5px;margin-top: 58px;">
+                    <br>
+                    <div><a title="<<" href="javascript:void(0);" id="group_col_add_link" ng-click="add('group')"> <span class="glyphicon glyphicon-arrow-left">添加</span></a></div><br>
+                    <div><a title=">>" href="javascript:void(0);" id="group_col_remove_link" ng-click="remove('group')"> <span class="glyphicon glyphicon-arrow-right">移除</span></a></div>
+                </div>
+                <div style="float:left;width:200px;">
+                    <p class="form-lable-p">表所有字段</p>
+                    <select style="width:200px;height:200px;" name="allTableCol" class="filtered" id="allTableCol"  multiple="multiple"
+                    ng-model="allTableCol" ng-options="col as col.title for col in allTableCols">
+                    </select>
+                </div>
+                <div style="float:left;width:50px;padding-left: 5px;margin-top: 58px;">
+                    <br>
+                    <div><a title=">>" href="javascript:void(0);" id="sum_col_add_link" ng-click="add('sum')"> 添加<span class="glyphicon glyphicon-arrow-right"></span></a></div><br>
+                    <div><a title="<<" href="javascript:void(0);" id="sum_col_remove_link" ng-click="remove('sum')"> 移除<span class="glyphicon glyphicon-arrow-left"></span></a></div>
+                </div>
+                <div style="float:left;width:200px;">
+                    <p class="form-lable-p">sum字段</p>
+                    <select style="width:200px;height:200px;" id="mergeSumCol" multiple="multiple" size="0" name="mergeSumCol"
+                      ng-model="mergeSumCol" ng-options="sumCol as sumCol.title for sumCol in mergeSumCols">
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-2" style="margin-left:-20px;color: red;">
+                <spna>注意事项：</spna><br>
+                <spna>
+                    1.原表所有字段必须完全分配到group和sum字段里<br>
+                    2.如果是文本字段必须分配到group字段里，否则会抛出异常
+                </spna>
+            </div>
+        </div>
+        </form>
+    </div>
+    <div class="modal-footer footer-btn">
+        <button class="btn btn-primary btn-ok" type="button" ng-click="ok()" ng-disabled="allTableCols.length>0">保存</button>
+        <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+    </div>
+</script>
+
+{% endverbatim %}

@@ -1,0 +1,130 @@
+{% extends 'base.html' %} {% load staticfiles %} {% block title %}数据字典管理{% endblock %} {% block content %}
+    <link rel="stylesheet" href="{% static 'plugin/angular/angular-ui-tree/angular-ui-tree.min.css' %}"></link>
+    <link rel="stylesheet" href="{% static '/system/datadictionary/app.css' %}"></link>
+    <style>
+        .node-detail{
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+        .tree-node-content{
+            margin: 3px;
+        }
+        .row .col-sm-12{
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+        .labelTextStyle{
+            text-align: right;
+        }
+        .box{
+            margin-top: 11px;
+        }
+        .textAeraStyle{
+            min-height: 85px;
+            padding-bottom: 15px;
+        }
+        .showContent{
+            min-height: 42px;
+            padding-top: 6px;
+            padding-left: 5px;
+        }
+    </style>
+    <div>
+        <section class="content-header cont-header">
+            <h1 class="cont-header-title">
+                数据字典管理
+            </h1>
+        </section>
+
+        <section class="content cont-body" ng-app="datadictionary">
+            <div ng-controller="datadictionaryCtrl" class="row">
+                <div class="col-sm-12">
+                    <div class="col-sm-6">
+                        <button id="uploadfile" ng-click="save()" class="btn btn-primary">保存</button>
+                    </div>
+                    <div class="col-sm-6">
+                        <button id="addtoroot" ng-click="addToRootNode()" class="btn btn-primary">新增根节点</button>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <!--树形结构-->
+                            <div ui-tree id="tree-root">
+                                <ol ui-tree-nodes ng-model="data">
+                                    <li ng-repeat="node in data" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <!--详细信息-->
+                    <div class="col-sm-6">
+                        <div class="box node-detail">
+                            <div class="form-group clearfix">
+                                <label class="col-sm-3 control-label form-lable-add labelTextStyle">字典名称</label>
+                                <div class="col-sm-9">
+                                    <input ng-model="currSelectNode.dictionary_name" class="form-control" placeholder="请填写名称" ng-blur="autoFit('name')"></input>
+                                </div>
+                            </div>
+                            <div class="form-group clearfix">
+                                <label class="col-sm-3 control-label form-lable-add labelTextStyle">排序</label>
+                                <div class="col-sm-9">
+                                    <input type="number" ng-model="currSelectNode.order_num" class="form-control" ng-blur="autoFit('order')"></input>
+                                </div>
+                            </div>
+                            <div class="form-group clearfix">
+                                <label class="col-sm-3 control-label form-lable-add labelTextStyle">是否禁用</label>
+                                <div class="col-sm-9">
+                                    <select ng-model="currSelectNode.status" class="form-control">
+                                        <option value="1">启用</option>
+                                        <option value="0">禁用</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group clearfix">
+                                <label class="col-sm-3 control-label form-lable-add labelTextStyle">描述</label>
+                                <div class="col-sm-9">
+                                    <textarea ng-model="currSelectNode.description" class="form-control textAeraStyle" placeholder="请填写描述"></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!--定义的组件-->
+                <script type="text/ng-template" id="nodes_renderer.html">
+                    <div class="tree-node tree-node-content showContent">
+                        <a class="btn btn-success btn-xs" ng-if="node.nodes && node.nodes.length > 0"
+                            data-nodrag ng-click="toggle(this)">
+                                <span class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed,
+                                          'glyphicon-chevron-down': !collapsed}">
+                                </span>
+                        </a>
+                        <span ng-bind="node.dictionary_name"></span>
+                        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeNodeByMyself(this)"><span
+                                class="glyphicon glyphicon-remove"></span></a>
+                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="addFromDataSource(this)"
+                           style="margin-right: 8px;"><span
+                                class="glyphicon glyphicon-cog"></span></a>
+                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubNode(this)"
+                           style="margin-right: 8px;"><span
+                                class="glyphicon glyphicon-plus"></span></a>
+                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="editNode(this)"><span
+                                class="glyphicon glyphicon-edit"></span></a>
+                    </div>
+                    <ol ui-tree-nodes="" ng-model="node.nodes" ng-class="{hidden: collapsed}">
+                        <li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'">
+                        </li>
+                    </ol>
+                </script>
+            </div>
+        </section>
+    </div>
+
+    <script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-ui-tree/angular-ui-tree.js' %}"></script>
+    <script src="{% static 'system/datadictionary/index.js' %}?v={{ nowversion }}2"></script>
+
+{% endblock %}

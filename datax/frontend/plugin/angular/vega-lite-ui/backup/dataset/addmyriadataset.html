@@ -1,0 +1,18 @@
+<div class="add-myria-dataset">
+  <p>
+    Select a dataset from the Myria instance at
+    <input ng-model="myriaRestUrl"></input><button ng-click="loadDatasets('')">update</button>.
+  </p>
+  <form ng-submit="addDataset(myriaDataset)">
+    <div>
+      <select name="myria-dataset"
+        id="select-myria-dataset"
+        ng-disabled="disabled"
+        ng-model="myriaDataset"
+        ng-options="optionName(dataset) for dataset in myriaDatasets track by dataset.relationName">
+        <option value="">Select Dataset...</option>
+      </select>
+    </div>
+    <button type="submit">Add dataset</button>
+  </form>
+</div>

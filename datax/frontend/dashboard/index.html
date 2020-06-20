@@ -1,0 +1,1240 @@
+{% extends 'base.html' %} {% load staticfiles %} {% block title %}场景设计{% endblock %} {% block content %}
+<!-- Bootstrap Color Picker -->
+<link rel="stylesheet" href="{% static 'plugin/colorpicker/bootstrap-colorpicker.min.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/daterangepicker/daterangepicker.css'  %}">
+<link rel="stylesheet" href="{% static 'css/layoutit.css'  %}">
+<link rel="stylesheet" href="{% static 'css/bootstrap-combined.min.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/datatables-bootstrap/dataTables.bootstrap.css' %}">
+<link rel="stylesheet" href="{% static 'plugin/datatables-bootstrap/fixedColumns.dataTables.css' %}">
+<link rel="stylesheet" href="{% static 'plugin/jquery/pagination.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashthemes/default/default.css'  %}"><!--必须放到最后面-->
+
+
+<style type="text/css">
+    .nav svg,
+    .nav canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .table-embed .row {
+        margin-left: 0;
+    }
+
+    .table-embed .table-bordered {
+        border: 1px solid #dddddd;
+    }
+    .open-close {
+        margin-top: -10px !important;
+        margin-right: -16px !important;
+    }
+    .modal-title-padding{
+        padding: 5px !important;
+    }
+    #dataform .control-label{
+        width: 100px;
+    }
+    input[type="file"]{
+        padding-left: 0px;
+        padding-top: 0px;
+    }
+
+    .select-content {
+        position: absolute;
+        width: 200px;
+        height: 0px;
+        display: block;
+        background-color: #ffffff;
+        z-index: 999;
+        overflow: hidden;
+        transition: height 0.5s;
+        -moz-transition: height 0.5s; /* Firefox 4 */
+        -webkit-transition: height 0.5s; /* Safari and Chrome */
+        -o-transition: height 0.5s; /* Opera */
+    }
+
+    .url-content:hover > .select-content{
+        height: 280px;
+    }
+
+    .url-input:focus + .select-content{
+        height: 0px;
+    }
+    .myborderstyle{
+        padding-top: 10px;
+        border: 1px;
+        border-color: #71aec0;
+        border-style: solid;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
+    #demoSave .tabbable>.nav{   /*tabbar内容和标题不能隔离太远，这个.nav用的bootstrap-combination.css*/
+        margin-bottom: 0px;!important;
+    }
+    #menu-layoutit{ /*场景设计的菜单栏，避免在投影仪的分辨率下排版错乱*/
+        float: none;
+    }
+    #demoSave .lyrow>.label{/*每个布局的删除、拖动按钮需要显示在框外面*/
+        margin-top: -20px;
+    }
+    #demoSave .lyrow>.configuration>button{/*每个布局的编辑按钮需要显示在框外面,编辑按钮特殊处理，它所在的div层不一样*/
+        margin-top: -19px;
+    }
+    body.devpreview #demoSave .lyrow>.label{/*场景布局模式、预览下需要调整拖动按钮位置*/
+        margin-top: 0px;
+    }
+    body.devpreview #demoSave .lyrow>.configuration>button{/*场景布局模式、预览下需要调整编辑按钮位置*/
+        margin-top: -3px;
+        left: 51px;
+    }
+
+
+
+</style>
+{% verbatim %}
+<div ng-app="appdesignboard" ng-controller="designcontroller">
+    <div class="container-fluid">
+        <div class="navbar conf-navb" style="margin-bottom: 0px;border-bottom:1px solid #a3a5a8;">
+            <!--navbar-inner-->
+            <div class="container-fluid">
+                <button data-target=".nav-collapse" id="menutoggle" class="btn btn-navbar" type="button">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="brand brand-a">场景设置</a>
+                <div class="nav-collapse">
+                    <ul class="nav" id="menu-layoutit">
+                        <li class=""></li>
+                        <!--navbar-inner-->
+                        <li>
+                            <div class="btn-group" data-toggle="buttons-radio">
+                                <button type="button" id="edit" class="btn btn-primary active">
+                                    <i class="icon-edit "></i>编辑模式</button>
+                                <button type="button" class="btn btn-primary" id="devpreview">
+                                    <i class="icon-eye-close "></i>布局模式</button>
+                                <button type="button" class="btn btn-primary" id="sourcepreview">
+                                    <i class="icon-eye-open "></i>预览</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary" id="golbaltheme" data-target="#editorGlobal" data-toggle="modal">
+                                    <i class="icon-eye-open "></i>全局设置</button>
+                                <button type="button" class="btn btn-primary" id="dataRelation" ng-click="relationModal();">
+                                    <i class="icon-retweet"></i>数据关联</button>
+                                <button type="button" class="btn btn-primary" id="downloadbtn" data-target="#downloadModal" rel="/build/downloadModal" role="button"
+                                    data-toggle="modal">
+                                    <i class="icon-share "></i>保存</button>
+                                <button class="btn btn-primary" href="#clear" id="clear">
+                                    <i class="icon-trash "></i>清空</button>
+
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-primary" href="#undo" id="undo">
+                                    <i class="icon-arrow-left "></i>撤销</button>
+                                <button class="btn btn-primary" href="#redo" id="redo">
+                                    <i class="icon-arrow-right "></i>还原</button>
+                                <button class="btn btn-primary" href="/dashboard/scenelist" onclick="location.href='/dashboard/scenelist';">
+                                    <i class="icon-backward "></i>返回列表</button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!--/.nav-collapse -->
+            </div>
+        </div>
+    </div>
+    <div id="containerBody" class="hflex" class="rootlayout">
+        <div class="pane left-panel">
+            <div class="abs-100">
+                <div class="scroll-y full-width sidebar-nav">
+                    <ul class="nav nav-list accordion-group" data-key='layout'>
+                        <li class="nav-header nav-hea">
+                            <i class="icon-plus icon-black"></i> 布局设置
+                        </li>
+                        <li style="display: list-item;" class="rows" id="estRows">
+                            <div class="lyrow ui-draggable grid-btn">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" style="display:none;" class="btn btn-mini" data-target="#editorColumnModal" role="button" data-toggle="modal">
+                                        <i class="icon-edit icon-black"></i>编辑</button>
+                                </span>
+                                <div class="preview">
+                                    <input value="12" type="text" class="preview-inpt">
+                                </div>
+                                <div class="view">
+                                    <div class="row-fluid clearfix">
+                                        <div class="column cell-box col-md-12"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lyrow ui-draggable grid-btn">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorColumnModal" role="button" data-toggle="modal">
+                                        <i class="icon-edit icon-black"></i>编辑</button>
+                                </span>
+                                <div class="preview">
+                                    <input value="6 6" type="text" class="preview-inpt">
+                                </div>
+                                <div class="view">
+                                    <div class="row-fluid clearfix">
+                                        <div class=" column cell-box col-md-6"></div>
+                                        <div class=" column cell-box col-md-6"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lyrow ui-draggable grid-btn">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorColumnModal" role="button" data-toggle="modal">
+                                        <i class="icon-edit icon-black"></i>编辑</button>
+                                </span>
+                                <div class="preview">
+                                    <input value="8 4" type="text" class="preview-inpt">
+                                </div>
+                                <div class="view">
+                                    <div class="row-fluid clearfix">
+                                        <div class=" column cell-box col-md-8"></div>
+                                        <div class=" column cell-box col-md-4"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lyrow ui-draggable grid-btn">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorColumnModal" role="button" data-toggle="modal">
+                                        <i class="icon-edit icon-black"></i>编辑</button>
+                                </span>
+                                <div class="preview">
+                                    <input value="4 4 4" type="text" class="preview-inpt">
+                                </div>
+                                <div class="view">
+                                    <div class="row-fluid clearfix">
+                                        <div class=" column cell-box col-md-4"></div>
+                                        <div class=" column cell-box col-md-4"></div>
+                                        <div class=" column cell-box col-md-4"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lyrow ui-draggable grid-btn">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorColumnModal" role="button" data-toggle="modal">
+                                        <i class="icon-edit icon-black"></i>编辑</button>
+                                </span>
+                                <div class="preview">
+                                    <input value="2 6 4" type="text" class="preview-inpt">
+                                </div>
+                                <div class="view">
+                                    <div class="row-fluid clearfix">
+                                        <div class=" column cell-box col-md-2"></div>
+                                        <div class=" column cell-box col-md-6"></div>
+                                        <div class=" column cell-box col-md-4"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="nav nav-list accordion-group" data-key='static'>
+                        <li class="nav-header nav-hea">
+                            <i class="icon-plus icon-black"></i> 文本/导航
+                        </li>
+                        <li style="display: none;" class="boxes" id="elmBase">
+                            <div class="box box-element ui-draggable">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button>
+                                    <span class="btn-group">
+                                        <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">对齐
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li class="active">
+                                                <a href="#" rel="">默认</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="text-left">靠左</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="text-center">居中</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="text-right">靠右</a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                    <span class="btn-group">
+                                        <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">标记
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li class="active">
+                                                <a href="#" rel="">默认</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="muted">禁用</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="text-warning">警告</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="text-error">错误</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="text-info">提示</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="text-success">成功</a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                </span>
+                                <div class="preview">标题</div>
+                                <div class="static">
+                                    <div class="view">
+                                        <h3 contenteditable="true">标题内容请修改</h3>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="box box-element ui-draggable">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button>
+                                </span>
+                                <div class="preview">文本</div>
+                                <div class="static">
+                                    <div class="view">
+                                    <h2 contenteditable="true">标题</h2>
+                                    <p contenteditable="true">本部分是文本内容区域.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box box-element ui-draggable">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button>
+                                    <span class="btn-group">
+                                        <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">对齐
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li class="active">
+                                                <a href="#" rel="">默认</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="text-left">靠左</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="text-center">居中</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="text-right">靠右</a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                </span>
+                                <div class="preview">按钮</div>
+                                <div class="static">
+                                    <div class="view">
+                                        <a class="btn btn-mini" href="#" target="_blank">链接按钮</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box box-element ui-draggable">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button>
+                                    <span class="btn-group">
+                                        <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">样式
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li class="active">
+                                                <a href="#" rel="">默认</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="table-striped">条纹</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="table-bordered">边框</a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                    <a class="btn btn-mini" href="#" rel="table-hover">鼠标指示</a>
+                                    <a class="btn btn-mini" href="#" rel="table-condensed">紧凑</a>
+                                </span>
+                                <div class="preview">表格</div>
+                                <div class="static">
+                                    <div class="view">
+                                    <table class="table" contenteditable="true">
+                                        <thead>
+                                            <tr>
+                                                <th>编号</th>
+                                                <th>产品</th>
+                                                <th>交付时间</th>
+                                                <th>状态</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="success">
+                                                <td>1</td>
+                                                <td>TB - Monthly</td>
+                                                <td>01/04/2012</td>
+                                                <td>Approved</td>
+                                            </tr>
+                                            <tr class="error">
+                                                <td>2</td>
+                                                <td>TB - Monthly</td>
+                                                <td>02/04/2012</td>
+                                                <td>Declined</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                     </div>
+                                </div>
+                            </div>
+                            <div class="box box-element ui-draggable">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button>
+                                    <span class="btn-group">
+                                        <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">样式
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li class="active">
+                                                <a href="#" rel="">默认</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="alert-info">提示</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="alert-error">错误</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="alert-success">成功</a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                </span>
+                                <div class="preview">提示框</div>
+                                <div class="static">
+                                    <div class="view">
+                                    <div contenteditable="true">
+                                        <button type="button" class="close" data-dismiss="alert">×</button>
+                                        <h4>提示!</h4>
+                                        <strong>警告!</strong> 请注意你的个人隐私安全.
+                                    </div>
+                                     </div>
+                                </div>
+                            </div>
+                            <div class="box box-element ui-draggable">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button>
+                                    <span class="btn-group">
+                                        <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">位置
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li class="active">
+                                                <a href="#" rel="">默认</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="tabs-below">底部</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="tabs-left">靠左</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="tabs-right">靠右</a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                </span>
+                                <div class="preview">切换卡</div>
+                                <div class="static">
+                                    <div class="view">
+                                    <div class="tabbable" id="myTabs">
+                                        <!-- Only required for left/right tabs -->
+                                        <ul class="nav nav-tabs">
+                                            <li class="active">
+                                                <a href="#tab1" data-toggle="tab" contenteditable="true">第一部分</a>
+                                            </li>
+                                            <li>
+                                                <a href="#tab2" data-toggle="tab" contenteditable="true">第二部分</a>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content">
+                                            <div class="tab-pane active " id="tab1" contenteditable="true">
+                                                <div class="span12 column" contenteditable="true"><!--第一部分内容.--></div>
+                                            </div>
+                                            <div class="tab-pane " id="tab2" contenteditable="true">
+                                                <div class="span12 column" contenteditable="true"><!--第二部分内容.--></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                     </div>
+                                </div>
+                            </div>
+                            <div class="box box-element ui-draggable">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button>
+                                    <span class="btn-group">
+                                        <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">样式
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li class="active">
+                                                <a href="#" rel="">默认</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="img-rounded">圆角</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="img-circle">圆圈</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" rel="img-polaroid">相框</a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                </span>
+                                <div class="preview">图片</div>
+                                <div class="static">
+                                    <div class="view">
+                                    <img alt="140x140" src="">
+                                     </div>
+                                </div>
+                            </div>
+                            <div class="box box-element ui-draggable">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorModal" role="button" data-toggle="modal">编辑</button>
+                                </span>
+                                <div class="preview">轮换图</div>
+                                <div class="static">
+                                    <div class="view">
+                                    <div class="carousel slide" id="myCarousel">
+                                        <ol class="carousel-indicators">
+                                            <li class="active" data-slide-to="0" data-target="#myCarousel"></li>
+                                            <li data-slide-to="1" data-target="#myCarousel" class=""></li>
+                                        </ol>
+                                        <div class="carousel-inner">
+                                            <div class="item active">
+                                                <img alt="">
+                                                <div class="carousel-caption" contenteditable="true">
+                                                    <h4>棒球</h4>
+                                                    <p>棒球运动是一种以棒打球为主要特点，集体性、对抗性很强的球类运动项目，在美国、日本尤为盛行。</p>
+                                                </div>
+                                            </div>
+                                            <div class="item">
+                                                <img alt="">
+                                                <div class="carousel-caption" contenteditable="true">
+                                                    <h4>冲浪</h4>
+                                                    <p>冲浪是以海浪为动力，利用自身的高超技巧和平衡能力，搏击海浪的一项运动。运动员站立在冲浪板上，或利用腹板、跪板、充气的橡皮垫、划艇、皮艇等驾驭海浪的一项水上运动。</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a data-slide="prev" href="#myCarousel" class="left carousel-control">‹</a>
+                                        <a data-slide="next" href="#myCarousel" class="right carousel-control">›</a>
+                                    </div>
+                                     </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="nav nav-list accordion-group" data-key='filter'>
+                        <li class="nav-header">
+                            <i class="icon-plus icon-black"></i> 过滤器
+                        </li>
+                        <li style="display: none;" class="boxes">
+                            <div class="box box-element ui-draggable ">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorFilter" role="button" data-toggle="modal">编辑</button>
+                                </span>
+                                <div class="preview">输入框</div>
+                                <div class="view">
+                                    <span class=" filter-title col-md-2">名称</span>
+                                    <input class="col-md-10 filter-module" data-height='30' data-width='200' data-filter-type="text" id="filterview_1" data-column=""
+                                        data-method="equal" type="text">
+                                </div>
+                            </div>
+                            <div class="box box-element ui-draggable ">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorFilter" role="button" data-toggle="modal">编辑</button>
+                                </span>
+                                <div class="preview">日期选择</div>
+                                <div class="view">
+                                    <span class=" filter-title col-md-2">名称</span>
+                                    <input class="col-md-10 filter-module" data-height='30' data-width='200' data-filter-type="daterange" data-start="" data-end=""
+                                        id="filterview_2" data-column="" data-method="equal" type="text">
+                                </div>
+                            </div>
+                            <div class="box box-element ui-draggable ">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorFilter" role="button" data-toggle="modal">编辑</button>
+                                </span>
+                                <div class="preview">年份</div>
+                                <div class="view">
+                                    <span class=" filter-title col-md-2">年份</span>
+                                    <select class="col-md-10 filter-module" data-default="year" data-height='30' data-width='200' data-method="equal" data-filter-type="select" id="filterview_3"
+                                        data-column="">
+                                        <option value="2000">2000</option>
+                                        <option value="2001">2001</option>
+                                        <option value="2002">2002</option>
+                                        <option value="2003">2003</option>
+                                        <option value="2004">2004</option>
+                                        <option value="2005">2005</option>
+                                        <option value="2006">2006</option>
+                                        <option value="2007">2007</option>
+                                        <option value="2008">2008</option>
+                                        <option value="2009">2009</option>
+                                        <option value="2010">2010</option>
+                                        <option value="2011">2011</option>
+                                        <option value="2012">2012</option>
+                                        <option value="2013">2013</option>
+                                        <option value="2014">2014</option>
+                                        <option value="2015">2015</option>
+                                        <option value="2016">2016</option>
+                                        <option value="2017">2017</option>
+                                        <option value="2018">2018</option>
+                                        <option value="2019">2019</option>
+                                        <option value="2020">2020</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="box box-element ui-draggable ">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorFilter" role="button" data-toggle="modal">编辑</button>
+                                </span>
+                                <div class="preview">月份</div>
+                                <div class="view">
+                                    <span class=" filter-title col-md-2">月份</span>
+                                    <select class="col-md-10 filter-module" data-default="month" data-height='30' data-width='200' data-method="equal" data-filter-type="select" id="filterview_4"
+                                        data-column="">
+                                        <option value=""></option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="box box-element ui-draggable ">
+                                <a href="#close" class="remove label label-important">
+                                    <i class="icon-remove icon-white"></i>删除</a>
+                                <span class="drag label">
+                                    <i class="icon-move icon-white"></i>拖动</span>
+                                <span class="configuration">
+                                    <button type="button" class="btn btn-mini" data-target="#editorFilter" role="button" data-toggle="modal">编辑</button>
+                                </span>
+                                <div class="preview">下拉框</div>
+                                <div class="view">
+                                    <span class=" filter-title col-md-2">名称</span>
+                                    <select class="col-md-10 filter-module" data-default="" data-height='30' data-width='200' data-method="equal" data-filter-type="select"  data-filter-add="selectadd" id="filterview_5"
+                                        data-column="" data-options="">
+                                    </select>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <chart-group kinds="kinds"></chart-group>
+                </div>
+            </div>
+        </div>
+        <div class="pane main-panel">
+            <div id="demoSave" class="abs-100 no-top-margin no-right-margin scroll-y">
+                <div class="demo ui-sortable">
+                </div>
+            </div>
+            <div id="download-layout">
+                <div class="container-fluid"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" id="editorColumnModal" style="width:600px;height:178px;">
+        <div class="modal-header open-header">
+            <h3 class="modal-title open-header-title modal-title-padding">版面设置</h3>
+            <!--弹出框的关闭按钮-->
+            <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <!--<div class="form-group clearfix">-->
+            <div class="clearfix">
+                <label for="colheight" class="col-sm-2 control-label colheight">宽度固定</label>
+                <div class="col-sm-4 form-input-add">
+                    <input type="text" class="form-control" id="colheight" name="colheight" placeholder="请填写宽度(数字)" style="height:30px;width:120px"> px
+                </div>
+                <!--<div class="form-group clearfix">-->
+                <div class="clearfix">
+                    <label for="colheight" class="col-sm-2 control-label colheight">背景色选择</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="colbgcolor" name="colbgcolor" style="height:30px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a id="savecontentcol" class="btn btn-primary btn-ok" data-dismiss="modal">保存</a>
+            <a id="removecontentcol" class="btn btn-primary" data-dismiss="modal">移除宽度</a>
+            <a class="btn btn-cancel" data-dismiss="modal">关闭</a>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" id="editorModal" style="height:455px;">
+        <div class="modal-header open-header">
+            <h3 class="modal-title open-header-title modal-title-padding">编辑</h3>
+            <!--弹出框的关闭按钮-->
+            <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>
+                <textarea id="contenteditor" style="visibility: hidden; display: none;"></textarea>
+            </p>
+        </div>
+        <div class="modal-footer">
+            <a id="savecontent" class="btn btn-primary btn-ok" data-dismiss="modal">保存</a>
+            <a class="btn btn-cancel" data-dismiss="modal">关闭</a>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" id="downloadModal" style="width:700px;height:353px;">
+        <div class="modal-header open-header">
+            <h3 class="modal-title open-header-title modal-title-padding">保存场景</h3>
+            <!--弹出框的关闭按钮-->
+            <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="dataform">
+                <div class="form-group clearfix">
+                    <label for="name" class="col-sm-2 control-label">场景名称</label>
+                    <div class="col-sm-3" style="margin-left: -4px;">
+                        <input type="text" id="id" name="id" style="display:none;" ng-model="group.id">
+                        <input type="text" id="basicconfig" name="basicconfig" style="display:none;" ng-model="group.basicconfig">
+                        <input type="text" class="form-control" id="name" name="name" ng-model="group.name" placeholder="请填写场景名称" style="height:30px;">
+                    </div>
+                    <label for="kind" class="col-sm-2 control-label" style="padding-left: 50px;margin-left: -4px">类别</label>
+                    <div class="col-sm-3">
+                        <select ng-model="group.kind" id="kind" name="kind" style="width:150px;" class="form-control">
+                            <option ng-repeat="x in enumkinds" value="{{x.code}}">{{x.name}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label for="name" class="col-sm-2 control-label">关键字</label>
+                    <div class="col-sm-3 form-input-add">
+                        <input type="text" class="form-control" id="keywords" name="keywords" ng-model="group.keywords" placeholder="请填写查询关键字" style="height:30px;">
+                    </div>
+                    <label for="name" class="col-sm-2 control-label" style="padding-left: 22px">场景描述</label>
+                    <div class="col-sm-3 form-input-add">
+                        <input type="text" class="form-control" id="remark" name="remark" ng-model="group.remark" placeholder="请填写描述信息" style="height:30px;">
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label for="createname" class="col-sm-2 control-label">创建人</label>
+                    <div class="col-sm-4 form-input-add">
+                        <input type="text" class="form-control" id="createname" name="createname" ng-model="group.createname" disabled style="height:30px;">
+                    </div>
+                    <label for="createtime" class="col-sm-2 control-label" style="margin-left: 15px">创建时间</label>
+                    <div class="col-sm-4 form-input-add">
+                        <input type="text" class="form-control" id="createtime" name="createtime" ng-model="group.createtime" disabled style="height:30px;">
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label for="name" class="col-sm-2 control-label" ng-click="showhtml=!showhtml">显示场景模板</label>
+                    <div class="col-sm-10" ng-show="showhtml">
+                        <div class="btn-group">
+                            <button type="button" id="fluidPage" class="active btn ">
+                                <i class="icon-fullscreen icon-white"></i> 自适应宽度</button>
+                            <button type="button" class="btn " id="fixedPage">
+                                <i class="icon-screenshot icon-white"></i> 固定宽度</button>
+                        </div>
+                        <br>
+                        <p>
+                            <textarea id="htmlcleanconfig" name="htmlcleanconfig" ng-model="group.htmlcleanconfig"></textarea>
+                            <textarea style="display:none;" id="htmlrawstring" name="htmlrawstring" ng-model="group.htmlrawconfig"></textarea>
+                        </p>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a class="btn" id="btnSave">
+                <i class="icon-share icon-white"></i> 保存</a>
+            <a class="btn" data-dismiss="modal">关闭</a>
+        </div>
+    </div>
+    <div class="modal hide fade" role="dialog" id="shareModal">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <h3>保存</h3>
+        </div>
+        <div class="modal-body">保存成功</div>
+        <div class="modal-footer">
+            <a class="btn" data-dismiss="modal">Close</a>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" id="editorModalChart" style="height:357px;">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <h3>编辑</h3>
+        </div>
+        <div class="modal-body">
+            <form>
+                <div class="form-group clearfix">
+                    <label class="col-sm-2 control-label">显示边框</label>
+                    <div class="col-sm-4">
+                        <select id="showborder" class="col-sm-12" style="width: 80px" onchange="angular.element(this).scope().showbdstyle(this)">
+                            <option value="y">是</option>
+                            <option value="n">否</option>
+                        </select>
+                    </div>
+                    <div id="showbgw" style="display: none;">
+                        <label class="col-sm-2 control-label">边框宽度</label>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" id="borderwidth" name="borderwidth" min="0" value="0" placeholder="整数" style="height:30px;width:60px"> px
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group clearfix" id="showbdstyle" style="display: none">
+                    <label class="col-sm-2 control-label">边框颜色</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="bordercolor" name="bordercolor" style="height:30px;width:70px">
+                    </div>
+                    <label class="col-sm-2 control-label">边框样式</label>
+                    <div class="col-sm-4">
+                        <select id="borderstyle" class="col-sm-12" style="width: 80px" onchange="angular.element(this).scope().selectbdstyle()">
+                            <option value="none" selected="selected">无</option>
+                            <option value="solid">实线</option>
+                            <option value="dashed">虚线</option>
+                            <option value="dotted">点线</option>
+                            <option value="double">双线</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group clearfix" rel="canRedirct">
+                    <label for="colheight" class="col-sm-2 control-label">背景颜色</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="chtbgcolor" name="chtbgcolor" style="height:30px;width:70px">
+                    </div>
+                    <label for="colheight" class="col-sm-2 control-label">透明度</label>
+                    <div class="col-sm-4">
+                        <input type="number" class="form-control" id="chartopacity" name="chartopacity" value="1" style="height:30px;width:60px" min="0" max="1" step="0.01">
+                    </div>
+                </div>
+            </form>
+            <form id="echartconfigform" class="chartconfigform" form-type='echarts' name="echartconfigform">
+                <div class="form-group clearfix" rel="canRedirct">
+                    <label for="colheight" class="col-sm-2 control-label">图形高度</label>
+                    <div class="col-sm-4">
+                        <input type="number" class="form-control" id="echartheight" name="echartheight" placeholder="整数" style="height:30px;width:60px"> px
+                    </div>
+                    <label for="colheight" class="col-sm-3 control-label" style="width: 100px">是否点击跳转</label>
+                    <div class="col-sm-6" style="width: 80px">
+                        <select name="clickredirect" id="clickredirect" class="col-sm-12">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label for="colheight" class="col-sm-2 control-label">标题</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="echarttitle" name="echarttitle" style="height:30px;width:150px">
+                    </div>
+                    <label for="colheight" class="col-sm-2 control-label">副标题</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="echartsubtitle" name="echartsubtitle" style="height:30px;width:150px">
+                    </div>
+                </div>
+                <!--<div class="form-group clearfix" rel="canRedirct">
+                    <label for="colheight" class="col-sm-3 control-label">是否点击跳转</label>
+                    <div class="col-sm-6">
+                        <select name="clickredirect" id="clickredirect" class="col-sm-4">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </div>
+                </div>-->
+                <div class="form-group clearfix" rel="canRedirct">
+                    <label for="colheight" class="col-sm-2 control-label">关联链接</label>
+                    <div class="col-sm-4">
+                        <div class="col-sm-10 form-input-add url-content">
+                            <input type="text" class="form-control full-width" id="clickUrl" name="clickUrl" style="height:30px;width:150px">
+                            <div class="select-content">
+                                <div style="float:left;width:200px;">
+                                    <p class="form-lable-p">选择场景</p>
+                                    <select style="width:200px; height: 260px;" name="allusers" class="filtered" multiple="multiple" ng-model="selscenes"
+                                        ng-options="scene.name group by scene.kind for scene in scenes" ng-change="changeScene()">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <label for="colheight" class="col-sm-2 control-label">参数</label>
+                    <div class="col-sm-4">
+                        <select name="clickParam" class="full-width col-sm-9" id="clickParam">
+                            <option value="">请选择</option>
+                        </select>
+                    </div>
+                </div>
+
+            </form>
+            <form id="tableconfigform" class="chartconfigform" form-type='table' name="tableconfigform">
+                <div class="form-group clearfix">
+                    <label for="colheight" class="col-sm-2 control-label">滚动高度</label>
+                    <div class="col-sm-4">
+                        <input type="number" class="form-control" id="tableScrollY" name="tableScrollY" placeholder="整数" style="height:30px;width:60px"> px
+                    </div>
+                    <label for="colheight" class="col-sm-2 control-label">是否分页</label>
+                    <div class="col-sm-4">
+                        <input type="checkbox" id="pagin" name="pagin">
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label for="colheight" class="col-sm-2 control-label">左固定列</label>
+                    <div class="col-sm-4">
+                        <input type="number" class="form-control" id="leftFiexColumn" name="leftFiexColumn" placeholder="整数" style="height:30px;width:60px">
+                    </div>
+                    <label for="colheight" class="col-sm-2 control-label">右固定列</label>
+                    <div class="col-sm-4">
+                        <input type="number" class="form-control" id="rightFiexColumn" name="rightFiexColumn" placeholder="整数" style="height:30px;width:60px">
+                    </div>
+                </div>
+                <!--<div class="form-group clearfix">
+                    <label for="colheight" class="col-sm-2 control-label">是否分页</label>
+                    <div class="col-sm-4">
+                        <input type="checkbox" id="pagin" name="pagin">
+                    </div>
+                </div>-->
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a id="savecontentchart" class="btn btn-primary" data-dismiss="modal">保存</a>
+            <a class="btn" data-dismiss="modal">关闭</a>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" id="editorGlobal" style="width:600px;height:363px;">
+        <!--这个div用于保存各个主题对charts图表样式的配置项，方便与js里获取样式的属性-->
+        <div id="savechartsbgdefaultconf" style="display:none;height: 0px;width: 0px"></div>
+        <div class="modal-header open-header">
+            <h3 class="modal-title open-header-title modal-title-padding">全局设置</h3>
+            <!--弹出框的关闭按钮-->
+            <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id=basicconfigform>
+                <div class="form-group clearfix">
+                    <label for="colheight" class="col-sm-2 control-label colheight">主题选择</label>
+                    <div class="col-sm-3">
+                        <!--<select class="form-control col-sm-9" id="globaltheme" name="globaltheme" ng-model="basicconfigobj.globaltheme">
+                            <option value="/frontend/css/dashthemes/default/default.css">默认</option>
+                            <option value="/frontend/css/dashthemes/glass/glass.css">玻璃</option>
+                            <option value="/frontend/css/dashthemes/glass/light.css">闪耀</option>
+                            <option value="/frontend/css/dashthemes/glass/soft.css">柔和</option>
+                        </select>-->
+                        <select class="form-control col-sm-9" id="globaltheme" name="globaltheme" ng-model="basicconfigobj.globaltheme">
+                            <option value="/frontend/css/dashthemes/default/default_empty.css" ng-selected="1">--请选择--</option>
+                            <option value="/frontend/css/dashthemes/default/default.css" ng-selected="1">默认</option>
+                            <option ng-repeat="gltheme in globalthemelist" value="{{ gltheme.fileurl }}">
+                                {{gltheme.confname}}
+                            </option>
+                        </select>
+                    </div>
+                    <label for="colheight" class="col-sm-2 control-label colheight">背景色选择</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="globalbgcolor" name="globalbgcolor" ng-model="basicconfigobj.globalbgcolor" style="height:30px;width: 80px">
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label for="colheight" class="col-sm-2 control-label colheight">宽度固定</label>
+                    <div class="col-sm-4" style="width: 143px;">
+                        <input type="text" class="form-control" id="globalwidth" name="globalwidth" ng-model="basicconfigobj.globalwidth" placeholder="请填写数字"
+                            style="height:30px;width:80px"><span> px</span>
+                    </div>
+                    <label for="colheight" class="col-sm-2 control-label colheight">边框圆角</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="roundvalue" name="roundvalue" ng-model="basicconfigobj.roundvalue" value="0" placeholder="请填写数字"
+                            style="height:30px;width:80px"><spna> px</spna>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label for="colheight" class="col-sm-2 control-label">背景图片</label>
+                    <div class="col-sm-8">
+                        <input type="file" class="form-control" id="globalbgpic" name="globalbgpic" style="height:30px;">
+                    </div>
+                    <div class="col-sm-2">
+                        <button id="uploadbgpic" class="btn btn-primary">上传</button>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label for="colheight" class="col-sm-2 control-label">背景图片地地址</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="globalbgpicurl" name="globalbgpicurl" ng-model="basicconfigobj.globalbgpicurl"
+                            style="height:30px;">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a id="savecontentglobal" class="btn btn-primary" style="width: 72px" data-dismiss="modal">保存</a>
+            <a id="removecontentglobal" class="btn btn-primary" data-dismiss="modal">移除宽度</a>
+            <a class="btn btn-cancel" data-dismiss="modal">关闭</a>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" id="editorFilter" style="width:600px;height:372px;">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <h3>编辑</h3>
+        </div>
+        <div class="modal-body">
+            <form id="filter-form">
+                <input type="text" style="display:none;" id="filter_module_id">
+                <div class="form-group clearfix" data-filter-type="all">
+                    <label for="colheight" class="col-sm-2 control-label colheight">目标列</label>
+                    <div class="col-sm-9">
+                        <select class="form-control" id="filter-column-select" onchange="angular.element(this).scope().filterSelect()">
+                            <option value="">选择场景中存在的图标所包含列</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group clearfix" data-filter-type="all">
+                    <label class="col-sm-2 control-label colheight">高度</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="module-height" name="module_height" placeholder="请填写高度(数字)" style="height:30px;"
+                        />
+                    </div>
+                    <label class="col-sm-2 control-label colheight" style="text-align: center;">长度</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="module-width" name="module_width" placeholder="请填写长度(数字)" style="height:30px;"
+                        />
+                    </div>
+                </div>
+                <div class="form-group clearfix" data-filter-type="all">
+                    <label class="col-sm-2 control-label colheight">名称</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="filter-label-text" name="filter_label_text" style="height:30px;" />
+                    </div>
+                </div>
+                <div class="form-group clearfix" data-filter-type="text">
+                    <label for="" class="col-sm-2 control-label colheight">匹配方式</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" id="filter-method" name="filter_method">
+                            <option value="equal">等于</option>
+                            <option value="like">包含</option>
+                            <option value="b">大于</option>
+                            <option value="s">小余</option>
+                            <option value="b_equal">大于等于</option>
+                            <option value="x_equal">小于等于</option>
+                            <option value="in">在结果集中(in)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group clearfix" data-filter-type="select">
+                    <label for="" class="col-sm-2 control-label colheight">默认值</label>
+                    <div class="col-sm-4">
+                        <input type="text" id="filterDeault" name="filterDeault" style="height: 30px;">
+                    </div>
+                </div>
+                <div class="form-group clearfix" data-filter-type="select" data-filter-add="selectadd" style="display:none;">
+                    <label for="" class="col-sm-2 control-label colheight">下拉选项<br>(回车分隔)</label>
+                    <div class="col-sm-4">
+                        <textarea  id="filterselectvalues" name="filterselectvalues" style="height: 70px;"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a id="saveConfigFilter" class="btn btn-primary btn-ok" data-dismiss="modal">保存</a>
+            <a class="btn btn-cancel" data-dismiss="modal">关闭</a>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" id="relationModal" style="width:500px;height:298px;">
+        <div class="modal-header" style="height: 46px">
+            <a class="close open-close" style="text-align: center;padding-top: 13px" data-dismiss="modal">×</a>
+            <h3>数据关联</h3>
+        </div>
+        <div class="modal-body" style="padding-bottom: 40px">
+            <form id="filter-form">
+                <div class="form-group clearfix" >
+                    <div class="col-sm-3">
+                        <button ng-click="addSource();">添加分组</button>
+                    </div>
+                </div>
+                <div ng-repeat="(key,row) in relationConfig track by key" class="myborderstyle">
+                    <div class="form-group clearfix">
+                        <label for="colheight" class="col-sm-2 control-label colheight">源图表</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" ng-model="row.source.id" ng-change="mapField(key)" id="source-select">
+                                <option value="">请选择</option>
+                                <option ng-repeat="item in sourceChartList track by $index" value="{{ item.id }}">{{ item.title }}</option>
+                            </select>
+                        </div>
+                        <div ng-if="row.source.id != ''" class="col-sm-3" style="padding-top: 3px;">
+                            <button ng-click="addTarget(key);">添加关联图表</button>
+                        </div>
+                    </div>
+                    <!--<div class="form-group clearfix" ng-if="row.source.id != ''">
+                        <div class="col-sm-5" style="padding-left: 80px;margin-top: -20px;">
+                            <button ng-click="addTarget(key);">添加关联图表</button>
+                        </div>
+                    </div>-->
+                    <div class="clearfix" ng-if="row.source.id != ''" ng-repeat="(itemkey,item) in row.target track by itemkey">
+                        <label for="colheight" class="col-sm-2 control-label colheight">目标表</label>
+                        <div class="col-sm-6">
+                            <select class="" ng-model="item.id">
+                                <option value="">请选择</option>
+                                <option ng-repeat="item in allChart track by $index" ng-if="item.id != row.source.id" value="{{ item.id }}">{{ item.title }}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <button class="btn btn-default" ng-click="delTarget(key,itemkey);">删除</button>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a id="saveDataRelation" class="btn btn-primary" style="width: 72px" data-dismiss="modal" ng-click="saveRelation();">保存</a>
+            <a class="btn btn-cancel" data-dismiss="modal">关闭</a>
+        </div>
+    </div>
+    {% endverbatim %}
+    <script src="{% static 'plugin/datalib/datalib.js' %}"></script>
+    <script src="{% static 'plugin/echarts/echarts.js' %}"></script>
+    <script src="{% static 'plugin/echarts/echarts-wordcloud.min.js' %}"></script>
+    <script src="{% static 'plugin/datatables/js/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'plugin/datatables-bootstrap/dataTables.bootstrap.js' %}"></script>
+    <script src="{% static 'plugin/datatables/js/dataTables.fixedColumns.js' %}"></script>
+
+    <!-- bootstrap color picker -->
+    <script src="{% static 'plugin/colorpicker/bootstrap-colorpicker.min.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'plugin/moment/moment.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugin/moment/locale/zh-cn.js' %}"></script>
+    <script>
+        moment.locale('zh-cn');
+    </script>
+    <script src="{% static 'plugin/daterangepicker/daterangepicker.js' %}"></script>
+
+
+    <!-- <script src="{% static 'js/tools.js' %}"></script> -->
+    <script src="{% static 'plugin/jquery/dashboard/jquery-ui.js' %}"></script>
+    <script src="{% static 'plugin/ckeditor/ckeditor.js' %}"></script>
+    <script src="{% static 'plugin/jquery/jquery.htmlClean.js' %}"></script>
+    <script src="{% static 'plugin/jquery/zh-cn.js' %}"></script>
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=Wuh7Oy6carflwquDvNZ3lGzY"></script>
+    <!-- 主组件包 -->
+    <!-- 生成地图所需其他包 -->
+    <script src="{% static 'js/map/china.js' %}"></script>
+    <!-- 百度地图扩展包 -->
+    <script src="{% static 'js/map/bmap.min.js' %}"></script>
+    <!-- 各省市的地理坐标 -->
+    <script src="{% static 'js/map/coordinate.js' %}"></script>
+    <script src="{% static 'js/relation.js' %}"></script>
+    <script src="{% static 'js/echart.tool.js' %}"></script>
+    <script src="{% static 'js/table.js' %}"></script>
+    <script src="{% static 'plugin/jquery/pagination.min.js' %}"></script>
+    <!-- <script src="{% static 'dashboard/layoutit/scripts.js' %}"></script> -->
+    <script src="{% static 'dashboard/directives/chartdraggroup_after.js' %}"></script>
+    <script src="{% static 'dashboard/index.js' %}?v={{ nowversion }}1"></script>
+    <script src="{% static 'dashboard/directives/chartdraggroup.js' %}"></script>
+    <script src="{% static 'dashboard/directives/chartdrag.js' %}"></script>
+    <script>
+        $(function () {
+            $("body").addClass("edit");
+        });
+          $(".nav-header").click(function () {
+            if($("#elmBase").hasClass("ui-sortable")) {
+                $("#elmBase").removeClass("ui-sortable");
+            }
+          });
+        var source = $("#sourcepreview");
+        source.click(function () {
+            $(".column").removeClass("ui-sortable");
+        });
+        var edit = $("#edit");
+        edit.click(function () {
+            $(".column").addClass("ui-sortable");
+        });
+
+        //页面加载完成后给每个图表添加鼠标事件
+        $(window).load(function () {
+            additionTagShowAndHide();
+        })
+
+        //console.log(width);
+    </script> {% endblock %}

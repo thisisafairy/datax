@@ -1,0 +1,75 @@
+{% verbatim %}
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title">保存组件</h3>
+    <!--弹出框的关闭按钮-->
+    <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form class="form-horizontal" id="dataform" name="dataform">
+        <div class="form-group">
+            <label for="name" class="col-sm-2 control-label">组件名</label>
+            <div class="col-sm-10 form-input-add">
+                <input type="text" class="form-control" id="name" name="name" ng-model="chartObj.name" placeholder="请填写组件名称">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="createname" class="col-sm-2 control-label">类别</label>
+            <div class="col-sm-4 form-input-add">
+                <select ng-model="chartObj.kind" id="kind" name="kind" class="form-control">
+                    <option ng-repeat="x in kinds" value="{{x.code}}">{{x.name}}</option>
+                </select>
+            </div>
+            <label for="createtime" class="col-sm-2 control-label">数据刷新周期</label>
+            <div class="col-sm-2 form-input-add">
+                <input type="text" class="form-control" id="refreshspeed" name="refreshspeed" ng-model="chartObj.refreshspeed" placeholder="请填写组件刷新周期">
+            </div>
+            <label class="col-sm-1 control-label">秒</label>
+        </div>
+
+        <div class="form-group">
+            <label for="name" class="col-sm-2 control-label">关键字</label>
+            <div class="col-sm-10 form-input-add">
+                <input type="text" class="form-control" id="keywords" name="keywords" ng-model="chartObj.keywords" placeholder="请填写组件查询关键字">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-sm-2 control-label">组件描述</label>
+            <div class="col-sm-10 form-input-add">
+                <textarea ng-model="chartObj.remark" id="remark" name="remark" style="width:100%;height:80px;" placeholder="请填写组件描述信息">
+                </textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="createname" class="col-sm-2 control-label">创建人</label>
+            <div class="col-sm-2 form-input-add">
+                <input type="text" class="form-control" id="createname" name="createname" ng-model="chartObj.createname" disabled>
+            </div>
+            <label for="createtime" class="col-sm-2 control-label">创建时间</label>
+            <div class="col-sm-4 form-input-add">
+                <input type="text" class="form-control" id="createtime" name="createtime" ng-model="chartObj.createtime" disabled>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="jsonconfig" class="col-sm-2 control-label" ng-click="showjson=!showjson">显示高级JSON配置</label>
+            <div class="col-sm-10 form-input-add" ng-show="showjson">
+                <textarea ng-model="chartObj.jsonconfig" id="jsonconfig" name="jsonconfig" style="width:100%;height:200px;">
+                </textarea>
+                <!-- 
+                <textarea ng-model="group.filterstring" id="filterstring" name="filterstring" style="display:none;">
+                </textarea>
+                <textarea ng-model="group.datasetstring" id="datasetstring" name="datasetstring" style="display:none;">
+                </textarea>
+                -->
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" type="button" ng-click="save()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>
+
+{% endverbatim %}

@@ -1,0 +1,63 @@
+{% verbatim %}
+<style type="text/css">
+    .form-horizontal .form-group {
+        width: 50%;
+        float: left;
+    }
+</style>
+<div class="col-md-12">
+    <a href="#/list" class="btn btn-primary editable-table-button btn-xs btn-edit">返回</a>
+</div>
+<div class="col-md-12">
+    <div class="grid-tool-bar">
+        <a class="btn btn-default" ng-click="dataEdit('edit')">
+            <i class="fa fa-edit"></i> 保存修改
+        </a>
+        <a class="btn btn-default" ng-click="dataEdit('add')">
+            <i class="fa fa-plus"></i> 新增
+        </a>
+        <a class="btn btn-default" ng-click="dataEdit('delete')">
+            <i class="fa fa-trash-o"></i> 删除
+        </a>
+    </div>
+    <div ui-grid="gridOptions" style="width: 100%; min-height: 380px; text-align: center;"
+         ui-grid-pagination ui-grid-selection ui-grid-resize-columns ui-grid-auto-resize ui-grid-edit>
+    </div>
+</div>
+
+<!-- 新增/编辑 -->
+<script type="text/ng-template" id="dataEdit.html">
+    <div class="modal-header open-header">
+        <h3 class="modal-title open-header-title" style="width: 90%;">新增数据
+        </h3>
+        <!--  弹出框的关闭按钮  -->
+        <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+
+    </div>
+    <div class="modal-body open-body">
+        <form class="form-horizontal" id="moduleForm" name="moduleForm">
+            <div class="edit-control" ng-repeat="(key, val) in tableCols track by key">
+                <div class="form-group" ng-if="val.columns != 'column1'">
+                    <label for="title" class="col-sm-4 control-label">{{ val.name }}</label>
+                    <div class="col-sm-8 form-input-add">
+                        <input ng-if="val.type != 'date'" type="text" name="{{ val.columns }}" ng-model="$parent.dataObj[val.columns]" class="form-control">
+                        <p ng-if="val.type == 'date'" class="input-group">
+                            <input type="text" class="form-control" uib-datepicker-popup ng-model="$parent.dataObj[val.columns]" is-open="popup2.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="open2()"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer footer-btn">
+        <button class="btn btn-primary btn-ok" type="button" ng-click="saveData()">保存</button>
+        <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+    </div>
+</script>
+
+{% endverbatim %}

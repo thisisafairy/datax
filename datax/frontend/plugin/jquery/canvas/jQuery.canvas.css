@@ -1,0 +1,81 @@
+ .canvas-container {
+            position: relative;
+        }
+
+        .canvas-tools {
+            width: auto;
+            height: 21px;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+            .canvas-tools span {
+                padding: 5px;
+                cursor: pointer;
+                background-color: #DEDEDE;
+            }
+
+            .canvas-tools .actived {
+                background-color: #EEE;
+                color: #690;
+            }
+
+        .my-canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            border: 1px solid #666;
+        }
+
+        .canvas-tools-menu {
+            position: absolute;
+            left: 49px;
+            top: 26px;
+            width: 21px;
+            padding: 0;
+        }
+         .canvas-tools-menu li{
+             list-style-type:none;
+             min-height:21px;
+             font-size:16px;
+             cursor:pointer;
+             vertical-align:middle;
+             padding:5px;
+             margin:0;
+         }
+           .canvas-tools-menu li:hover{
+               color:#DDD;
+           }
+         .canvas-tools-width li
+         {
+             width:120px;
+         }
+         .fl{
+             float:left;
+         }
+         .fr{
+             float:right;
+         }
+        .canvas-text {
+            min-width: 100px;
+            width: auto;
+            min-height: 21px;
+            height: 45px;
+            position: absolute;
+            background: none;
+        }
+
+            .canvas-text .canvas-text-tools {
+                height: 23px;
+                line-height: 23px;
+                vertical-align: top;
+            }
+
+                .canvas-text .canvas-text-tools * {
+                    float: left;
+                }
+
+            .canvas-text .form-control {
+                width: 100%;
+            }

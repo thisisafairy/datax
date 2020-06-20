@@ -1,0 +1,40 @@
+
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}测试{% endblock %}
+
+{% block content %}
+
+<style type="text/css">
+    .expander {
+        border: 1px solid black;
+        width: 250px;
+    }
+    
+    .expander>.title {
+        background-color: black;
+        color: white;
+        padding: .1em .3em;
+        cursor: pointer;
+    }
+    
+    .expander>.body {
+        padding: .1em .3em;
+    }
+    </style>
+    
+{% verbatim %}
+<div ng-app="expanderModule">
+    <div ng-controller='SomeController' >
+        <accordion>
+            <expander class='expander' ng-repeat='expander in expanders' expander-title='expander.title'>
+                {{expander.text}}
+            </expander>
+        </accordion>
+    </div>
+</div>
+{% endverbatim %}
+<script src="{% static 'system/test/index.js' %}"></script>
+
+
+{% endblock %}

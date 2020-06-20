@@ -1,0 +1,168 @@
+ {% extends 'base_177.html' %} {% load staticfiles %} {% block title %}用户管理{% endblock %} {% block content %}
+    <link rel="stylesheet" href="{% static 'plugin/angular/angular-material/angular-material.min.css' %}" />
+{% verbatim %}
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel">
+        用户管理
+    </h1>
+</section>
+<style>
+.addbut{
+
+}
+</style>
+<div class="col-sm-12 user-list" ng-app="userlist">
+    <div class="box" ng-controller="userListController" id="userListController">
+        <div class="box-body user-list-body">
+            <div class="col-md-3">
+                <a class="btn btn-default btn-usermanage" ng-click="open()">
+                    <i class="fa fa-plus"></i> 新增
+                </a>
+            </div>
+            <div class="col-md-offset-6 col-md-3">
+                <div class="form-group">
+                    <div class="col-sm-6 cont-body-tabinput">
+                        <input type="text" ng-model="searchkey" ng-change="search()" class="form-control cont-bodyfrom-input" placeholder="搜索名称">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 userlist-table">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th data-field="username" data-align="left">用户名(登录账户名)</th>
+                            <th data-field="nickname" data-align="left">昵称</th>
+                            <th data-field="email" data-align="left">邮箱</th>
+                            <th style="min-width: 262px">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(key,value) in lists">
+                            <td>{{ value.username }}</td>
+                            <td>{{ value.nickname }}</td>
+                            <td>{{ value.email }}</td>
+                            <td>
+                                <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="edit(value.id)">编辑</button>
+                                <button class="btn btn-primary editable-table-button  btn-xs btn-buttons" ng-click="auth($event,value.id,value.username)">授权</button>
+                                <button class="btn btn-primary editable-table-button  btn-xs btn-buttons" ng-click="dataAuth(value.id,value.tagfield)">数据权限</button>
+                                <button class="btn  editable-table-button  btn-xs btn-buttons" ng-click="delete(value)">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-12">
+                <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                    boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+            </div>
+        </div>
+        <script type="text/ng-template" id="myModalSetDataPermission.html">
+            <div class="modal-header open-header">
+                <h3 class="modal-title open-header-title">分配数据权限</h3>
+                <!--  弹出框的关闭按钮  -->
+                <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body open-body">
+                <form class="form-horizontal"  >
+                    <!--<div class="form-group" >
+                        <button type="button" ng-click="add()" class="btn btn-large btn-block btn-default">新增</button>
+                    </div>-->
+                    <div class="form-group" style="height: 30px;line-height: 30px;padding-right: 13px;padding-left: 13px;text-align: center;" ng-repeat="row in config track by $index">
+                        <!--<div class="col-md-1 form-input-add">
+                            <span ng-click="delete($index)" >
+                                <i class="fa fa-times"></i>
+                            </span>
+                        </div>-->
+                        <div class="col-sm-3  form-input-add">
+                            <select class="form-control" ng-model="row.tagid">
+                                <option value="">选择权限类型</option>
+                                <option value="{{ row.id }}" ng-repeat="row in tags track by $index">{{ row.name }}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4 form-input-add">
+                             <select class="form-control" ng-model="row.fun">
+                                <option value="">选择匹配方式</option>
+                                <option value="like">包含</option>
+                                <option value="=">等于</option> 
+                                <option value=">">大于</option> 
+                                <option value="<">小于</option> 
+                                <option value=">=">大于等于</option>
+                                <option value="<=">小于等于</option>  
+                            </select>
+                        </div>
+                        <div class="col-sm-4 form-input-add">
+                            <input type="text" ng-model="row.value" class="form-control ">
+                        </div>
+                        <div class="col-md-1 form-input-add">
+                            <button class="btn  editable-table-button  btn-xs btn-buttons" ng-click="delete($index)">删除</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer footer-btn">
+                <button type="button" ng-click="add()" class="btn btn-default btn-add">新增一条</button>
+                <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+                <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+            </div>
+        </script>
+        <script type="text/ng-template" id="myModalSetPermission.html">
+            <div class="modal-header open-header">
+                <h3 class="modal-title open-header-title">账户权限信息</h3>
+                <!--  弹出框的关闭按钮  -->
+                <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body open-body">
+                <form class="form-horizontal" id="userform" name="userform">
+                  <div class="form-group">
+                    <label for="firstname" class="col-sm-2 control-label form-lable-add">账户名</label>
+                    <div class="col-sm-10 form-input-add">
+                        <input type="text"  id="id" name="id" style="display:none;" ng-model="group.id">
+                      <input type="text" disabled class="form-control" id="name" name="name" ng-model="name" >
+                    </div>
+                  </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label form-lable-add">模块</label>
+                    <div class="col-sm-10 form-input-add">
+                        <div style="float:left;width:200px;">
+                            <p class="form-lable-p">所有模块</p>
+                            <select style="width:200px;height:200px;" name="allusers" class="filtered" id="allusers"  multiple="multiple"
+                            ng-model="selusers" ng-options="user.name group by user.parentname for user in allusers">
+                            </select>
+                        </div>
+                        <div style="float:left;width:50px;padding-left: 5px;margin-top: 58px;">
+                            <br>
+                            <div><a title=">>" href="#" id="id_user_add_link" ng-click="add()"> 添加<span class="glyphicon glyphicon-arrow-right"></span></a></div><br>
+                            <div><a title="<<" href="#" id="id_user_remove_link" ng-click="remove()"> 移除<span class="glyphicon glyphicon-arrow-left"></span></a></div>
+                        </div>
+                        <div style="float:left;width:200px;">
+                            <p class="form-lable-p">已授权模块</p>
+                            <select style="width:200px;height:200px;" id="selusers" multiple="multiple" size="0" name="selusers"
+                              ng-model="seledusers" ng-options="user.name for user in users">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="form-group" >
+                    <div style="float:left">
+                    </div>
+                </div>-->
+                </form>
+            </div>
+            <div class="modal-footer footer-btn">
+                <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+                <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+            </div>
+        </script>
+    </div>
+</div>
+{% endverbatim %}
+<script src="{% static 'plugin/angular/angular-aria/angular-aria.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-animate/angular-animate.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-messages/angular-messages.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-material/angular-material.min.js' %}"></script>
+
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'system/userlist/listApp.js' %}?v={{ nowversion }}1"></script> {% endblock %}

@@ -1,0 +1,92 @@
+<style>
+    .modal-content{/*设置弹出框的宽度，这个类是uimodel弹出时候加载的*/
+        width: 480px;
+    }
+    .modal-body{
+        padding-bottom: 0px;
+    }
+    .menutextstyle{
+        text-align: left;
+        margin-left: 40px;
+        border-bottom: 1px solid;
+        width: calc(100% - 70px);
+        padding-bottom: 10px;
+    }
+    .clickAble_true{
+        cursor: not-allowed !important;
+    }
+</style>
+{% verbatim %}
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title">保存</h3>
+   <!--弹出框的关闭按钮-->
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body">
+    <form role="form" class="form-horizontal clearfix" name="myForm" method="post">
+       <input type="text" class="hide" name="id" ng-model="config.id">
+       <input type="text" class="hide" name="conntype" ng-model="config.conntype">
+       <div class="form-group clearfix">
+            <label for="title" class="col-sm-2 control-label">名称：</label>
+            <div class="col-sm-6 form-input-add">
+               <input type="text" required name="title" ng-model="config.title" class="form-control">
+            </div>
+        </div>
+        <div class="form-group clearfix">
+            <label for="desc" class="col-sm-2 control-label">类型：</label>
+            <div class="col-sm-6 form-input-add">
+                <select class="form-control" required name="config.datatype" ng-model="config.datatype" ng-change="changeTpCallBackFun()">
+                    <option value="">请选择</option>
+                    <option value="new">新增</option>
+                    <option value="disabled" disabled>————————</option>
+                    <option value="{{ type.id }}" ng-repeat="type in allDBType">{{ type.name }}</option>
+                </select>
+            </div>
+
+        </div>
+        <div class="form-group clearfix">
+            <label for="desc" class="col-sm-2 control-label">描述：</label>
+            <div class="col-sm-10 form-input-add">
+                <textarea type="text" name="desc" ng-model="config.desc" class="form-control" style="max-width: 370px"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group clearfix" style="margin-bottom: 0px;">
+            <div class="confirm-title">
+                <label class="col-sm-12 menutextstyle">请选择接下来的操作(这将自动保存当前元数据)</label>
+            </div>
+            <div class="confirm-content col-md-12" style="height: 90px;">
+                <div ng-click="ok('edit')" class="col-md-3 menu-array clickAble_{{ clickDisRights }}">
+                    <div class="inbox">
+                        <div class="iconset icon_gray_edit"></div>
+                        <span class="menu-text">继续编辑</span>
+                    </div>
+                </div>
+                <div ng-click="ok('add')" class="col-md-3 menu-array clickAble_{{ clickDisRights }}">
+                    <div class="inbox">
+                        <div class="iconset icon_gray_add"></div>
+                        <span class="menu-text">新增数据接入</span>
+                    </div>
+                </div>
+                <div ng-click="ok('list')" class="col-md-3 menu-array clickAble_{{ clickDisRights }}">
+                    <div class="inbox">
+                        <div class="iconset icon_gray_list"></div>
+                        <span class="menu-text">返回列表</span>
+                    </div>
+                </div>
+                <div ng-click="ok('next')" class="col-md-3 menu-array clickAble_{{ clickDisRights }}">
+                    <div class="inbox">
+                        <div class="iconset icon_gray_next"></div>
+                        <span class="menu-text">进行下一步操作</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!--<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" ng-disabled="!myForm.$valid" type="button" ng-click="ok()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>-->
+{% endverbatim %}

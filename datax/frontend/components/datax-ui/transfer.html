@@ -1,0 +1,38 @@
+<div class="datax-transfer transfer-full-content {{ componentStyle }}" ng-class="contentClass">
+    <div class="datax-transfer-content">
+        <div class="datax-transfer-left datax-transfer-list">
+            <div class="datax-transfer-list-header">
+                <datax-checkbox checked="checkAllLeft">{{list.length}} 项</datax-checkbox>
+                <span class="datax-transfer-list-header-title">
+                    {{ sourceTitle }}
+                </span>
+            </div>
+            <div class="datax-transfer-list-body">
+                <ul class="datax-transfer-list-content">
+                    <li class="datax-transfer-list-content-item" ng-repeat="item in list">
+                        <datax-checkbox checked="item.checked" change="selectChange()" disabled="item.disabled">{{item[dxLabel]}}</datax-checkbox>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="datax-transfer-operation">
+            <button datax-button type="primary" icon="angle-left" size="small" disabled="true" click="toLeft();"></button>
+            <button datax-button type="primary" icon="angle-right" size="small" disabled="true" click="toRight();"></button>
+        </div>
+        <div class="datax-transfer-right datax-transfer-list">
+            <div class="datax-transfer-list-header">
+                <datax-checkbox checked="checkAllRight">{{resultList.length}} 项</datax-checkbox>
+                <span class="datax-transfer-list-header-title">
+                    {{ targetTitle }}
+                </span>
+            </div>
+            <div class="datax-transfer-list-body">
+                <ul class="datax-transfer-list-content">
+                    <li class="datax-transfer-list-content-item" ng-repeat="item in resultList">
+                        <datax-checkbox checked="item.checked" change="selectChange()" disabled="item.disabled">{{item[dxLabel]}}</datax-checkbox>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

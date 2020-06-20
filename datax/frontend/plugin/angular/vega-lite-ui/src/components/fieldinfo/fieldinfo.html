@@ -1,0 +1,55 @@
+<span class="field-info">
+  <span class="hflex full-width" ng-click="clicked($event)">
+
+    <span class="type-caret"
+      ng-class="{active: !disableCaret}">
+      <span class="type fa {{icon}}"
+        ng-show="showType"
+        title="{{typeName}}">
+      </span>
+    </span>
+
+    <span ng-if="fieldDef.aggregate!=='count'"
+      class="field-info-text">
+      <span ng-if="func(fieldDef)"
+        class="field-func"
+        title="{{ func(fieldDef) }}"
+        ng-class="{any: fieldDef._any}"
+        >
+        {{ func(fieldDef) }}
+      </span><!--prevent unnecessary space
+      --><span class="field-name" title="{{ (fieldDef.title || fieldTitle(fieldDef.field)) | underscore2space }}"
+        ng-class="{hasfunc: func(fieldDef), any: fieldDef._any}"
+        >{{ (fieldDef.title || fieldTitle(fieldDef.field)) | underscore2space }}</span>
+
+        <span class="wildcard-field-count">
+          {{ fieldCount(fieldDef.field) }}
+        </span>
+    </span>
+
+    <span ng-if="fieldDef.aggregate==='count' || fieldDef.autoCount"
+      class="field-count field-info-text">
+      <span class="field-name">{{fieldDef.field}}</span>
+    </span>
+
+    <span class="no-shrink remove" ng-show="showRemove">
+      <a class="remove-field" ng-click="removeAction()">
+        <i class="fa fa-times"></i>
+      </a>
+    </span>
+
+    <!-- Hide Filter for count field since we don't have post-aggregation filter yet--> 
+    <!-- <span ng-if="fieldDef.aggregate!=='count'"
+      class="no-shrink filter" ng-show="showFilter">
+      <a class="filter-field" ng-click="filterAction()">
+        <i class="fa fa-filter"></i>
+      </a>
+    </span>
+
+    <span class="no-shrink add" ng-show="showAdd">
+      <a class="add-field" ng-click="addAction()">
+        <i class="fa fa-plus"></i>
+      </a>
+    </span> -->
+  </span>
+</span>

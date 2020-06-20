@@ -1,0 +1,566 @@
+ {% extends 'base.html' %} {% load staticfiles %} {% block title %}财务数据采集管理{% endblock %}
+{% block content %}
+<link href="{% static 'css/Ext/css/ext-all.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'css/Ext/ax-all.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'css/ext/ux/css/LockingGridView.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'js/ext/ux/fileuploadfield/css/fileuploadfield.css'  %}" rel="stylesheet" type="text/css" />
+<style>
+</style>
+{% verbatim %}
+    <div id="form">
+    </div>
+    <div id="cumgrid"></div>
+{% endverbatim %}
+    <script src="{% static 'js/ext/adapter/jquery/ext-jquery-adapter.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ext-all.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ax-all.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/pgfunc-ext.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/locale/ext-lang-zh_CN.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ux/LockingGridView.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ux/fileuploadfield/fileuploadfield.js'%}" type="text/javascript"></script>
+
+    <script>
+        Ext.BLANK_IMAGE_URL = "{% static 'js/ext/s.gif' %}";
+        Ext.Ajax.defaultHeaders = {'X-CSRFToken' : getCookie('csrftoken')};
+
+        var monthworks = 0;
+        var yearEnum = { "2017": 2017, "2018": 2018, "2019": 2019, "2020": 2020,"2021": 2021, "2022": 2022, "2023": 2023, "2024": 2024, "2025": 2025, "2026": 2026  };
+        var monthEmun =  { "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "11": 11, "12": 12 };
+        var channelsEnum = {"文水基地":"文水基地","晋中基地":"晋中基地",'':'全部'};
+        var businessEnum = {"应收账款":"应收账款","新增业务":"新增业务",'':'全部'};
+        var mtypeEnum = {"一般销售":"一般销售","特殊销售":"特殊销售","BT":"BT",'':'全部'};
+        var stateEnum = {"关闭":"关闭","已逾期":"已逾期","未到期":"未到期"};
+        var saleteamEnum = {"系统集成_何文中":"系统集成_何文中","国外销售_余诗伟":"国外销售_余诗伟","国内销售_朱建国":"国内销售_朱建国","其它":"其它"};
+        var csdutymenEnum = {"宋一文":"宋一文","李俊秀":"李俊秀","赵晓娟":"赵晓娟","庞娟娟":"庞娟娟","马淑楠":"马淑楠","武俊娥":"武俊娥","苗艳波":"苗艳波","高妩":"高妩","高莉莉":"高莉莉","谢如意":"谢如意"};
+        //后台数据URL
+        var listdataurl = '/ex/financelist?page=1' ; //后台返回列表数据 {total:1:rows:[{name:'name1',code:'code1'}]}
+        var customerdataurl = 'http://localhost:3230/commonpages/data/userdata.aspx';//客户json结构 {successful:true,rows:[{name:'name1',code:'code1'}]}
+        var saleteamdataurl = 'http://localhost:3230/commonpages/data/userdata.aspx';//销售团队json结构 {successful:true,rows:[{name:'name1',code:'code1'}]}
+        var salerdataurl = 'http://localhost:3230/commonpages/data/userdata.aspx';//销售负责人json结构 {successful:true,rows:[{name:'name1',code:'code1'}]}
+        var cspersondataurl = 'http://localhost:3230/commonpages/data/userdata.aspx';//CS负责人json结构 {successful:true,rows:[{name:'name1',code:'code1'}]}
+
+        Ext.onReady(function(){
+            //获取客户信息
+            var userselstore = new Ext.data.JsonStore({
+                id: 'UserID',root: 'rows',
+                fields: [{ name: 'UserID' }, { name: 'Name' }, { name: 'LoginName' }],
+                url: customerdataurl,
+                baseParams: { cmd: 'GETUSERS' }
+            });
+            var usercombo = {
+                    xtype : 'combo',displayField : 'Name',valueField : 'Name',store : userselstore,mode : 'remote', triggerAction : 'all',
+                    editable:true,minChars : 1,allowBlank : true,forceSelection : false
+                    //hideTrigge:true,typeAhead : true,
+                    };
+            //获取客户信息自动完成控件结束
+
+            //定义所展示的列
+            var cols = [
+                 new Ext.grid.RowNumberer(),
+                new Ext.grid.CheckboxSelectionModel({singleSelect:false}),
+                { header: "销售主体",width:60,dataIndex: "saler",editor:{xtype:'aimcombo',enumdata: channelsEnum}},
+                { header: "客户名称",width:160,dataIndex: "customers",editor:{xtype:'textarea'}},
+                {header: "AR余额汇总",dataIndex: "allar", editor:{ xtype: 'numberfield',allowBlank:false}, summaryType: 'sum' },
+                {header: "计提3% 6个月以下",dataIndex: "sixmonth", editor:{ xtype: 'numberfield',allowBlank:true} },
+                {header: "计提5%6个月-1年",dataIndex: "oneyear", editor:{ xtype: 'numberfield',allowBlank:true} },
+                {header: "计提10%1-2年",dataIndex: "twoyears", editor:{ xtype: 'numberfield',allowBlank:true} },
+                {header: "计提30% 2-3年",dataIndex: "threeyears", editor:{ xtype: 'numberfield',allowBlank:true} },
+                {header: "计提50% 3-4年",dataIndex: "fouryears", editor:{ xtype: 'numberfield',allowBlank:true} },
+                {header: "计提50% 4年以上",dataIndex: "otheryears",editor:{xtype:'numberfield'} },
+                {header: "计提坏账准备金额",dataIndex: "badmoney", editor:{ xtype: 'numberfield',allowBlank:true} },
+                {header: "项目名称",dataIndex: "projectname", editor:{ xtype: 'textarea',allowBlank:false} },
+                {header: "AR状态",dataIndex: "arstate", editor:{ xtype:'aimcombo',enumdata: stateEnum} },
+                {header: "业务类型",dataIndex: "businesstype", editor:{ xtype:'aimcombo',enumdata: mtypeEnum} },
+                {header: "回款预测类型",dataIndex: "artype", editor:{xtype:'aimcombo',enumdata: businessEnum,lazyRender: true}},
+                {header: "销售团队",dataIndex: "saleteam", editor:{xtype:'aimcombo',enumdata: saleteamEnum,lazyRender: true}},
+                {header: "销售负责人",dataIndex: "dutymen", editor:{xtype:'textfield',allowBlank: false} },
+                {header: "CS负责人",dataIndex: "csdutymen", editor:{xtype:'aimcombo',enumdata: csdutymenEnum,lazyRender: true} },
+                {header: "商务逾期金额",dataIndex: "premoney", editor:{ xtype: 'numberfield',allowBlank:true} },
+                {header: "到期时间",dataIndex: "incomedate", editor:{ xtype: 'datefield',allowBlank:true} ,renderer:ExtGridDateOnlyRender},
+                {header: "付款方式",dataIndex: "paytype", editor:{xtype:'textarea'} },
+                {header: "担保措施",dataIndex: "dutytype", editor:{ xtype: 'textarea',allowBlank:false} },
+                {header: "Remarks/Next Steps",id: "remarks", dataIndex: "remarks", editor:{ xtype: 'textarea',allowBlank:false}}
+
+
+                {#{header: "week1",id:'armoney1',width:65,dataIndex: "armoney1", editor:{ xtype: 'numberfield',decimalPrecision:2} },#}
+                {#{header: "week2",id:'armoney2',width:65,dataIndex: "armoney2", editor:{ xtype: 'numberfield',decimalPrecision:2} },#}
+                {#{header: "week3",id:'armoney3',width:65,dataIndex: "armoney3", editor:{ xtype: 'numberfield',decimalPrecision:2} },#}
+                {#{header: "week4",id:'armoney4',width:65,dataIndex: "armoney4", editor:{ xtype: 'numberfield',decimalPrecision:2} },#}
+                {#{header: "week5",id:'armoney5',width:65,dataIndex: "armoney5", editor:{ xtype: 'numberfield',decimalPrecision:2} },#}
+                {#{header: "week6",id:'armoney6',width:65,dataIndex: "armoney6", editor:{ xtype: 'numberfield',decimalPrecision:2} }#}
+           ];
+            var year = Ext.getCmp("year")?Ext.getCmp("year").getValue():new Date().getFullYear();
+            var month = new Date().getMonth()+1;
+            cols.push({header: "小计",width:70,dataIndex: "armoneysum",renderer:colRenderer})
+            {#return cols;#}
+            for(var i=1;i<month;i++)
+            {
+                cols.push({header: i+"月",width:50,dataIndex: "armoneymonth"+i, renderer:beforeorderRenderer});
+            }
+           var weeks = allWeeks(year,month);
+            monthworks = weeks.length;
+           var weeksAdd = allWeeks(year,month+1)
+            monthworksnext = weeksAdd.length;
+           for(var w=1;w<=weeks.length;w++)
+           {
+               cols.push({header: weeks[i],width:65,dataIndex: "armoney"+w, editor:{ xtype: 'numberfield',decimalPrecision:2} });
+           }
+           for(var w=1;w<=weeksAdd.length;w++)
+           {
+               cols.push({header: weeksAdd[i],width:65,dataIndex: "armoney"+(w+6), editor:{ xtype: 'numberfield',decimalPrecision:2} });
+           }
+
+            for(var i=month+2;i<=12;i++)
+            {
+                cols.push({header: i+"月",width:50,dataIndex: "armoneymonth"+i, editor:{ xtype: 'numberfield',decimalPrecision:2} });
+            }
+
+             //小计自动计算
+            function colRenderer(val, p, rec, rowIndex, columnIndex) {
+                switch (this.name) {
+                    case "armoneysum":
+                        return parseFloat(rec.data.armoney1==null||rec.data.armoney1==""?0:rec.data.armoney1)+parseFloat(rec.data.armoney2==null||rec.data.armoney2==""?0:rec.data.armoney2)+parseFloat(rec.data.armoney3==null||rec.data.armoney3==""?0:rec.data.armoney3)
+                        +parseFloat(rec.data.armoney4==null||rec.data.armoney4==""?0:rec.data.armoney4)+parseFloat(rec.data.armoney5==null||rec.data.armoney5==""?0:rec.data.armoney5)+parseFloat(rec.data.armoney6==null||rec.data.armoney6==""?0:rec.data.armoney6)+
+                                parseFloat(rec.data.armoney7==null||rec.data.armoney7==""?0:rec.data.armoney7)+parseFloat(rec.data.armoney8==null||rec.data.armoney8==""?0:rec.data.armoney8)+parseFloat(rec.data.armoney9==null||rec.data.armoney9==""?0:rec.data.armoney9)
+                        +parseFloat(rec.data.armoney10==null||rec.data.armoney10==""?0:rec.data.armoney10)+parseFloat(rec.data.armoney11==null||rec.data.armoney11==""?0:rec.data.armoney11)+parseFloat(rec.data.armoney12==null||rec.data.armoney12==""?0:rec.data.armoney12)+
+                            parseFloat(rec.data.armoneymonth1==null||rec.data.armoneymonth1==""?0:rec.data.armoneymonth1)+parseFloat(rec.data.armoneymonth2==null||rec.data.armoneymonth2==""?0:rec.data.armoneymonth2)+parseFloat(rec.data.armoneymonth3==null||rec.data.armoneymonth3==""?0:rec.data.armoneymonth3)
+                        +parseFloat(rec.data.armoneymonth4==null||rec.data.armoneymonth4==""?0:rec.data.armoneymonth4)+parseFloat(rec.data.armoneymonth5==null||rec.data.armoneymonth5==""?0:rec.data.armoneymonth5)+parseFloat(rec.data.armoneymonth6==null||rec.data.armoneymonth6==""?0:rec.data.armoneymonth6)+
+                                parseFloat(rec.data.armoneymonth7==null||rec.data.armoneymonth7==""?0:rec.data.armoneymonth7)+parseFloat(rec.data.armoneymonth8==null||rec.data.armoneymonth8==""?0:rec.data.armoneymonth8)+parseFloat(rec.data.armoneymonth9==null||rec.data.armoneymonth9==""?0:rec.data.armoneymonth9)
+                        +parseFloat(rec.data.armoneymonth10==null||rec.data.armoneymonth10==""?0:rec.data.armoneymonth10)+parseFloat(rec.data.armoneymonth11==null||rec.data.armoneymonth11==""?0:rec.data.armoneymonth11)+parseFloat(rec.data.armoneymonth12==null||rec.data.armoneymonth12==""?0:rec.data.armoneymonth12);
+                        break;
+                }
+                return val;
+            }
+
+
+
+            //查询所需的store
+            var store =new Ext.data.Store({
+                autoLoad : false,  
+                idProperty: 'id',
+                url: listdataurl,  
+                reader : new Ext.data.JsonReader({totalProperty: 'total',root: 'rows'}, 
+                    [{ name : 'id'},{name : 'saler'}, {name : 'customers'}, {name:'customertype'}, {name : 'allar'}, {name:'sixmonth'}, {name : 'oneyear'},
+                      {name:'twoyears'}, {name : 'threeyears'}, {name:'fouryears'}, {name : 'otheryears'}, {name:'badmoney'}, {name : 'projectname'}, {name:'arstate'}, {name : 'businesstype'}, 
+                        {name:'artype'}, {name : 'saleteam'},{name:'businesstype'}, {name:'artype'},{name:'dutymen'},{name:'csdutymen'}, {name : 'premoney'}, {name:'incomedate'},{name:'paytype'}, {name : 'dutytype'}, {name:'remarks'},
+                    {name : 'year'}, {name:'month'},{name:'weeknum'}, {name : 'week'}, {name:'armoney'},{name:'version'}, 
+                    {name:'createid'},{name:'createname'}, {name : 'createtime'}, {name:'modifyid'},{name:'modifyname'},{name:'modifytime'},
+                    {name:'armoney1'},{name:'armoney2'}, {name : 'armoney3'}, {name:'armoney4'},{name:'armoney5'},{name:'armoney6'},
+                    {name:'armoney7'},{name:'armoney8'},{name:'armoney9'},{name:'armoney10'},{name:'armoney11'},{name:'armoney12'},
+                        {name:'armoneymonth1'},{name:'armoneymonth2'},{name:'armoneymonth3'},{name:'armoneymonth4'},{name:'armoneymonth5'},{name:'armoneymonth6'},
+                    {name:'armoneymonth7'},{name:'armoneymonth8'},{name:'armoneymonth9'},{name:'armoneymonth10'},{name:'armoneymonth11'},{name:'armoneymonth12'}]),  
+                sortInfo: {field: 'createtime', direction: 'ASC'},
+                  listeners:{
+                         beforeload:function(){
+                               Ext.getBody().mask('页面加载刷新中,请稍后......');
+                          },load:function(){Ext.getBody().unmask();}
+                   }
+            });  
+
+           var toolbar = new Ext.Toolbar(['-', {
+                    text: '添加',
+                    handler: function(){
+                        var Record = grid.getStore().recordType;
+                        var date = new Date()
+                        var p = new Record({"saler":"","customers":"","allar":0,"sixmonth":0,"oneyear":0,"twoyears":0,
+                            "threeyears":0,"fouryears":0,"otheryears":0,"badmoney":0,"projectname":"","arstate":"",
+                            "businesstype":"","artype":"","saleteam":"","dutymen":"","csdutymen":"","premoney":0,
+                            "incomedate":date,"paytype":"","dutytype":"","remarks":"","year":date.getFullYear(),
+                            "month":date.getMonth()+1,"customertype":"","createtime":date,"armoney1":0,"armoney2":0,
+                            "armoney3":0,"armoney4":0,"armoney5":0,"armoney6":0,"armoney7":0,"armoney8":0,"armoney9":0,
+                            "armoney10":0,"armoney11":0,"armoney12":0,"armoneymonth1":0,"armoneymonth2":0,"armoneymonth3":0,
+                        "armoneymonth4":0,"armoneymonth5":0,"armoneymonth6":0,"armoneymonth7":0,"armoneymonth8":0,"armoneymonth9":0,
+                        "armoneymonth10":0,"armoneymonth11":0,"armoneymonth12":0});
+                        grid.stopEditing();
+                        var insRowIdx = store.data.length;
+                        store.insert(insRowIdx, p);
+                        grid.startEditing(insRowIdx, 2);
+                    }
+                }, '-', {
+                    text: '删除',
+                    handler: function(){
+                        Ext.Msg.confirm('信息', '确定要删除？', function(btn){
+                            if (btn == 'yes') {
+                               var recs = grid.getSelectionModel().getSelections();
+                                var ids='';
+                                for (var i = 0; i < recs.length; i++) {
+                                        if (recs[i] && (recs[i].get("id") == null || recs[i].get("id") == "")) {
+                                            grid.getStore().remove(recs[i]);
+                                            grid.getStore().commitChanges();
+                                        }
+                                        else if(recs[i])
+                                        {
+                                            ids+="'" + recs[i].get("id")+"',";
+                                        }
+                                    }
+                                $.ajax({
+                                    url: '/ex/deleteFinanceOrder',
+                                    type: 'post',
+                                    data: { 'datas':ids }
+                                }).then(function (rs) {
+                                    if (rs.code == '1') {
+                                        Ext.getBody().unmask();
+                                        Reload(true);
+                                    }
+                                    else {
+                                        alert(rs.msg);
+                                        Ext.getBody().unmask();
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }, '-',{
+                    text: '保存',
+                    handler: function(){
+                        recs = store.getModifiedRecords();
+                        var dt=[];
+                        $.each(recs, function() {
+                            dt.push(this.data);
+                        });
+                        if(dt.length===0){
+                            return;
+                        }
+                        //alert(JSON.stringify(dt));
+                        Ext.getBody().mask("保存中...");
+                        $.ajax({
+                            url: '/ex/saveFinanceOrder',
+                            type: 'post',
+                            data: { 'datas': JSON.stringify(dt)}
+                        }).then(function (rs) {
+                            if (rs.code == '1') {
+                                Ext.getBody().unmask();
+                            }
+                            else {
+                                alert(rs.msg);
+                                Ext.getBody().unmask();
+                            }
+                        });
+
+                    }
+                },'-',{
+                    text: '刷新',
+                    handler: function(){
+                        Reload();
+                    }
+                },'-',{text:'导入最新Excel',handler:function(){
+                    fileWindow();
+           }}]);
+            var curYear = new Date().getFullYear();
+            var curMonth = new Date().getMonth();
+            var hgStore = new Ext.data.ArrayStore({id:0,fields : [ 'VALUE'],data : [['1'], ['2'], ['3'], ['4'], ['5']]});
+            var schBar = new Ext.ux.AimSchPanel({
+                store: store,
+                padding: '3 0 0 0',
+                collapsed:false,
+                columns:2,
+                items: [
+                {#{ fieldLabel: '年份', id: 'year', value: curYear, required: true, style: { marginTop: '2px' }, enumdata: yearEnum, xtype: 'aimcombo',schopts: { qryopts: "{ mode: 'Like', field: 'year' }"} ,#}
+                {#listeners: {'select': function(){  ReBuildCols();Reload();}} },#}
+                {#{ fieldLabel: '月度', id: 'month', value: curMonth+1, required: true, style: { marginTop: '2px' }, enumdata: monthEmun, xtype: 'aimcombo',schopts: { qryopts: "{ mode: 'Like', field: 'month' }"} ,#}
+                {#listeners: {'select': function(){ ReBuildCols();Reload(); }}},#}
+                { fieldLabel: '回款预测类型', id: 'mtype', style: { marginTop: '2px' },labelWidth:90, enumdata: businessEnum, xtype: 'aimcombo',schopts: { qryopts: "{ mode: 'Like', field: 'hg' }"} ,
+                listeners: {'select': function(){ Reload(); }}},
+                { fieldLabel: '业务类型', id: 'btype',  required: true, style: { marginTop: '2px' }, enumdata: mtypeEnum, xtype: 'aimcombo',schopts: { qryopts: "{ mode: 'Like', field: 'product' }"} ,
+                listeners: {'select': function(){ Reload(); }}},
+                { fieldLabel: '客户名称', id: 'customer',  required: true, style: { marginTop: '2px' }, xtype: 'textfield',schopts: { qryopts: ""} ,
+                listeners: {'select': function(){ Reload(); }}}]
+            });
+           var titPanel = new Ext.ux.AimPanel({
+                    tbar: toolbar,
+                    items: [schBar]
+                });
+           var grid = new Ext.ux.grid.AimEditorGridPanel({
+               title:'财务数据采集',
+                lockable: true,
+                clicksToEdit: 1,
+                height:document.body.clientHeight-40,
+                renderTo: 'cumgrid',
+                enableColumnHide: false,
+                store: store,
+                columns: cols,
+                tbar: titPanel,
+                width:document.body.clientWidth-$("#silderApp").width(),
+                columnLines: true
+            });
+           //需要锁定到最左边的列
+           grid.getColumnModel().setLocked(0,true);
+           grid.getColumnModel().setLocked(1,true);
+           grid.getColumnModel().setLocked(2,true);
+           grid.getColumnModel().setLocked(3,true);
+           //构建需要填报的周信息
+           //ReBuildCols();
+           //加载数据
+           Reload();
+
+           {#function ReBuildCols()#}
+           {#{#}
+           {#    var weeks = allWeeks(Ext.getCmp("year").getValue(),Ext.getCmp("month").getValue());#}
+           {#    var colModel = grid.getColumnModel();#}
+           {#    colModel.setHidden(colModel.findColumnIndex("armoney5"),true);#}
+           {#    colModel.setHidden(colModel.findColumnIndex("armoney6"),true);#}
+           {#    for(var i=0;i<weeks.length;i++)#}
+           {#    {#}
+           {#         colModel.setHidden(colModel.findColumnIndex("armoney"+(i+1)),false);#}
+           {#         colModel.setColumnHeader(colModel.findColumnIndex("armoney"+(i+1)),weeks[i]);#}
+           {#    }#}
+           {#}#}
+           //加载后台数据
+           function Reload(flag) {
+               if (flag!==true&&store.getModifiedRecords().length > 0)
+               {
+                   Ext.Msg.confirm('信息', '存在未保存的记录，确定要重新加载新数据？', function(btn){
+                        if (btn == 'yes') {
+                            Reload(true);
+                        }
+                    });
+               }
+               else
+               {
+                   //传递到后台的参数
+                    store.load({
+                        params:{
+                            {#year:Ext.getCmp("year").getValue(),#}
+                            {#month:Ext.getCmp("month").getValue(),#}
+                            mtype:Ext.getCmp("mtype").getValue(),
+                            btype:Ext.getCmp("btype").getValue(),
+                            customer:Ext.getCmp("customer").getValue(),
+                            monthweeks:monthworks
+                        }
+                    });
+               }
+           }
+        });
+        var addwin = null;
+        function fileWindow(){
+            if(addwin)addwin.show();
+            else
+            {
+                var uploadForm=new Ext.FormPanel({
+                    id:'uploadForm',
+                    width:520,
+                    frame:true,
+                    fileUpload: true,
+                    autoHeight:true,
+                    bodyStyle:'10px 10px 0px 10px',
+                    labelWidth:50,
+                    enctype: 'multipart/form-data',
+                    defaults:{
+                        anchor: '95%',
+                        allowBlank: false
+                    },
+                    items:[
+                        {
+                            xtype:'fileuploadfield',
+                            emptyText: '请选择上传文件...',
+                            fieldLabel: '文件：',
+                            id:'uploadFile',
+                            name: 'upload',
+                            allowBlank: false,
+                            blankText: '文件名称不能为空.',
+                             buttonCfg: {
+                                        text: '选择...'// 上传文件时的本地查找按钮
+                              }
+                        }
+                    ],
+                    buttons: [{
+                                    text: '上传',
+                                    handler: function(){
+                                        if(uploadForm.getForm().isValid()){
+                                            var targetFile = document.getElementById('uploadFile-file')
+                                            var formChartsData = new FormData();
+                                            formChartsData.append("filename", targetFile.files[0]);
+                                            $.ajax({
+                                                url: '/ex/uploadBadDebt',
+                                                type: 'post',
+                                                processData: false,
+                                                contentType: false,
+                                                data: formChartsData
+                                            }).then(function (rs) {
+                                                if (rs.status == "success") {
+                                                    alert('上传成功')
+                                                    addwin.hide();
+                                                } else {
+                                                    alert('上传失败');
+                                                }
+                                            });
+                                            // uploadForm.getForm().submit({
+                                            //     url:'/ex/uploadBadDebt',
+                                            //     method:'POST',
+                                            //     headers: {'Content-Type': null, 'X-CSRFToken': getCookie('csrftoken')},
+                                            //     waitTitle: '请稍后',
+                                            //     waitMsg: '正在上传文档文件 ...',
+                                            //     success: function(fp, action){
+                                            //         Ext.MessageBox.alert('信息', action.result.msg);
+                                            //         Ext.getCmp("uploadFile").reset();          // 指定文件字段的id清空其内容
+                                            //         addwin.hide();
+                                            //         Reload();
+                                            //     },
+                                            //     failure: function(fp, action){
+                                            //         Ext.MessageBox.alert('警告', action.result.msg);
+                                            //         addwin.hide();
+                                            //     }
+                                            // });
+                                        }
+                                    }
+                                },{
+                                    text: '重置',
+                                    handler: function(){
+                                        uploadForm.getForm().reset();
+                                    }
+                                }]
+
+                });
+                addwin =new Ext.Window({
+                   title : '上传新文档',
+                    closable : true,
+                    width : 520,
+                    autoHeight: true,
+                    border : false,
+                    plain : true,
+                    modal : true,
+                    layout : 'fit',
+                    bodyStyle : 'padding:5px;',
+                    maximizable : false,// 禁止最大化
+                    closeAction : 'hide',
+                    closable : true,// 是否有关闭
+                    collapsible : true,// 可折叠
+                    iconCls : 'bind',
+                    items: [uploadForm]
+                }).show();
+
+            }
+        }
+
+         function openInput(id,month,iscapacity){
+            //iscapacity=="capacity" 代表是修改历史产能
+            iscapacity = iscapacity=="capacity"?1:0;
+            var year = new Date().getFullYear();
+            var weeks = allWeeks(year,parseInt(month));//周次
+            $.ajax({
+                url: '/ex/geteditdata?year='+year+"&month="+month+"&id="+id+"&iscapacity=2"+"&weeks="+weeks.length,
+                type: 'get'
+            }).then(function (rs) {
+                var fields = [];
+                    for(var i=1;i<=weeks.length;i++) {
+                        fields.push({xtype:'numberfield',fieldLabel:weeks[i-1],id:'armoney'+i,name:'armoney'+i,value:rs.data['armoney'+i]});//value绑定后台返回的各周值,比如 value:rs.data['out'+i];
+                    }
+                    var uploadForm=new Ext.FormPanel({
+                        id:'uploadForm',
+                        width:200,
+                        frame:true,
+                        fileUpload: true,
+                        autoHeight:true,
+                        bodyStyle:'10px 10px 0px 10px',
+                        labelWidth:100,
+                        defaults:{
+                            anchor: '95%',
+                            allowBlank: false
+                        },
+                        items:fields,
+                        buttons: [{
+                                        text: '保存',
+                                        handler: function(){
+                                            //if(uploadForm.getForm().isValid()){
+                                            var data={};
+                                            for(var i=1;i<=weeks.length;i++) {
+                                                data['armoney'+i] = Ext.getCmp("armoney"+i).getValue();
+                                            }
+                                            $.ajax({
+                                                url: '/ex/updatedata?year='+year+"&month="+month+"&id="+id+"&iscapacity=2"+"&weeks="+weeks.length+'&datas='+JSON.stringify(data),
+                                                type: 'get',
+                                                processData: false,
+                                                contentType: false,
+                                            }).then(function (rs) {
+                                                if (rs.status == "success") {
+                                                    addwin.close();
+                                                    Reload();
+                                                } else {
+                                                    alert('更新失败');
+                                                }
+                                            });
+                                            //}
+                                        }
+                                    },{
+                                        text: '关闭',  handler: function(){
+                                                        addwin.close();}}]
+
+                    });
+                    var addwin =new Ext.Window({
+                       title : '修改历史记录',
+                        closable : true,
+                        width : 220,
+                        autoHeight: true,
+                        border : false,
+                        plain : true,
+                        modal : true,
+                        layout : 'fit',
+                        bodyStyle : 'padding:5px;',
+                        maximizable : false,// 禁止最大化
+                        closable : true,// 是否有关闭
+                        collapsible : true,// 可折叠
+                        iconCls : 'bind',
+                        items: [uploadForm]
+                    }).show();
+
+            });
+
+
+
+
+        }
+
+        function beforeorderRenderer(val, p, rec, rowIndex, columnIndex) {
+                if(this.name.indexOf("armoneymonth")>=0)
+                {
+                    val = val==null||val==""?0:val;
+                    return '<a href=# onclick=openInput("'+rec.data.id+'","'+this.name.replace("armoneymonth",'')+'");>'+val+'</a>';
+                }
+
+           }
+
+        // 传入年月的相关周信息
+        function allWeeks(a,b) {
+            a = parseInt(a),b=parseInt(b);
+            var week_array = [];
+            var weekt_array = [];
+            var today = new Date(a,b-1,1);
+            var year = today.getFullYear();
+            var month = today.getMonth();
+            var i = 0;
+            var start = new Date(year, month, 1); // 得到当月第一天
+            var end = new Date(year, month+1, 0); // 得到当月最后一天
+            var start_day = start.getDay(); // 当月第一天是周几
+            switch(start_day)
+            {
+                case 0: i = 0 - 5; break;
+                case 1: i = 0 - 6; break;
+                case 2: i = 0 - 7; break;
+                case 3: i = 0 - 8; break;
+                case 4: i = 0 - 9; break;
+                case 5: i = 1-4; break;
+                case 6: i = 0-4; break;
+            }
+
+            while ( new Date(year, month, i) <= end) {
+                if(new Date(year, month, i + 6)<start){
+                }
+                else
+                {
+                    week_array.push([  new Date(year, month, i)<start?start:new Date(year, month, i),
+                                   new Date(year, month, i + 6)>end?end:new Date(year, month, i + 6)
+                                ]
+                            )
+                    weekt_array.push((new Date(year, month, i)<start?(start.getMonth()+1)+"."+start.getDate():(month+1)+"."+i )+"-" +
+                        (new Date(year, month, i + 6)>end?(end.getMonth()+1)+"."+end.getDate():(month+1)+"."+(i+6))
+                            )
+                }
+                i += 7;
+            }
+            monthworks = weekt_array.length;
+            console.log(weekt_array);
+            return weekt_array;
+        }
+    </script>
+
+{% endblock %}

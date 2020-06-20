@@ -1,0 +1,154 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/mobile-home.css' %}?v={{ nowversion }}1">
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}?v={{ nowversion }}1">
+    <script src="{% static 'plugin/jquery/jquery-2.2.3.min.js' %}"></script>
+    <script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular.min.js'%}"></script>
+    <script src="{% static 'plugin/angular/angular-ui-bootstrap/ui-bootstrap-tpls.js'%}"></script>
+    <script type="application/javascript">
+        var terminalType = /Android|webOS|iPhone|iPod|Windows Phone|iPad|SymbianOS|BlackBerry/i.test(navigator.userAgent) ? "phone" :  "pc";
+        if (terminalType == 'phone') {
+            terminalType = /iPad/i.test(navigator.userAgent) ? "ipad" :  "phone";
+        }
+    </script>
+    <title>数据可视化</title>
+</head>
+{% verbatim %}
+<body>
+    <div ng-style="style()" resize class="content" ng-app="homepageapp" ng-controller="homepagectrl">
+        <div id="phoneHomePage" class="full-content" style="display: none; background-color: rgba(255, 255, 255, 1); ">
+            <div class="m-header m-component" id="mbHeaderDiv">
+                <i class="fa fa-list m-menu" ng-click="showMBMenu()"></i>
+                自定义标题
+                <i class="fa fa-star-o m-collection" ng-if="mbMenu==false"></i>
+            </div>
+            <div class="m-body m-component" id="mbExtraDiv">
+                <div class="full-content m-body-content">
+                    <div class="m-body-menu" ng-if="footerType == 'menu'">
+                        <uib-accordion close-others="true">
+                            <div uib-accordion-group class="panel-default" is-open="row.open" ng-repeat="row in menuList">
+                                <uib-accordion-heading>
+                                    {{ row.name }}
+                                    <i class="pull-right glyphicon"
+                                       ng-class="{'glyphicon-chevron-down': row.open, 'glyphicon-chevron-right': !row.open}"></i>
+                                </uib-accordion-heading>
+                                <ul class="list-group">
+                                    <li ng-if="row.url && row.url.length > 1" ng-click="openMbPage(row)" class="list-group-item">{{ row.name }}</li>
+                                    <li ng-if="row.child.length > 0" ng-repeat="childrow in row.child"
+                                        class="list-group-item" ng-click="openMbPage(childrow)">{{ childrow.name }}</li>
+                                </ul>
+                            </div>
+                        </uib-accordion>
+                    </div>
+                    <div class="m-body-collection" ng-if="footerType == 'collection'">
+                        <ul class="list-group">
+                            <li class="list-group-item">Cras justo odio</li>
+                            <li class="list-group-item">Dapibus ac facilisis in</li>
+                            <li class="list-group-item">Morbi leo risus</li>
+                            <li class="list-group-item">Porta ac consectetur ac</li>
+                            <li class="list-group-item">Vestibulum at eros</li>
+                        </ul>
+                    </div>
+                    <div class="m-body-message" ng-if="footerType == 'message'">
+                        <ul class="list-group">
+                            <li class="list-group-item"><i class="fa fa-bell"></i>&nbsp;Cras justo odio</li>
+                            <li class="list-group-item"><i class="fa fa-bell"></i>&nbsp;Dapibus ac facilisis in</li>
+                            <li class="list-group-item"><i class="fa fa-bell-o"></i>&nbsp;Morbi leo risus</li>
+                            <li class="list-group-item"><i class="fa fa-bell-o"></i>&nbsp;Porta ac consectetur ac</li>
+                            <li class="list-group-item"><i class="fa fa-bell-o"></i>&nbsp;Vestibulum at eros</li>
+                        </ul>
+                    </div>
+                    <div class="m-body-setting" ng-if="footerType == 'setting'">
+                        <a class="btn btn-default">注销</a>
+                    </div>
+                </div>
+            </div>
+            <div class="m-footer m-component">
+                <div class="footer-item" ng-click="switchMbBodyContent('menu')" ng-class="{'footer-check':footerType=='menu'}">
+                    <i class="fa fa-th-list"></i>
+                    <span>菜单</span>
+                </div>
+                <div class="footer-item" ng-click="switchMbBodyContent('collection')" ng-class="{'footer-check':footerType=='collection'}">
+                    <i class="fa " ng-class="{'fa-star':footerType=='collection', 'fa-star-o':footerType!='collection'}"></i>
+                    <span>收藏</span>
+                </div>
+                <div class="footer-item" ng-click="switchMbBodyContent('message')" ng-class="{'footer-check':footerType=='message'}">
+                    <i class="fa " ng-class="{'fa-commenting':footerType=='message', 'fa-commenting-o':footerType!='message'}"></i>
+                    <span>消息</span>
+                </div>
+                <div class="footer-item" ng-click="switchMbBodyContent('setting')" ng-class="{'footer-check':footerType=='setting'}">
+                    <i class="fa fa-cog"></i>
+                    <span>设置</span>
+                </div>
+            </div>
+            <div class="m-chart-body m-component">
+                <iframe id="mainMbChartFrame" frameborder="0" class="full-content" name="mainIframe" src="" frameborder="0"></iframe>
+            </div>
+        </div>
+        <div id="pcHomePage" style="display: none;">
+            <header class="header" ng-style="headerStyle">
+                智慧运营分析平台
+            </header>
+            <main ng-style="themeStyle">
+                <iframe id="mainChartFrame" name="mainIframe" src="" frameborder="0"></iframe>
+            </main>
+            <div class="nav-btn-group" ng-style="navBtnGroup">
+                <div class="btn">
+                    <i class="fa fa-cog"></i>
+                    <a href="#">设置</a>
+                </div>
+                <div class="btn">
+                    <i class="fa fa-sign-out"></i>
+                    <a href="/account/homepage/logout">退出</a>
+                </div>
+            </div>
+            <div ng-click="switchHeader();" ng-style="toggleStyle" class="header-status" >
+                <!-- <i ng-class="{true:'fa fa-toggle-up',false:'fa fa-toggle-down'}[headerStatus]"></i> -->
+            </div>
+            <div class="nav-btn" ng-click="openList($event);" ng-style="navBtnStyle">导航</div>
+            <div class="nav-list menu-list" ng-style="navListStyle" ng-mouseleave="switchMenu('hide')" ng-mouseover="switchMenu('show')">
+                <ul class="list">
+                    <li class="menu_title" ng-repeat="row in menuList">
+                        <div class="first-title" ng-click="open($index,$event,row)" ng-mouseover="showChildMenu($index, row, menuList)">
+                            {{ row.name }}
+                            <i ng-if="row.child.length > 0" class="fa fa-caret-right menu-arrow"></i>
+                        </div><!-- ng-mouseover="showChildMenu(row, menuList)" -->
+                        <ul ng-if="row.child.length > 0" class="child-list menu-list" ng-style="child_style" ><!-- ng-class="{true:'active'}[row.is_active]" -->
+                            <li ng-repeat="childrow in row.child" class="menu_title" ng-click="toPage(childrow)">{{ childrow.name }}</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- <footer >
+                <div class="nav-btn" ng-click="openList($event);" ng-class="{true:'active',false:''}[clicked]">
+                    菜单
+                </div>
+                <div class="nav-list box_shadow" ng-class="{true:'active',false:''}[clicked]">
+                    <ul class="list ">
+                        <li class="menu_title" ng-click="open($index,$event,row)" ng-repeat="row in menuList">
+                            <div ng-mouseover="showChildMenu(row, menuList)" class="title">{{ row.name }}</div>
+                            <ul class="child-list box_shadow" ng-style="child_style" ng-class="{true:'active'}[row.is_active]">
+                                <li ng-repeat="childrow in row.child" class="menu_title" ng-click="toPage(childrow)">{{ childrow.name }}</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </footer> -->
+        </div>
+    </div>
+
+</body>
+{% endverbatim %}
+<script src="{% static 'bi/homepage/index.js' %}?v={{ nowversion }}1"></script>
+
+</html>

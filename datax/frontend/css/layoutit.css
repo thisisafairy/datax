@@ -1,0 +1,781 @@
+@charset "utf-8";
+.rootlayout {
+    -webkit-transition: margin 500ms ease;
+    -moz-transition: margin 500ms ease;
+    -ms-transition: margin 500ms ease;
+    -o-transition: margin 500ms ease;
+    transition: margin 500ms ease;
+    overflow-y: auto;
+}
+
+.navbar {}
+
+@media (max-width: 980px) {
+    /* Enable use of floated navbar text */
+    .navbar-text.pull-right {
+        float: none;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
+@media (max-width: 979px) {
+    .navbar-fixed-top {}
+    .navbar-fixed-top {}
+}
+
+.navbar-inverse .brand {
+    width: 180px;
+    color: #fff;
+}
+
+.brand img {
+    float: left;
+    margin: 2px 10px 0 0;
+}
+
+.brand .label {
+    position: relative;
+    left: 10px;
+    top: -3px;
+    font-weight: normal;
+    font-size: 9px;
+    background: #666;
+    -webkit-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.7);
+    -moz-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.7);
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.edit .demo {
+    padding-top: 28px;
+    border: 1px solid #c5c4c4;
+    border-radius: 4px;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.edit .demo:after {
+    background-color: #F5F5F5;
+    border: 1px solid #DDDDDD;
+    border-radius: 0px 0 4px 0;
+    color: #9DA0A4;
+    content: "框架容器";
+    font-size: 8px;
+    font-weight: bold;
+    left: -1px;
+    padding: 3px 7px;
+    position: absolute;
+    top: -1px;
+}
+
+#containerBody .demo.ui-sortable {
+    border: none;
+    min-height: 100%;
+}
+
+.sidebar-nav {
+    height: 100%;
+}
+
+.sidebar-nav .nav-header {
+    cursor: pointer;
+    font-size: 14px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-nav .nav-header span.label {
+    font-size: 10px;
+    /*padding-bottom:0;*/
+    position: relative;
+    top: -1px;
+}
+
+.sidebar-nav .nav-header i.icon-plus {}
+
+.sidebar-nav .nav-header .popover {
+    color: #999;
+    text-shadow: none;
+}
+
+.popover-info {
+    position: relative;
+}
+
+.popover-info .popover {
+    display: none;
+    top: -12.5px;
+    left: 15px;
+}
+
+.popover-info:hover .popover {
+    display: block;
+    opacity: 1;
+    width: 400px;
+}
+
+.popover-info:hover .popover .arrow {
+    top: 23px;
+}
+
+.sidebar-nav .accordion-group {
+    border: none;
+}
+
+.boxes {}
+
+.sidebar-nav li {
+    padding-bottom: 5px;
+}
+
+.sidebar-nav .box {
+    line-height: 25px;
+    width: 160px;
+    height: 25px;
+}
+
+.sidebar-nav .chart {
+    height: 25px;
+    width: 160px;
+    /*height: auto !important;*/
+    overflow: inherit;
+}
+
+.sidebar-nav .preview {
+    display: block;
+    color: #666;
+    font-size: 12px;
+    line-height: 22px;
+}
+
+.sidebar-nav .preview input {
+    width: 90px;
+    padding: 0 10px;
+    background: #bbb;
+    font-size: 10px;
+    color: #999;
+    line-height: 20px;
+    height: 20px;
+    position: relative;
+    top: -1px;
+}
+
+.sidebar-nav .view {
+    display: none;
+}
+
+.sidebar-nav .chart .view {
+    display: block;
+}
+
+.sidebar-nav .remove, .sidebar-nav .configuration {
+    display: none;
+}
+
+.sidebar-nav .boxes {
+    display: none;
+}
+
+.demo .preview {
+    display: none;
+}
+
+.demo .box .view {
+    display: block;
+}
+
+.ui-draggable-dragging .view {
+    display: block;
+}
+
+/*.demo .ui-sortable-placeholder { outline: 5px dotted #ddd; visibility: visible!Important; border-radius: 4px; }*/
+
+.ui-sortable-placeholder {
+    outline: 1px dashed rgb(235, 159, 159);
+    visibility: visible!Important;
+    border-radius: 4px;
+}
+.boxes .drag{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    cursor: pointer;
+}
+.grid-btn .drag{
+    top: 5px;
+    right: 56px;
+    position: absolute;
+    cursor: pointer;
+    z-index: 11;
+}
+
+.box, .lyrow {
+    position: relative;
+}
+
+.box {
+    z-index: 10;
+    margin:5px 35px 0px 0px;
+    padding: 5px;
+    /*background-color: #FFFFFF;*/
+}
+
+#estRows .grid-btn .drag {
+    top: 5px;
+    right: 0px;
+    z-index: 10;
+    margin-top: -6px;
+}
+#elmComponents .chart .drag {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+}
+
+.configuration button{
+    display: inline-block!important;
+}
+.chart .drag ,.filterFrameStyle .drag ,.staticFrameStyle .drag{
+    position: static;
+}
+.chart .remove ,.filterFrameStyle .remove ,.staticFrameStyle .remove{
+    position: static!important;
+}
+.chart .configuration ,.filterFrameStyle .configuration ,.staticFrameStyle .configuration {
+    /*position: absolute;*/
+    top: 35px;
+    right: -46px;
+    white-space: nowrap;
+    z-index: 5;
+    width: 150px;
+    height: 200px;
+}
+
+.grid-btn .remove {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 11;
+}
+
+.demo .configuration {
+    filter: alpha(opacity=0);
+    opacity: 0;
+    -webkit-transition: all 500ms ease;
+    -moz-transition: all 500ms ease;
+    -ms-transition: all 500ms ease;
+    -o-transition: all 500ms ease;
+    transition: all 500ms ease;
+}
+
+.demo .drag, .demo .remove {
+    filter: alpha(opacity=0);
+    opacity: 0;
+    -webkit-transition: all 500ms ease;
+    -moz-transition: all 500ms ease;
+    -ms-transition: all 500ms ease;
+    -o-transition: all 500ms ease;
+    transition: all 500ms ease;
+}
+
+.demo .lyrow:hover>.drag, .demo .lyrow:hover>.configuration, .demo .lyrow:hover>.remove, .demo .box:hover .drag, .demo .box:hover .configuration, .demo .box:hover .remove {
+    filter: alpha(opacity=100);
+    opacity: 1;
+}
+
+/*
+.edit .demo .row-fluid:before {
+    background-color: #bb7546;
+    border: 1px solid #ff0000;
+    border-radius: 4px 0 4px 0;
+    color: #FFFFFF;
+    content: "行";
+    font-size: 10px;
+    font-weight: bold;
+    left: -1px;
+    line-height: 2;
+    padding: 3px 7px;
+    position: absolute;
+    top: -1px;
+} */
+
+.demo .row-fluid {
+    /*background-color: #ffffff;*/
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    /*-webkit-box-shadow: inset 0 1px 13px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: inset 0 1px 13px rgba(0, 0, 0, 0.1);
+	box-shadow: inset 0 1px 13px rgba(0, 0, 0, 0.1);*/
+    /*border: 1px solid #DDDDDD;改*/
+    /*border-radius: 4px 4px 4px 4px;改改*/
+    /* margin: 10px 0; */
+    position: relative;
+    padding: 0 5px;
+}
+
+.ui-sortable{
+    border: 2px solid #fff;
+}
+
+/* .edit .column:after {
+    background-color: #F5F5F5;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px 0 4px 0;
+    color: #9DA0A4;
+    content: "列";
+    font-size: 12px;
+    font-weight: bold;
+    left: -1px;
+    padding: 3px 7px;
+    position: absolute;
+    top: -1px;
+} */
+
+.column {
+    /*background-color: #FFFFFF;改*/
+    /*border: 1px solid #DDDDDD;改*/
+    border-radius: 4px 4px 4px 4px;
+    margin: 5px 0;
+    padding:0px 5px 5px 5px;
+    position: relative;
+    min-height: 36px;
+}
+
+/* preview */
+
+body.devpreview {
+    margin-left: 0px;
+}
+
+.devpreview .sidebar-nav {
+    left: -200px;
+    -webkit-transition: all 0ms ease;
+    -moz-transition: all 0ms ease;
+    -ms-transition: all 0ms ease;
+    -o-transition: all 0ms ease;
+    transition: all 0ms ease;
+}
+
+.devpreview .left-panel{
+    width: 0 !important;
+}
+/*.devpreview .drag, .devpreview .*/
+configuration, .devpreview .remove {
+    display: none !Important;
+}
+/*.devpreview .demo .box, */
+.devpreview .demo .row-fluid {
+    padding-top: 0;
+    background: none;
+}
+
+.devpreview .demo .column {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#download-layout {
+    display: none
+}
+
+#editorModal textarea, #downloadModal textarea {
+    width: 100%;
+    height: 280px;
+    resize: none;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#editorModal {
+    width: 640px;
+}
+
+a.language-selected {
+    font-style: italic;
+    font-weight: bold;
+}
+
+.grid-btn>.configuration button {
+    position: absolute;
+    z-index: 10;
+    right: 106px;
+    top: 3px;
+}
+
+.row-fluid {
+    width: 100%;
+    *zoom: 1;
+}
+
+.row-fluid:before, .row-fluid:after {
+    display: table;
+    content: "";
+    line-height: 0;
+}
+
+.row-fluid:after {
+    clear: both;
+}
+
+.row-fluid [class*="span"] {
+    display: block;
+    width: 100%;
+    min-height: 30px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    margin-left: 1.2%;
+    *margin-left: 1%;
+}
+
+.row-fluid [class*="span"]:first-child {
+    margin-left: 0;
+}
+
+.row-fluid .controls-row [class*="span"]+[class*="span"] {
+    margin-left: 1%;
+}
+
+.row-fluid .span12 {
+    width: 100%;
+    *width: 99.94680851063829%;
+}
+
+.row-fluid .span11 {
+    width: 91.48936170212765%;
+    *width: 91.43617021276594%;
+}
+
+.row-fluid .span10 {
+    width: 82.97872340425532%;
+    *width: 82.92553191489361%;
+}
+
+.row-fluid .span9 {
+    width: 74.46808510638297%;
+    *width: 74.41489361702126%;
+}
+
+.row-fluid .span8 {
+    width: 65.95744680851064%;
+    *width: 65.90425531914893%;
+}
+
+.row-fluid .span7 {
+    width: 57.44680851063829%;
+    *width: 57.39361702127659%;
+}
+
+.row-fluid .span6 {
+    width: 48.93617021276595%;
+    *width: 48.88297872340425%;
+}
+
+.row-fluid .span5 {
+    width: 40.42553191489362%;
+    *width: 40.37234042553192%;
+}
+
+.row-fluid .span4 {
+    width: 31.914893617021278%;
+    *width: 31.861702127659576%;
+}
+
+.row-fluid .span3 {
+    width: 23.404255319148934%;
+    *width: 23.351063829787233%;
+}
+
+.row-fluid .span2 {
+    width: 14.893617021276595%;
+    *width: 14.840425531914894%;
+}
+
+.row-fluid .span1 {
+    width: 6.382978723404255%;
+    *width: 6.329787234042553%;
+}
+
+.alert {
+    padding: 8px 35px 8px 14px;
+    margin-bottom: 20px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    background-color: #fcf8e3;
+    border: 1px solid #fbeed5;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.alert, .alert h4 {
+    color: #c09853;
+}
+
+.alert h4 {
+    margin: 0;
+}
+
+.alert .close {
+    position: relative;
+    top: -2px;
+    right: -21px;
+    line-height: 20px;
+}
+
+.alert-success {
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    color: #468847;
+}
+
+.alert-success h4 {
+    color: #468847;
+}
+
+.alert-danger, .alert-error {
+    background-color: #f2dede;
+    border-color: #eed3d7;
+    color: #b94a48;
+}
+
+.alert-danger h4, .alert-error h4 {
+    color: #b94a48;
+}
+
+.alert-info {
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+    color: #3a87ad;
+}
+
+.alert-info h4 {
+    color: #3a87ad;
+}
+
+.alert-block {
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+.alert-block>p, .alert-block>ul {
+    margin-bottom: 0;
+}
+
+.alert-block p+p {
+    margin-top: 5px;
+}
+
+.content-wrapper {
+    background-color: #e3e6eb;
+}
+
+.content-wrapper .container-fluid .navbar.conf-navb {
+    border-radius: 0;
+}
+
+.container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#menu-layoutit {
+    margin-top: 4px;
+    margin-left: 17.2%;
+}
+
+select.markselect.auto {
+    background-color: #f4f4f4;
+    border-radius: 3px;
+    border: 1px solid #c2c8d8;
+    color: #333333;
+    font-size: 12px;
+    padding-bottom: 2px;
+    margin-top: -3px;
+}
+
+.sidebar-nav .nav.nav-list.accordion-group .nav-hea {
+    text-shadow: none;
+}
+
+.shelf-pane .shelf-group .shelf .shelf-label {
+    padding-left: 8px;
+}
+
+.sidebar-nav .accordion-group .rows .lyrow .drag {
+    font-size: 12px;
+    color: #999999;
+    background-color: #f4f4f4;
+    border: 1px solid #cacaca;
+}
+
+.sidebar-nav .accordion-group .rows .lyrow .preview .preview-inpt {
+    background-color: #ffffff;
+    width: 105px;
+}
+
+.sidebar-nav .accordion-group .rows .lyrow .drag.label {
+    background-color: #57658c;
+    color: #ffffff;
+}
+
+.sidebar-nav .accordion-group .boxes .box .preview {
+    line-height: 19px;
+    padding-left: 6px;
+    max-width: 90px;
+    overflow: hidden;
+
+}
+
+.sidebar-nav .accordion-group .boxes .box .drag.label {
+    margin-top: 1px!important;
+    background-color: #57658c;
+    margin-right: 4px;
+    line-height: 19px;
+}
+
+.nav-collapse .nav .btn-group .btn.btn-primary {
+    color: #333333;
+    box-shadow: none;
+    text-shadow: none;
+    border: 1px solid #dddddd;
+    background-color: #f4f4f4;
+    background-image: none;
+}
+
+.nav-collapse .nav .btn-group .btn.btn-primary.active {
+    background-color: #e7e7e7;
+    border: 1px solid #adadad;
+}
+
+.nav-collapse .nav .btn-group .btn.btn-primary i {
+    margin-right: 3px;
+}
+
+/*组件设计*/
+
+.pane.data-pane.noselect .card .sidebar-header h2 a small {
+    color: #333333;
+}
+
+.pane.data-pane.noselect .card .sidebar-header button span {
+    margin-right: 2px;
+}
+
+.pane.encoding-pane .card .shelf-encoding-pane .right {
+    padding-left: 6px !important;
+}
+
+.pane.encoding-pane .card .shelf-encoding-pane .shelf-pane.shelf-marks-pane .right {
+    margin-top: -3px;
+}
+
+.pane.encoding-pane .card .shelf-pane .right i {
+    margin-right: 2px;
+}
+
+.pane.data-pane .card .sidebar-header button {
+    height: 24px;
+}
+
+.shelf-pane.shelf-marks-pane h3 {
+    margin-bottom: 8px;
+}
+
+.shelf-pane.shelf-positional-pane.full-width {
+    margin-bottom: 18px;
+}
+
+.shelf-pane.shelf-marks-pane.full-width {
+    margin-bottom: 0px;
+}
+
+.shelf-pane.shelf-encoding-pane.full-width {
+    margin-bottom: 10px;
+    margin-top: 14px;
+}
+
+/*场景设置容器框架的编辑弹窗里的按钮*/
+
+#savecontentcol, #removecontentcol, #savecontent {
+    background: none;
+    background-color: #57658c;
+    border: 1px solid #38425d;
+}
+
+#editorColumnModal .modal-footer .btn-cancel, #editorModal .modal-footer .btn-cancel {
+    background: none;
+    color: #474747;
+    border: 1px solid #a1a1a1;
+    text-shadow: none;
+}
+
+.open-header {
+    padding: 15px;
+    height: 46px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.modal-title.open-header-title {
+    float: left;
+    width: 80%;
+    font-size: 18px;
+    line-height: 19px;
+}
+
+.colheight {
+    line-height: 30px;
+}
+
+#downloadModal .btn-group .btn, #btnSave {
+    background: none;
+    background-color: #57658c;
+    color: #ffffff;
+}
+
+#downloadModal .btn-group .btn.active {
+    background: none;
+    background-color: #38425d;
+    color: #ffffff;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+}
+
+.border-line {
+    border: 1px solid #333;
+}
+
+.text-center {
+    border-bottom: 1px dotted #dedede;
+}
+
+/*.cell-box {
+    background: white;
+}*/
+
+.pane {
+    padding: 0px;
+    position: relative;
+}
+
+.left-panel {
+    width: 200px;
+    flex-shrink: 0;
+    background: #ccc;
+    padding: 9px 0;
+    border-right: 1px solid #ccc;
+}
+
+.main-panel {
+    -webkit-box-flex: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+}
+.configuration span{
+    display: inline-block;
+}

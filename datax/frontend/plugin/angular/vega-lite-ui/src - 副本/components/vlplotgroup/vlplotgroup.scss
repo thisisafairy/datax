@@ -1,0 +1,134 @@
+
+.vis-list-more, .vis-list-empty {
+  height: 60px;
+  line-height: 60px;
+  vertical-align: middle;
+  text-align:center;
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+/** vl-plot-group in vis-list */
+// TODO consider if this can just be moved to .vis-list
+.vl-plot-group.wrapped-vl-plot-group {
+  // max-width: 520px;
+  overflow-x: hidden;
+  max-height: 390px;
+  flex-grow: 1;
+  padding-right: 11px;
+  padding-bottom: 11px;
+  .vl-plot {
+    min-height: 150px;
+  }
+}
+
+/** used for vertical scroll thumbnails */
+.vl-plot-group.row-vl-plot-group {
+  max-width: 100%;
+
+  max-height: 390px;
+
+  &.selected {
+    border: 3px solid #aaa;
+    background: #ccc;
+    .vl-plot canvas{
+      opacity: 0.85;
+    }
+  }
+}
+
+.vl-plot-group .filter-info {
+    line-height: 18px;
+    height: 20px;
+    width: 22px;
+    text-align: center;
+}
+
+.vl-plot-group a.command{
+  color: #aaa;
+  user-select: none;
+
+  &.debug {
+    color: #72a386;
+  }
+
+  &.active {
+    color: #0c96d0;
+  }
+
+  &.active:hover {
+    color: $link-hover-color;
+  }
+
+  &:hover {
+    color: #72C1D5;
+  }
+
+  .fa.fa-refresh.transpose {
+    transform: rotateZ(135deg) scaleX(-1);
+  }
+
+  .fa.sort.sort-x {
+   transform: rotateZ(270deg);
+  }
+
+  &.disabled, &.disabled:hover, &[disabled=disabled], [disabled=disabled]:hover {
+    display: none;
+  }
+
+}
+
+
+
+.vl-plot-group-header {
+  margin-bottom: 5px;
+  display: flex;
+  .toolbox {
+    position: relative;
+    flex-grow: 0;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .toolbox .command {
+    text-transform: uppercase;
+  }
+
+  .command.select {
+    .fa-server {
+      transform: scaleX(-1);
+    }
+  }
+}
+
+.dev-tool {
+  width: 150px;
+}
+
+.vl-plot-group .annotation {
+  min-height: 60px;
+  resize: none;
+  border-color: lightgray;
+}
+
+.bookmark-alert {
+  position: absolute;
+  right: 0;
+  top: 20px;
+  color: white;
+  background-color: #38425D;
+  padding: 8px;
+  border-radius: 3px;
+  text-align: left;
+  z-index: 1;
+  min-width: 150px;
+}
+.bookmark-alert a {
+  color: white;
+  margin-right: 8px;
+}
+.bookmark-alert a:hover {
+  color: lightgray;
+}
+.bookmark-alert a i {
+  margin-right: 4px;
+}

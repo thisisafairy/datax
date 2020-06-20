@@ -1,0 +1,93 @@
+{% extends 'base.html' %} {% load staticfiles %} {% block title %}全局消息模板配置{% endblock %} {% block content %} {% verbatim %}
+<style>
+.searchboxstyle{
+    padding-left: 0px;
+}
+.importbuttonstyle{
+    float: left;
+    padding-left: 20px;
+}
+.importDtCountStyle{
+    display: inline-block;
+    min-width: 240px;
+    position: relative;
+    top: 2px;
+}
+.logshowarea{
+    height: 150px;
+    width:100%;
+    overflow-y:scroll
+}
+.tbodystyle{
+    height: 250px;
+    overflow-y:scroll;
+}
+.upWarning{
+    color:red;
+    padding-left: 20px;
+}
+.myxbtn{
+    height: 27px;
+
+}
+ #editor {overflow:scroll; max-height:300px}
+</style>
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel" style="display: inline-block">
+        全局消息模板配置
+    </h1>
+</section>
+<div class="col-sm-12" ng-app="msgconfig">
+    <div class="box" ng-controller="msgConfigController">
+         <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#emailConfig" role="tab" data-toggle="tab">邮件配置</a></li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" id="emailConfig" class="tab-pane active">
+                <div>
+                    <label>所有已配置模板:</label>
+                </div>
+                <button class="fa fa-plus btn btn-default btn-usermanage" ng-click="openemailtemplate()">新增</button>
+                <table class="table table-hover" >
+                    <tr>
+                        <td>模板名称</td>
+                        <td>模板标题</td>
+                        <td>模板内容</td>
+                        <td>状态</td>
+                        <td>操作</td>
+                    </tr>
+                    <tr ng-repeat="template in templateconfs">
+                        <td>{{ template.templatename }}</td>
+                        <td>{{ template.templatetitle }}</td>
+                        <td>{{ template.templatecontent }}</td>
+                        <td>{{ template.status == 0? '未使用':'已使用'}}</td>
+                        <td>
+                            <button class="btn btn-primary editable-table-button btn-xs btn-buttons"
+                                    ng-click="edit(template.id,'emailtemplate')">编辑</button>
+                            <button class="btn btn-primary editable-table-button btn-xs btn-buttons"
+                                        ng-click="del(template.id,'emailtemplate')">删除</button>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+            <div >
+                <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                    boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+{% endverbatim %}
+
+
+
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'system/importdata/msgconfig.js' %}?v={{ nowversion }}1"></script> {% endblock %}

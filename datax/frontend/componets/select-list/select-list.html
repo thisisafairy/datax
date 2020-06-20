@@ -1,0 +1,18 @@
+<div class="datax-select-list select-list-full-content {{ componentStyle }}" ng-class="contentClass">
+    <div class="select-list-header text-not-wrap">
+        <span ng-if="titleName">{{ titleName }}</span>
+    </div>
+    <div class="select-list-body">
+        <div class="select-list-filter" ng-if="filter">
+            <input class="select-list-filter-input">
+        </div>
+        <ul class="select-list-item-list">
+            <li class="select-list-item text-not-wrap" ng-repeat="row in list" title="{{ row[displayField] }}"
+                ng-click="selectItem(row, '')" ng-dblclick="selectItem(row, 'db')"
+                ng-class="{'row-checked':row['checked']}">
+                <span>{{ row[displayField] }}</span>
+            </li>
+        </ul>
+    </div>
+
+</div>

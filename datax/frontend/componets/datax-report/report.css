@@ -1,0 +1,12 @@
+.report-table-content {
+    width: 100%;
+    height: 100%;
+}
+
+.report-table-content .report-table {
+    border-collapse: collapse;
+}
+
+.report-table-content .report-table td {
+    border: 1px solid rgba(204, 204, 204, 1);
+}

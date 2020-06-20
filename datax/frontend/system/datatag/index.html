@@ -1,0 +1,62 @@
+ {% extends 'base_177.html' %} {% load staticfiles %} {% block title %}数据标签{% endblock %} {% block content %}
+    <link rel="stylesheet" href="{% static 'plugin/angular/angular-material/angular-material.min.css' %}" />
+{% verbatim %}
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel">
+        数据标签
+    </h1>
+</section>
+<div class="col-sm-12 user-list" ng-app="datapermtaglist" id="datapermtaglist">
+    <div class="box" ng-controller="datapermtagController">
+        <div class="box-body user-list-body">
+            <div class="col-md-3">
+                <a class="btn btn-default btn-usermanage" ng-click="open()">
+                    <i class="fa fa-plus"></i> 新增
+                </a>
+            </div>
+            <div class="col-md-offset-6 col-md-3">
+                <div class="form-group">
+                    <div class="col-sm-6 cont-body-tabinput">
+                        <input type="text" ng-model="searchkey" ng-change="search()" class="form-control cont-bodyfrom-input" placeholder="搜索名称">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 userlist-table">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th data-field="tagname" data-align="left">标签名</th>
+                            <th data-field="tagremark" data-align="left">备注</th>
+                            <th style="min-width: 126px">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(key,value) in lists">
+                            <td>{{ value.tagname }}</td>
+                            <td>{{ value.tagremark }}</td>
+                            <td>
+                                <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="edit(value.id)">编辑</button>
+                                <button class="btn  editable-table-button  btn-xs btn-buttons" ng-click="delete(value)">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-12">
+                <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                    boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endverbatim %}
+<script src="{% static 'plugin/angular/angular-aria/angular-aria.min.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-animate/angular-animate.min.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-messages/angular-messages.min.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-material/angular-material.min.js' %}"></script>
+
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'system/datatag/index.js' %}?v={{ nowversion }}1"></script> {% endblock %}

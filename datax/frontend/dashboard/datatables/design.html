@@ -1,0 +1,630 @@
+{% extends 'base_lite.html' %} {% load staticfiles %}
+{% block title %}
+报表设计
+{% endblock %} {% block content %}
+<!--<editor-fold desc="静态资源">-->
+<!-- #region -->
+<link rel="stylesheet" href="{% static 'plugin/colorpicker/bootstrap-colorpicker.min.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-bootstrap-colorpicker/colorpicker.min.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/angular/angularjs-datepicker/angular-datepicker.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/handsontable/handsontable.full.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'css/common.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'componets/groupselect/group-select.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'componets/multi-select/multi-select.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'componets/select-list/select-list.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'componets/datax-report/report.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'dashboard/datatables/report-design.css' %}?v={{ nowversion }}1">
+<!-- #endregion -->
+<!--</editor-fold>-->
+{% verbatim %}
+<div class="design-main-content" ng-app="reportDesignApp" style="background-color: RGBA(255, 255, 255, 1)"
+    ng-controller="reportDesignController">
+    <div class="design-content" ng-style="style()" resize>
+        <div class="box-mask"></div>
+        <!--<editor-fold desc="保存">-->
+        <!-- #region -->
+        <div class="save-content standard-modal general-transition floating-layer-margin">
+            <div class="modal-header open-header">
+                保存
+                <button type="button" ng-click="closeSavePanel()" class="close open-close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body open-body">
+                <form class="form-horizontal" name="saveForm">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">名称</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="name" required class="form-control" ng-model="tableData.name">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">类型</label>
+                        <div class="col-sm-6">
+                            <multi-select items="enumKinds" value-field="'code'" display-field="'name'"
+                                value="tableData.kind" value-change="" multiple="false" filter="false"></multi-select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">标签</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer footer-btn">
+                <button class="btn btn-primary btn-ok" id="saveBtn" ng-disabled="saveForm.name.$invalid" type="button"
+                    ng-click="saveReportConfig()">保存</button>
+                <button class="btn btn-default" type="button" ng-click="closeSavePanel()">新增报表</button>
+                <button class="btn btn-default" type="button" ng-click="closeSavePanel()">继续编辑</button>
+                <button class="btn btn-default" type="button" ng-click="closeSavePanel()">配置场景</button>
+                <button class="btn btn-default" type="button" ng-click="closeSavePanel()">关闭页面</button>
+            </div>
+        </div>
+        <!-- #endregion -->
+        <!--</editor-fold>-->
+
+        <!--<editor-fold desc="全局配置">-->
+        <!-- #region -->
+        <div class="global-panel standard-modal" ng-init="switch='permission'" datax-panel-drag>
+            <div class="modal-header open-header custom-header drag-title">
+                <ul class="nav nav-tabs">
+                    <li role="presentation" ng-class="{'active':switch == 'permission'}"
+                        ng-click="switch = 'permission'"><a>权限</a></li>
+                    <li role="presentation" ng-class="{'active':switch == 'pinned'}" ng-click="switch = 'pinned'">
+                        <a>行列锁定</a></li>
+                    <!-- <li role="presentation" ng-class="{'active':switch == 'tableReport'}" ng-click="switch = 'tableReport'"><a>数据填报配置</a></li> -->
+                </ul>
+                <button type="button" ng-click="closeGlobalPanel()" class="close open-close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body open-body">
+                <div ng-show="switch == 'permission'">
+                    <div style="line-height: 34px;">
+                        <label class="col-sm-3 control-label">列权限</label>
+                        <div class="col-sm-3"><a class="btn btn-default" ng-click="addPermission('col')">新增</a></div>
+                        <label class="col-sm-3 control-label">行权限</label>
+                        <div class="col-sm-3"><a class="btn btn-default" ng-click="addPermission('row')">新增</a></div>
+                    </div>
+                    <div class="equally-distributed-2" style="margin-top: 10px;">
+                        <div class="form-group" ng-repeat="($index, col) in tableData.permission.col track by $index">
+                            <label>列</label>
+                            <input type="number" class="form-control" min="1" max="1000" step="1" ng-model="col.num">
+                            <label>权限</label>
+                            <multi-select items="usertag" display-field="'name'" value-field="'id'" value="col.tag"
+                                filter="true"></multi-select>
+                            <button type="button" class="btn btn-primary"
+                                ng-click="deletePermission('col', $index)">删除</button>
+                        </div>
+                    </div>
+                    <div class="equally-distributed-2" style="margin-top: 10px;">
+                        <div class="form-group" ng-repeat="($index, row) in tableData.permission.row track by $index">
+                            <label>列</label>
+                            <input type="number" class="form-control" min="1" max="1000" step="1" ng-model="row.num">
+                            <label>权限</label>
+                            <multi-select items="usertag" display-field="'name'" value-field="'id'" value="row.tag"
+                                filter="true"></multi-select>
+                            <button type="button" class="btn btn-primary"
+                                ng-click="deletePermission('row', $index)">删除</button>
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="switch == 'pinned'">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">增加在左边锁定的列</label>
+                                <div class="col-sm-6">
+                                    <multi-select items="colLeftArr" display-field="'name'" value-field="'id'"
+                                        value="tableData.pinned.left" multiple="true"></multi-select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">增加在右边锁定的列</label>
+                                <div class="col-sm-6">
+                                    <multi-select items="colRightArr" display-field="'name'" value-field="'id'"
+                                        value="tableData.pinned.right" multiple="true"></multi-select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">增加在上方锁定的行</label>
+                                <div class="col-sm-6">
+                                    <multi-select items="rowArr" display-field="'name'" value-field="'id'"
+                                        value="tableData.pinned.top" multiple="true"></multi-select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">增加在下方锁定的行</label>
+                                <div class="col-sm-6">
+                                    <multi-select items="rowArr" display-field="'name'" value-field="'id'"
+                                        value="tableData.pinned.bottom" multiple="true"></multi-select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div ng-show="switch == 'tableReport'">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">no</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer footer-btn">
+                <button class="btn btn-primary btn-ok" type="button" ng-click="closeGlobalPanel('save')">保存</button>
+                <button class="btn btn-warning btn-cancel" type="button"
+                    ng-click="closeGlobalPanel('close')">关闭</button>
+            </div>
+        </div>
+        <!-- #endregion -->
+        <!--</editor-fold>-->
+
+        <!--<editor-fold desc="单元格设置">-->
+        <!-- #region -->
+        <div class="function-content standard-modal" datax-panel-drag>
+            <div class="modal-header open-header custom-header drag-title">
+                <ul class="nav nav-tabs">
+                    <li role="presentation" ng-show="configSwitchGroup.indexOf('function') > 0"
+                        ng-class="{'active':configSwitch == 'function'}" ng-click="configSwitch = 'function'"><a>公式</a>
+                    </li>
+                    <li role="presentation" ng-show="configSwitchGroup.indexOf('group') > 0"
+                        ng-class="{'active':configSwitch == 'group'}" ng-click="configSwitch = 'group'"><a>分组汇总</a></li>
+                    <li role="presentation" ng-show="configSwitchGroup.indexOf('cellType') > 0"
+                        ng-class="{'active':configSwitch == 'cellType'}" ng-click="configSwitch = 'cellType'">
+                        <a>数据填报配置</a></li>
+                </ul>
+                <button type="button" ng-click="closeFunctionEditPanel()" class="close open-close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body open-body">
+                <div ng-show="configSwitch == 'function'">
+                    <div class="function-edit">
+                        <textarea class="function-input" ng-model="functionText"></textarea>
+                    </div>
+                    <div class="function-type-list">
+                        <select-list items="functionList" display-field="'name'" value="functionType"
+                            value-change="changeFunctionType()" title-name="'函数类型:'"></select-list>
+                    </div>
+                    <div class="function-name-list">
+                        <select-list items="functions" display-field="'code'" db-click-function="changeFunctionArea()"
+                            value="selectFunction" value-change="changeFunction()" title-name="'名称:'"></select-list>
+                    </div>
+                    <div class="function-description">
+                        <div>{{ selectDescription }}</div>
+                    </div>
+                </div>
+                <div ng-show="configSwitch == 'group'">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">是否分组汇总</label>
+                            <div class="col-sm-6">
+                                <div class="checkbox">
+                                    <label>
+                                        <input ng-model="summaryGroup.group" type="checkbox">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="summaryGroup.group">
+                            <label class="col-sm-3 control-label">选择父数据所在的单元格</label>
+                            <div class="col-sm-6">
+                                <multi-select items="olapDataCell" value-field="'coors'" display-field="'name'"
+                                    value="summaryGroup.parentRow" filter="true" value-change="changeGroupParent()">
+                                </multi-select>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="summaryGroup.group">
+                            <label class="col-sm-3 control-label">选择当前单元格合并方式</label>
+                            <div class="col-sm-6">
+                                <multi-select items="summaryMethod" value-field="'code'" display-field="'name'"
+                                    value="summaryGroup.type"></multi-select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div ng-show="configSwitch == 'cellType'">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">列名</label>
+                            <div class="col-sm-6">
+                                <input type="text" ng-model="cellEditOptions.name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">编辑框类型</label>
+                            <div class="col-sm-6">
+                                <multi-select items="editTypes" value-field="'value'" display-field="'name'"
+                                    value="cellEditOptions.type"></multi-select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">数据源</label>
+                            <div class="col-sm-6">
+                                <multi-select items="dictsList" display-field="'dictionary_name'" value-field="'id'"
+                                    value="cellEditOptions.source" filter="true"></multi-select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer footer-btn">
+                <button class="btn btn-primary btn-ok" type="button"
+                    ng-click="closeFunctionEditPanel('save')">保存</button>
+                <button class="btn btn-warning btn-cancel" type="button"
+                    ng-click="closeFunctionEditPanel('close')">关闭</button>
+            </div>
+        </div>
+        <!-- #endregion -->
+        <!--</editor-fold>-->
+
+        <div class="report-preview standard-modal general-transition">
+            <div class="modal-header open-header">
+                预览
+                <button type="button" ng-click="hidePreviewReport()" class="close open-close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body open-body">
+                <datax-report report-config="tableConfig"></datax-report>
+            </div>
+        </div>
+
+        <div class="left-block">
+            <div class="full-content-with-relative">
+                <div class="olap-switch" ng-class="{'switch-on': toolbarStatus.olap}" ng-click="switchToolBtn('olap')">
+                    <span>数据源</span>
+                    <i class="fa fa-caret-right"></i>
+                </div>
+                <div class="clone-item" ng-drag-clone="">
+                    <div class="field-item">{{clonedData.name}}</div>
+                </div>
+                <div class="page-operation-bar">
+                    <!-- <a class="btn btn-default" ng-click="loadDataSourceCols()">加载字段</a> -->
+                    <a class="btn btn-default" ng-click="openSavePanel()">保存</a>
+                    <a class="btn btn-default" ng-click="previewReport()">预览</a>
+                </div>
+                <group-select items="sourceList" value="dataSourceIds" value-change="dataSourceChange()"
+                    group-field="'olaptype'" display-field="'name'" value-field="'id'" filter="true"
+                    class="group-select-content"></group-select>
+                <div class="left-card">
+                    <div class="left-block-olap-list" ng-repeat="olap in olaps">
+                        <span>{{ olap.name }}</span>
+                        <div class="left-block-column-list">
+                            <div class="cursor-move ng-scope" ng-repeat="col in olap.cols">
+                                <span class="field-item full-width" ng-drag="true" ng-drag-data="col" draggable="false"
+                                    id="box_{{col.col}}"
+                                    ng-drag-success="onDragComplete($data, $event)">{{col.name}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="right-block">
+            <div class="table-tools">
+                <div class="functional-area">
+                    <!--<editor-fold desc="剪贴板">-->
+                    <!-- #region  -->
+                    <div class="clipboard-region">
+                        <div class="report-btn btn-paste" ng-click="pasteCell($event)" title="粘贴(ctrl/cmd + v)">
+                            <div class="btn-icon"></div>
+                            <div class="btn-text">粘贴</div>
+                        </div>
+                        <div class="report-btn btn-cut" ng-click="copyCell('cut')" title="剪切(ctrl/cmd + x)">
+                            <div class="btn-icon"></div>
+                            <div class="btn-text">剪切</div>
+                        </div>
+                        <div class="report-btn btn-copy" ng-click="copyCell('copy')" title="复制(ctrl/cmd + c)">
+                            <div class="btn-icon"></div>
+                            <div class="btn-text">复制</div>
+                        </div>
+                        <div class="report-btn btn-format-brush" ng-click="copyCell('copy')">
+                            <div class="btn-icon"></div>
+                            <div class="btn-text">格式刷</div>
+                        </div>
+                        <div class="region-title">剪贴板</div>
+                    </div>
+                    <!-- #endregion -->
+                    <!--</editor-fold>-->
+
+                    <!--<editor-fold desc="字体">-->
+                    <!-- #region  -->
+                    <div class="font-region">
+                        <div class="report-btn btn-select-font-family">
+                            <select class="btn-font-family" ng-model="btnModels.fontFamily"
+                                ng-change="setFont('family')"
+                                ng-options="item.value as item.name for item in fontFamily">
+                            </select>
+                        </div>
+                        <div class="report-btn btn-select-font-size">
+                            <select class="btn-font-size" ng-model="btnModels.fontSize" ng-change="setFont('size')"
+                                ng-options="item for item in fontSize">
+                            </select>
+                        </div>
+                        <div class="report-btn btn-font-size-add" ng-click="setFont('addSize')" title="增大字号">
+                            <div class="btn-icon"></div>
+                            <i class="fa fa-angle-up"></i>
+                        </div>
+                        <div class="report-btn btn-font-size-sub" ng-click="setFont('subSize')" title="减小字号">
+                            <div class="btn-icon"></div>
+                            <i class="fa fa-angle-down"></i>
+                        </div>
+                        <div class="report-btn btn-font-bold" ng-click="setFont('bold')" title="加粗">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="report-btn btn-font-italic" ng-click="setFont('italic')" title="斜体">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="report-btn btn-font-underline btn-drop-down">
+                            <div class="drop-down-panel">
+                                <ul class="drop-down-box box-shadow-min">
+                                    <li ng-click="setFont('textDecoration', 'underline')">下划线</li>
+                                    <li ng-click="setFont('textDecoration', 'line-through')">中划线</li>
+                                    <li ng-click="setFont('textDecoration', 'overline')">上划线</li>
+                                    <li ng-click="setFont('textDecoration', 'unset')">取消</li>
+                                </ul>
+                            </div>
+                            <i class="fa fa-caret-down btn-arrow-down"></i>
+                            <div class="btn-icon" title="下划线" ng-click="setFont('textDecoration', 'underline')"></div>
+                        </div>
+                        <div class="report-btn btn-cell-border btn-drop-down">
+                            <div class="drop-down-panel">
+                                <ul class="drop-down-box box-shadow-min drop-down-box-contain-icon">
+                                    <li ng-click="setCellBorder('borderTop', 'clean')">
+                                        <div class="btn-icon border-line-up"></div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;上框线
+                                    </li>
+                                    <li ng-click="setCellBorder('borderBottom', 'clean')">
+                                        <div class="btn-icon border-line-down"></div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;下框线
+                                    </li>
+                                    <li ng-click="setCellBorder('borderLeft', 'clean')">
+                                        <div class="btn-icon border-line-left"></div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;左框线
+                                    </li>
+                                    <li ng-click="setCellBorder('borderRight', 'clean')">
+                                        <div class="btn-icon border-line-right"></div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;右框线
+                                    </li>
+                                    <li ng-click="setCellBorder('borderNone', 'clean')">
+                                        <div class="btn-icon border-line-none"></div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;无框线
+                                    </li>
+                                    <li ng-click="setCellBorder('borderAll', 'clean')">
+                                        <div class="btn-icon border-line-all"></div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;全框线
+                                    </li>
+                                    <li ng-click="setCellBorder('borderOut', 'clean')">
+                                        <div class="btn-icon border-line-out"></div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;外框线
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="btn-icon"></div>
+                            <i class="fa fa-caret-down btn-arrow-down" title="框线"></i>
+                        </div>
+                        <div colorpicker="rgba" colorpicker-position="bottom" ng-model="bgColor"
+                            class="report-btn btn-background-color" title="背景色">
+                            <div class="btn-icon"></div>
+                            <i class="fa fa-caret-down btn-arrow-down"></i>
+                        </div>
+                        <div colorpicker="rgba" colorpicker-position="bottom" ng-model="fontColor"
+                            class="report-btn btn-font-color" title="字体颜色">
+                            <div class="btn-icon"></div>
+                            <i class="fa fa-caret-down btn-arrow-down"></i>
+                        </div>
+                        <div class="region-title">字体</div>
+                    </div>
+                    <!-- #endregion -->
+                    <!--</editor-fold>-->
+
+                    <!--<editor-fold desc="对齐方式">-->
+                    <!-- #region  -->
+                    <div class="alignment-region">
+                        <div class="report-btn btn-vertical-up" title="上对齐"
+                            ng-click="setCellAlignment('vertical', 'top')">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="report-btn btn-vertical-center" title="垂直居中"
+                            ng-click="setCellAlignment('vertical', 'middle')">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="report-btn btn-vertical-down" title="下对齐"
+                            ng-click="setCellAlignment('vertical', 'bottom')">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="report-btn btn-cell-warp" title="自动换行" ng-click="setCellAlignment('wrap', '')">
+                            <div class="btn-icon"></div>
+                            <div class="btn-text">自动换行</div>
+                        </div>
+                        <div class="report-btn btn-horizontally-left" title="左对齐"
+                            ng-click="setCellAlignment('horizontal', 'left')">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="report-btn btn-horizontally-center" title="水平居中"
+                            ng-click="setCellAlignment('horizontal', 'center')">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="report-btn btn-horizontally-down" title="右对齐"
+                            ng-click="setCellAlignment('horizontal', 'right')">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="report-btn btn-merge-cells btn-drop-down">
+                            <div class="drop-down-panel">
+                                <ul class="drop-down-box box-shadow-min drop-down-box-contain-icon">
+                                    <li ng-click="setCellAlignment('merge', 'center')">
+                                        <div class="btn-icon cell-merge-center"></div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;合并后居中
+                                    </li>
+                                    <li ng-click="setCellAlignment('crossMerge', 'cross')">
+                                        <div class="btn-icon cell-merge-cross"></div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;跨越合并
+                                    </li>
+                                    <li ng-click="setCellAlignment('merge', 'normal')">
+                                        <div class="btn-icon cell-merge-normal"></div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;合并单元格
+                                    </li>
+                                    <li ng-click="setCellAlignment('unMerge')">
+                                        <div class="btn-icon cell-merge-cancel"></div>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;取消合并单元格
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="btn-icon" title="合并单元格" ng-click="setCellAlignment('merge', 'center')"></div>
+                            <div class="btn-text" title="合并单元格" ng-click="setCellAlignment('merge', 'center')">合并后居中
+                            </div>
+                            <i class="fa fa-caret-down btn-arrow-down" title="合并单元格"></i>
+                        </div>
+                        <div class="region-title">对齐方式</div>
+                    </div>
+                    <!-- #endregion -->
+                    <!--</editor-fold>-->
+
+                    <!--<editor-fold desc="数字">-->
+                    <!-- #region  -->
+                    <div class="number-region">
+                        <div class="report-btn btn-cell-format">
+                            <select>
+                                <option>常规</option>
+                                <option>财务计数</option>
+                                <option>百分比</option>
+                            </select>
+                        </div>
+                        <div class="report-btn btn-currency-symbol btn-drop-down">
+                            <div class="drop-down-panel">
+                                <ul class="drop-down-box box-shadow-min drop-down-box-contain-icon">
+                                    <li ng-click="setCellNumberFormat('currency', '¥')">
+                                        ¥ 人民币
+                                    </li>
+                                    <li ng-click="setCellNumberFormat('currency', '$')">
+                                        $ 美元
+                                    </li>
+                                    <li ng-click="setCellNumberFormat('currency', '€')">
+                                        € 欧元
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="btn-icon" title="货币符号"></div>
+                        </div>
+                        <div class="report-btn btn-percentage" ng-click="setCellNumberFormat('percentage')" title="百分比">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="report-btn btn-financial-count" ng-click="setCellNumberFormat('financial')"
+                            title="财务计数">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="report-btn btn-decimal-point-add" title="增加小数点位数">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="report-btn btn-decimal-point-sub" title="减少小数点位数">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="region-title">数字</div>
+                    </div>
+                    <!-- #endregion -->
+                    <!--</editor-fold>-->
+
+                    <!--<editor-fold desc="样式">-->
+                    <!-- #region  -->
+                    <div class="style-region">
+                        <div class="report-btn btn-cell-style" title="预设样式">
+                            <div class="btn-icon"></div>
+                            <div class="btn-text">预设样式</div>
+                        </div>
+                        <div class="region-title">样式</div>
+                    </div>
+                    <!-- #endregion -->
+                    <!--</editor-fold>-->
+
+                    <!--<editor-fold desc="单元格">-->
+                    <!-- #region  -->
+                    <div class="cell-region">
+                        <div class="report-btn btn-cell-insert" title="插入行、列">
+                            <div class="btn-icon"></div>
+                            <span class="btn-text">插入</span>
+                        </div>
+                        <div class="report-btn btn-cell-del" title="删除行、列">
+                            <div class="btn-icon"></div>
+                            <span class="btn-text">删除</span>
+                        </div>
+                        <div class="report-btn btn-cell-scheme" title="单元格格式">
+                            <div class="btn-icon"></div>
+                            <span class="btn-text">格式</span>
+                        </div>
+                        <div class="region-title">单元格</div>
+                    </div>
+                    <!-- #endregion -->
+                    <!--</editor-fold>-->
+
+                    <!--<editor-fold desc="函数">-->
+                    <!-- #region  -->
+                    <div class="edit-region">
+                        <div class="report-btn btn-function" title="单元格配置" ng-click="openFunctionEditPanel()">
+                            <div class="btn-icon"></div>
+                            <div class="btn-text">单元格配置</div>
+                        </div>
+                        <div class="report-btn btn-filling" title="全局配置" ng-click="openGlobalPanel()">
+                            <div class="btn-icon"><i class="fa fa-cog"></i></div>
+                            <div class="btn-text">全局配置</div>
+                        </div>
+                        <div class="report-btn btn-clear" title="清除单元格">
+                            <div class="btn-icon"></div>
+                            <div class="btn-text">清除单元格</div>
+                        </div>
+                        <div class="region-title">编辑</div>
+                    </div>
+                    <!-- #endregion -->
+                    <!--</editor-fold>-->
+
+                </div>
+            </div>
+            <div id="reportSheet" ng-drop="true" ng-drop-success="onDropComplete($data,$event)"
+                ng-drag-move="onDragMove($data,$event)" ng-drag-start="onDragStart($data,$event)"
+                ng-drag-stop="onDragStop($data,$event)"></div>
+        </div>
+    </div>
+</div>
+{% endverbatim %}
+<!--<editor-fold desc="静态资源2">-->
+<!-- #region  -->
+<script type="text/javascript" src="{% static 'plugin/jquery/bootbox.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/angular/i18n/angular-locale_zh-cn.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'plugin/moment/moment.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/moment/locale/zh-cn.js' %}"></script>
+<script>
+    moment.locale('zh-cn');
+</script>
+<script src="{% static 'js/ngDraggable.js' %}"></script>
+<script src="{% static 'plugin/angular/angularjs-datepicker/angular-datepicker.min.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-bootstrap-colorpicker/bootstrap-colorpicker-module.min.js' %}"></script>
+<script src="{% static 'componets/datax-message-box/datax-alert.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'plugin/handsontable/handsontable.full.js' %}"></script>
+<script src="{% static 'plugin/handsontable/languages/zh-CN.js' %}"></script>
+<script src="{% static 'componets/datax-loading/loading.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/groupselect/group-select.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/multi-select/multi-select.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/select-list/select-list.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/datax-report/report.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/modal-drag/datax-panel-drag.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'dashboard/datatables/handsontable.main.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'dashboard/datatables/handsontable.utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'dashboard/datatables/report-design.js' %}?v={{ nowversion }}1"></script>
+<!-- #endregion -->
+<!--</editor-fold>-->
+
+{% endblock %}

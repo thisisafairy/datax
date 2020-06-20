@@ -1,0 +1,45 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>{% block title %}datax{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/datax-font/iconfont.css' %}">
+    <link rel="stylesheet" href="{% static 'css/common.min.css' %}?v={{ nowversion }}1">
+    <link rel="stylesheet" href="{% static 'components/datax-ui/datax-ui.min.css' %}?v={{ nowversion }}1">
+    <script src="{% static 'plugin/babel-polyfill/polyfill.min.js' %}"></script>
+    <script src="{% static 'plugin/jquery/jquery-2.2.3.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/angularjs-new/angular.min.js'%}"></script>
+    <script src="{% static 'plugin/lodash/lodash.min.js' %}"></script>
+    <script src="{% static 'plugin/axios/axios.min.js' %}"></script>
+    <script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+    <script src="{% static 'components/utils/datax-utils.min.js' %}?v={{ nowversion }}1"></script>
+    <script src="{% static 'components/datax-ui/datax-ui.min.js' %}?v={{ nowversion }}1"></script>
+    <script src="{% static 'plugin/moment/moment.min.js' %}"></script>
+    <script>
+        window.static = '{% static "" %}';
+
+        function showLoading() {}
+        function hideLoading() {}
+    </script>
+</head>
+
+    <body class="hold-transition datax-body datax-sidebar-mini sidebar-collapse">
+            {% include 'components/alert.html' %}
+        <div class="wrapper">
+            {% include 'components/header.html' %}
+            {% include 'components/sidebar.html' %}
+            <div class="datax-wrapper-content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </body>
+<script src="{% static 'components/datax-portal.js' %}?v={{ nowversion }}1"></script>
+</html>

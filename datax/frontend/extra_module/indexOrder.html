@@ -1,0 +1,521 @@
+ {% extends 'base.html' %} {% load staticfiles %} {% block title %}数据采集管理{% endblock %}
+{% block content %}
+<link href="{% static 'css/Ext/css/ext-all.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'css/Ext/ax-all.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'css/ext/ux/css/LockingGridView.css'  %}" rel="stylesheet" type="text/css" />
+<style>
+    .x-grid-back-red {
+        background: #FF0000;
+     }
+</style>
+{% verbatim %}
+    <div id="form">
+    </div>
+    <div id="cumgrid"></div>
+{% endverbatim %}
+    <script src="{% static 'js/ext/adapter/jquery/ext-jquery-adapter.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ext-all.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/pgfunc-ext.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/locale/ext-lang-zh_CN.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ax-all.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ux/LockingGridView.js'%}" type="text/javascript"></script>
+
+    <script>
+        Ext.BLANK_IMAGE_URL = "{% static 'js/ext/s.gif' %}";
+        Ext.Ajax.defaultHeaders = {'X-CSRFToken' : getCookie('csrftoken')};
+
+        var monthworks = 0;
+        var monthworksnext = 0;
+        var yearEnum = { "2017": 2017, "2018": 2018, "2019": 2019, "2020": 2020,"2021": 2021, "2022": 2022, "2023": 2023, "2024": 2024, "2025": 2025, "2026": 2026  };
+        var monthEmun =  { "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "11": 11, "12": 12 };
+        var channelsEnum = {"B2B":"B2B","B2C":"B2C"};
+        var businessEnum = {"Oversea":"Oversea","BT":"BT","Daily":"Daily","Internal":"Internal","OEM":"OEM"};
+        var productTypeEnum = {"单晶":"单晶","多晶":"多晶","异质结":"异质结","双玻":"双玻",'':'全部' };
+        var importanceEnum =  {"重要":"重要","紧急":"紧急","重要紧急":"重要紧急","无":"无"};
+        var hgEnum = { "0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5,'':'全部' };
+        var roygEnum = { "Green": "Green", "Yellow": "Yellow", "Red": "Red" };
+        var salesCompanyEnum = {"晋能清洁能源科技股份公司":"晋能清洁能源科技股份公司","晋能光伏技术有限责任公司":"晋能光伏技术有限责任公司"}
+        var salesBusinessTeamEnum = {"系统集成_何文中":"系统集成_何文中","国际销售_余诗伟":"国际销售_余诗伟","国内销售_朱建国":"国内销售_朱建国"}
+        var salesOperationEnum = {"宋一文":"宋一文","李俊秀":"李俊秀","赵晓娟":"赵晓娟","庞娟娟":"庞娟娟","马淑楠":"马淑楠","武俊娥":"武俊娥","苗艳波":"苗艳波","高妩":"高妩","高莉莉":"高莉莉","谢如意":"谢如意"}
+        var delayremarkEnum = {"丢单-由于客户原因取消":"丢单-由于客户原因取消","丢单-付款方式未达成一致":"丢单-付款方式未达成一致","丢单-价格原因未达成一致":"丢单-价格原因未达成一致","丢单-生产计划无法满足":"丢单-生产计划无法满足","丢单-政策影响":"丢单-政策影响","丢单-转移到新合同出货":"丢单-转移到新合同出货","推迟-客户原因":"推迟-客户原因","推迟-价格波动":"推迟-价格波动"}
+        var accountmanagerEnum = {"余诗伟":"余诗伟","王倩":"王倩","戴皙玮":"戴皙玮","朱建国":"朱建国","陈平常":"陈平常","马斌":"马斌","郝贵超":"郝贵超","李佳杰":"李佳杰","王璇":"王璇","张博":"张博","贺贝":"贺贝","茅忠平":"茅忠平"}
+        //后台数据URL
+        var listdataurl = '/ex/orderlist?page=1' ; //后台返回列表数据 {total:1:rows:[{name:'name1',code:'code1'}]}
+        var customerdataurl = '/ex/getDictionary';//json结构 {successful:true,rows:[{name:'name1',code:'code1'}]}
+
+        Ext.onReady(function(){
+            //获取客户信息
+            var userselstore = new Ext.data.JsonStore({
+                id: 'UserID',root: 'rows',
+                fields: [{ name: 'name' }, { name: 'code' }],
+                url: customerdataurl,
+                baseParams: { cmd: '0A67663E' }
+            });
+            var SalesChannelCombo = {
+                    xtype : 'combo',displayField : 'Name',valueField : 'Name',store : userselstore,mode : 'remote', triggerAction : 'all',
+                    editable:true,minChars : 1,allowBlank : true,forceSelection : true
+                    //hideTrigge:true,typeAhead : true,
+                    };
+            //获取客户信息自动完成控件结束
+            //定义所展示的列
+            var cols = RebuildAllColumns();
+            function renderryg(val,p,rec,rowIndex,colIndex){
+                switch(this.name){
+                    case "royg":
+                        var color = val||"white";
+                        return "<div style='width:100%;height:100%;background:"+color+"'>"+val+"</div>";
+                        break;
+                }
+            }
+            //小计自动计算
+            function colRenderer(val, p, rec, rowIndex, columnIndex) {
+                switch (this.name) {
+                    case "outsum":
+                        return parseFloat(rec.data.out1==null||rec.data.out1==""?0:rec.data.out1)+parseFloat(rec.data.out2==null||rec.data.out2==""?0:rec.data.out2)+parseFloat(rec.data.out3==null||rec.data.out3==""?0:rec.data.out3)
+                        +parseFloat(rec.data.out4==null||rec.data.out4==""?0:rec.data.out4)+parseFloat(rec.data.out5==null||rec.data.out5==""?0:rec.data.out5)+parseFloat(rec.data.out6==null||rec.data.out6==""?0:rec.data.out6)+
+                                parseFloat(rec.data.out7==null||rec.data.out7==""?0:rec.data.out7)+parseFloat(rec.data.out8==null||rec.data.out8==""?0:rec.data.out8)+parseFloat(rec.data.out9==null||rec.data.out9==""?0:rec.data.out9)
+                        +parseFloat(rec.data.out10==null||rec.data.out10==""?0:rec.data.out10)+parseFloat(rec.data.out11==null||rec.data.out11==""?0:rec.data.out11)+parseFloat(rec.data.out12==null||rec.data.out12==""?0:rec.data.out12)+
+                            parseFloat(rec.data.outmonth1==null||rec.data.outmonth1==""?0:rec.data.outmonth1)+parseFloat(rec.data.outmonth2==null||rec.data.outmonth2==""?0:rec.data.outmonth2)+parseFloat(rec.data.outmonth3==null||rec.data.outmonth3==""?0:rec.data.outmonth3)
+                        +parseFloat(rec.data.outmonth4==null||rec.data.outmonth4==""?0:rec.data.outmonth4)+parseFloat(rec.data.outmonth5==null||rec.data.outmonth5==""?0:rec.data.outmonth5)+parseFloat(rec.data.outmonth6==null||rec.data.outmonth6==""?0:rec.data.outmonth6)+
+                                parseFloat(rec.data.outmonth7==null||rec.data.outmonth7==""?0:rec.data.outmonth7)+parseFloat(rec.data.outmonth8==null||rec.data.outmonth8==""?0:rec.data.outmonth8)+parseFloat(rec.data.outmonth9==null||rec.data.outmonth9==""?0:rec.data.outmonth9)
+                        +parseFloat(rec.data.outmonth10==null||rec.data.outmonth10==""?0:rec.data.outmonth10)+parseFloat(rec.data.outmonth11==null||rec.data.outmonth11==""?0:rec.data.outmonth11)+parseFloat(rec.data.outmonth12==null||rec.data.outmonth12==""?0:rec.data.outmonth12);
+                        break;
+                    case "capacitysum":
+                        return parseFloat(rec.data.capacitym1==null||rec.data.capacitym1==""?0:rec.data.capacitym1)+parseFloat(rec.data.capacitym2==null||rec.data.capacitym2==""?0:rec.data.capacitym2)+parseFloat(rec.data.capacitym3==null||rec.data.capacitym3==""?0:rec.data.capacitym3)
+                        +parseFloat(rec.data.capacitym4==null||rec.data.capacitym4==""?0:rec.data.capacitym4)+parseFloat(rec.data.capacitym5==null||rec.data.capacitym5==""?0:rec.data.capacitym5)+parseFloat(rec.data.capacitym6==null||rec.data.capacitym6==""?0:rec.data.capacitym6)
+                          + parseFloat(rec.data.capacitym7==null||rec.data.capacitym7==""?0:rec.data.capacitym7)+parseFloat(rec.data.capacitym8==null||rec.data.capacitym8==""?0:rec.data.capacitym8)+parseFloat(rec.data.capacitym9==null||rec.data.capacitym9==""?0:rec.data.capacitym9)
+                        +parseFloat(rec.data.capacitym10==null||rec.data.capacitym10==""?0:rec.data.capacitym10)+parseFloat(rec.data.capacitym11==null||rec.data.capacitym11==""?0:rec.data.capacitym11)+parseFloat(rec.data.capacitym12==null||rec.data.capacitym12==""?0:rec.data.capacitym12);
+                        break;
+                    case "forv":
+                        return (rec.data.pn==null?"":rec.data.pn)+(rec.data.power==null?"":rec.data.power);
+                        break;
+                }
+                return val;
+            }
+            //查询所需的store
+            var store =new Ext.data.Store({
+                autoLoad : false,  
+                idProperty: 'id',
+                url: listdataurl,  
+                reader : new Ext.data.JsonReader({totalProperty: 'total',root: 'rows'}, 
+                    [{ name : 'id'},{name : 'saleschannel'}, {name : 'customer'}, {name:'customertype'}, {name : 'owner'}, {name:'ownerid'}, {name : 'team'},
+                      {name:'salesop'}, {name : 'salesopid'}, {name:'quotation'}, {name : 'contract'}, {name:'line'}, {name : 'projectdes'}, {name:'paymentterm'}, {name : 'unitprice'}, 
+                        {name:'pn'}, {name : 'power'}, {name:'product'},{name:'forv'}, {name : 'moneytype'}, {name:'importance'},{name:'hg'}, {name : 'royg'}, {name:'delayremark'},
+                    {name:'remark'}, {name : 'year'}, {name:'month'},{name:'weeknum'}, {name : 'week'}, {name:'out'},{name:'inventory'}, {name : 'capacity'}, {name:'version'}, 
+                    {name:'createid'},{name:'createname'}, {name : 'createtime'}, {name:'modifyid'},{name:'modifyname'},{name:'modifytime'},
+                    {name:'out1'},{name:'out2'}, {name : 'out3'}, {name:'out4'},{name:'out5'},{name:'out6'},{name:'out7'},{name:'out8'}, {name : 'out9'}, {name:'out10'},{name:'out11'},{name:'out12'},
+                    {name:'outmonth1'},{name:'outmonth2'}, {name : 'outmonth3'}, {name:'outmonth4'},{name:'outmonth5'},{name:'outmonth6'}, {name:'outmonth7'},
+                    {name:'outmonth8'}, {name : 'outmonth9'}, {name:'outmonth10'},{name:'outmonth11'},{name:'outmonth12'},
+                    {name:'capacitym1'},{name:'capacitym2'}, {name : 'capacitym3'}, {name:'capacitym4'},{name:'capacitym5'},{name:'capacitym6'},{name:'capacitym7'},{name:'capacitym8'}, {name : 'capacitym9'}, {name:'capacitym10'},{name:'capacitym11'},{name:'capacitym12'},
+                    {name:'orderstate'},{name:'unitcode'},{name:'lastyearsum'}]),  
+                sortInfo: {field: 'createtime', direction: 'ASC'}  ,
+                  listeners:{
+                         beforeload:function(){
+                               Ext.getBody().mask('页面加载刷新中,请稍后......');
+                          },load:function(){Ext.getBody().unmask();}
+                   }
+            });  
+
+           var toolbar = new Ext.Toolbar(['-', {
+                    text: '添加',
+                    handler: function(){
+                        var Record = grid.getStore().recordType;
+                        var date = new Date()
+                        var p = new Record({"modifyname":"","customer":"","customertype":"","owner":"","team":"","salesop":"",
+                        "quotation":"","contract":"","line":"","projectdes":"","paymentterm":"","unitprice":0,
+                        "pn":"","power":"","product":"","importance":"","hg":"","royg":"","delayremark":"","remark":"",
+                        "createtime":date,"year":date.getFullYear(),"month":date.getMonth()+1,"out1":0,"out2":0,"out3":0
+                        ,"out4":0,"out5":0,"out6":0,"out7":0,"out8":0,"out9":0,"out10":0,"out11":0,"out12":0,
+                        "outmonth1":0,"outmonth2":0,"outmonth3":0,"outmonth4":0,"outmonth5":0,"outmonth6":0,"outmonth7":0
+                        ,"outmonth8":0,"outmonth9":0,"outmonth10":0,"outmonth11":0,"outmonth12":0,"capacitym1":0,
+                            "capacitym2":0,"capacitym3":0,"capacitym4":0,"capacitym5":0,"capacitym6":0,"capacitym7":0
+                        ,"capacitym8":0,"capacitym9":0,"capacitym10":0,"capacitym11":0,"capacitym12":0,"lastyearsum":0});
+                        grid.stopEditing();
+                        var insRowIdx = store.data.length;
+                        store.insert(insRowIdx, p);
+                        grid.startEditing(insRowIdx, 2);
+                    }
+                }, '-', {
+                    text: '删除',
+                    handler: function(){
+                        Ext.Msg.confirm('信息', '确定要删除？', function(btn){
+                            if (btn == 'yes') {
+                                var recs = grid.getSelectionModel().getSelections();
+                                var ids='';
+                                for (var i = 0; i < recs.length; i++) {
+                                        if (recs[i] && (recs[i].get("id") == null || recs[i].get("id") == "")) {
+                                            grid.getStore().remove(recs[i]);
+                                            grid.getStore().commitChanges();
+                                        }
+                                        else if(recs[i])
+                                        {
+                                            ids+="'" + recs[i].get("id")+"',";
+                                        }
+                                    }
+                                $.ajax({
+                                    url: '/ex/deleteorder',
+                                    type: 'post',
+                                    data: { 'datas':ids }
+                                }).then(function (rs) {
+                                    if (rs.code == '1') {
+                                        Ext.getBody().unmask();
+                                        Reload(true);
+                                    }
+                                    else {
+                                        alert(rs.msg);
+                                        Ext.getBody().unmask();
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }, '-',{
+                    text: '保存',
+                    handler: function(){
+                        recs = store.getModifiedRecords();
+                        var dt=[];
+                        $.each(recs, function() {
+                            dt.push(this.data);
+                        });
+                        if(dt.length===0){
+                            return;
+                        }
+                        //alert(JSON.stringify(dt));
+                        Ext.getBody().mask("保存中...");
+                        $.ajax({
+                            url: '/ex/saveorder',
+                            type: 'post',
+                            data: { 'datas': JSON.stringify(dt),week:monthworks,nextweek:monthworksnext}
+                        }).then(function (rs) {
+                            if (rs.code == '1') {
+                                Ext.getBody().unmask();
+                            }
+                            else {
+                                //alert(rs.msg);
+                                Ext.getBody().unmask();
+                            }
+                        });
+
+                    }
+                },'-',{
+                    text: '刷新',
+                    handler: function(){
+                        Reload();
+                    }
+                },'-',{
+                    text: 'excel导出',
+                    handler: function(){
+                        Ext.getBody().mask("正在生成excel表格...");
+                        //传递到后台的参数
+                        hg = Ext.getCmp("hg").getCheckedValue();
+                        product = Ext.getCmp("product").getValue();
+                        owner = Ext.getCmp("owner").getValue();
+
+                        $.ajax({
+                            url: '/ex/exportorderexcel?hg='+hg + '&product=' + product + '&owner='+owner,
+                            type: 'post',
+
+                        }).then(function (rs) {
+                            Ext.getBody().unmask();
+                        });
+
+                    }
+
+
+                }
+                ]);
+            var curYear = new Date().getFullYear();
+            var curMonth = new Date().getMonth();
+            var hgStore = new Ext.data.ArrayStore({id:0,fields : [ 'VALUE'],data : [['1'], ['2'], ['3'], ['4'], ['5']]});
+            var schBar = new Ext.ux.AimSchPanel({
+                store: store,
+                padding: '3 0 0 0',
+                collapsed:false,
+                columns:3,
+                items: [
+
+                { fieldLabel: 'HG', id: 'hg',  store: hgStore, style: { marginTop: '2px' }, valueField :"VALUE" , displayField: "VALUE" , mode: 'local', xtype: 'multicombo',schopts: { qryopts: "{ mode: 'Like', field: 'hg' }"} ,
+                listeners: {'blur': function(){ Reload(); }}},
+                { fieldLabel: '产品类型', id: 'product',  required: true, style: { marginTop: '2px' }, enumdata: productTypeEnum, xtype: 'aimcombo',schopts: { qryopts: "{ mode: 'Like', field: 'product' }"} ,
+                listeners: {'select': function(){ Reload(); }}},
+                { fieldLabel: '销售支持', id: 'owner',  required: true, style: { marginTop: '2px' }, enumdata: accountmanagerEnum, xtype: 'aimcombo',schopts: { qryopts: "{ mode: 'Like', field: 'owner' }"} ,
+                listeners: {'select': function(){ Reload(); }}}]
+
+            });
+           var titPanel = new Ext.ux.AimPanel({
+                    tbar: toolbar,
+                    items: [schBar]
+                });
+           var grid = new Ext.ux.grid.AimEditorGridPanel({
+               title:'订单数据采集',
+                lockable: true,
+                clicksToEdit: 1,
+                height:document.body.clientHeight-40,
+                renderTo: 'cumgrid',
+                enableColumnHide: false,
+                store: store,
+                columns: cols,
+                tbar: titPanel,
+                columnLines: true,
+               width:document.body.clientWidth-$("#silderApp").width()
+            });
+           //需要锁定到最左边的列
+           grid.getColumnModel().setLocked(0,true);
+           grid.getColumnModel().setLocked(1,true);
+           grid.getColumnModel().setLocked(2,true);
+           grid.getColumnModel().setLocked(3,true);
+           //加载数据
+           Reload();
+
+           //新版本,动态构建一整年的列和store
+            function RebuildAllColumns()
+            {
+                cols = [
+                 new Ext.grid.RowNumberer({}),
+                new Ext.grid.CheckboxSelectionModel({singleSelect:false}),
+                { header: "Sales Channel",width:100,dataIndex: "saleschannel",editor:{xtype:'aimcombo',enumdata: channelsEnum}},
+                //{ header: "Sales Channel",width:100,dataIndex: "saleschannel",editor:SalesChannelCombo},
+                { header: "Customer",width:160,dataIndex: "customer",editor:{ xtype: 'textfield',allowBlank:false}},
+                {header: "Customer Type",dataIndex: "customertype", editor:{ xtype: 'textfield',allowBlank:false} },
+                {header: "Sales Company",width:160,dataIndex: "quotation", editor:{ xtype: 'aimcombo',allowBlank:false,enumdata: salesCompanyEnum} },
+                {header: "Sales Business Team",width:130,dataIndex: "team", editor:{ xtype: 'aimcombo',allowBlank:false,enumdata : salesBusinessTeamEnum} },
+                {header: "Account Manager/Owner",width:150,dataIndex: "owner", editor:{ xtype: 'aimcombo',allowBlank:false,enumdata : accountmanagerEnum} },
+                {header: "Sales Operation",dataIndex: "salesop", editor:{ xtype: 'aimcombo',allowBlank:false,enumdata:salesOperationEnum} },
+                {header: "Contract#",dataIndex: "contract", editor:{ xtype: 'textfield',allowBlank:false} },
+                {header: "Line of Business",dataIndex: "line",editor:{xtype:'aimcombo',enumdata: businessEnum,lazyRender: true} },
+                {header: "Project Description",dataIndex: "projectdes", editor:{ xtype: 'textarea',allowBlank:false} },
+                {header: "Payment Term",dataIndex: "paymentterm", editor:{ xtype: 'textarea',allowBlank:false} },
+                {header: "UnitPrice",dataIndex: "unitprice", editor:{ xtype: 'textfield',allowBlank:false} },
+                //{header: "组件型号",dataIndex: "unitcode", editor:{ xtype: 'textfield'} },
+                {header: "P/N",dataIndex: "pn", editor:{ xtype: 'textfield',allowBlank:false} },
+                {header: "Power",dataIndex: "power", editor:{ xtype: 'textfield',allowBlank:false} },
+                {header: "Product",dataIndex: "product", editor:{xtype:'aimcombo',enumdata: productTypeEnum,lazyRender: true}},
+                {header: "For V",width:110,dataIndex: "forv",renderer:colRenderer },
+                {header: "重要紧急 Open So HG3+HG4",dataIndex: "importance", editor:{xtype:'aimcombo',enumdata: importanceEnum,lazyRender: true}},
+                {header: "HG",dataIndex: "hg", editor:{xtype:'aimcombo',enumdata: hgEnum,allowBlank: false} },
+                {header: "R/O/Y/G",dataIndex: "royg",renderer:renderryg, editor:{xtype:'aimcombo',enumdata: roygEnum,lazyRender: true}},
+                {header: "丢单(HG0)或推迟原因",dataIndex: "delayremark", editor:{ xtype: 'aimcombo',allowBlank:false,enumdata:delayremarkEnum} },
+                {header: "Remarks/Next Steps",dataIndex: "remark", editor:{ xtype: 'textfield',allowBlank:false} },
+                {header:"lastyearsum",dataIndex:"lastyearsum",editor:{xtype:'textfield',allowBlank: false}}];
+
+                var year = Ext.getCmp("year")?Ext.getCmp("year").getValue():new Date().getFullYear();
+                var month = new Date().getMonth()+1;
+                cols.push({header: "小计(MW)",width:70,dataIndex: "outsum",renderer:colRenderer });
+
+                var colcap = [{header: "小计(产能)",width:70,dataIndex: "capacitysum",renderer:colRenderer }];
+                for(var i=1;i<month;i++)
+                {
+                    cols.push({header: i+"月",width:50,dataIndex: "outmonth"+i, renderer:beforeorderRenderer});
+                    //colcap.push({header: i+"月产能",width:60,dataIndex: "capacitym"+i, renderer:beforeorderRenderer })
+                }
+
+               var weeks = allWeeks(year,month);
+                monthworks = weeks.length;
+               var weeksAdd = allWeeks(year,month+1)
+                monthworksnext = weeksAdd.length;
+               for(var w=1;w<=weeks.length;w++)
+               {
+                   cols.push({header: weeks[i],width:65,dataIndex: "out"+w, editor:{ xtype: 'numberfield',decimalPrecision:2} });
+                   //colcap.push({header: weeks[i]+'产能',width:85,dataIndex: "capacity"+w,editor:{ xtype: 'numberfield',decimalPrecision:2}});
+               }
+               for(var w=1;w<=weeksAdd.length;w++)
+               {
+                   cols.push({header: weeksAdd[i],width:65,dataIndex: "out"+(w+6), editor:{ xtype: 'numberfield',decimalPrecision:2} });
+                   //colcap.push({header: weeksAdd[i],width:65,dataIndex: "capacity1"+w, editor:{ xtype: 'numberfield',decimalPrecision:2} });
+               }
+
+                for(var i=month+2;i<=12;i++)
+                {
+                    cols.push({header: i+"月",width:50,dataIndex: "outmonth"+i, editor:{ xtype: 'numberfield',decimalPrecision:2} });
+                    //colcap.push({header: i+"月产能",width:60,dataIndex: "capacitym"+i, editor:{ xtype: 'numberfield',decimalPrecision:2} })
+                }
+                cols.push({header:"inventory",width:70,dataIndex:"inventory"});
+                for(var i=1;i<=12;i++)
+                {
+                    colcap.push({header: i+"月产能",width:60,dataIndex: "capacitym"+i, editor:{ xtype: 'numberfield',decimalPrecision:2} })
+                }
+                cols = cols.concat(colcap);
+                return cols;
+
+            }
+           //加载后台数据
+           function Reload(flag) {
+               if (flag!==true&&store.getModifiedRecords().length > 0)
+               {
+                   Ext.Msg.confirm('信息', '存在未保存的记录，确定要重新加载新数据？', function(btn){
+                        if (btn == 'yes') {
+                            Reload(true);
+                        }
+                    });
+               }
+               else
+               {
+                   //传递到后台的参数
+                    store.load({
+                        params:{
+                            //year:Ext.getCmp("year").getValue(),
+                            //month:Ext.getCmp("month").getValue(),
+                            hg:Ext.getCmp("hg").getCheckedValue(),
+                            product:Ext.getCmp("product").getValue(),
+                            owner:Ext.getCmp("owner").getValue(),
+                            monthweeks:monthworks,
+                            monthworksnext:monthworksnext
+                        }
+                    });
+               }
+           }
+
+
+           function beforeorderRenderer(val, p, rec, rowIndex, columnIndex) {
+                if(this.name.indexOf("outmonth")>=0)
+                {
+                    val = val==null||val==""?0:val;
+                    return '<a href=# onclick=openInput("'+rec.data.id+'","'+this.name.replace("outmonth",'')+'");>'+val+'</a>';
+                }
+                if(this.name.indexOf("capacitym")>=0)
+                {
+                    val = val==null||val==""?0:val;
+                    return '<a href=# onclick=openInput("'+rec.data.id+'","'+this.name.replace("capacitym",'')+'","capacity");>'+val+'</a>';
+                }
+           }
+
+
+        });
+        function openInput(id,month,iscapacity){
+            //iscapacity=="capacity" 代表是修改历史产能
+            iscapacity = iscapacity=="capacity"?1:0;
+
+            var year = new Date().getFullYear();
+            var weeks = allWeeks(year,parseInt(month));//周次
+            $.ajax({
+                url: '/ex/geteditdata?year='+year+"&month="+month+"&id="+id+"&iscapacity="+iscapacity+"&weeks="+weeks.length,
+                type: 'get'
+            }).then(function (rs) {
+                var fields = [];
+                    for(var i=1;i<=weeks.length;i++) {
+                        if (iscapacity == 0){
+                            fields.push({xtype:'numberfield',fieldLabel:weeks[i-1],id:'out'+i,name:'out'+i,value:rs.data['out'+i]});//value绑定后台返回的各周值,比如 value:rs.data['out'+i];
+                        }else {
+                            fields.push({xtype:'numberfield',fieldLabel:weeks[i-1],id:'capacity'+i,name:'capacity'+i,value:rs.data['capacity'+i]});//value绑定后台返回的各周值,比如 value:rs.data['out'+i];
+                        }
+
+                    }
+                    var uploadForm=new Ext.FormPanel({
+                        id:'uploadForm',
+                        width:200,
+                        frame:true,
+                        fileUpload: true,
+                        autoHeight:true,
+                        bodyStyle:'10px 10px 0px 10px',
+                        labelWidth:100,
+                        defaults:{
+                            anchor: '95%',
+                            allowBlank: false
+                        },
+                        items:fields,
+                        buttons: [{
+                                        text: '保存',
+                                        handler: function(){
+                                            //if(uploadForm.getForm().isValid()){
+                                            var data={};
+                                            if (iscapacity == 0){
+                                                for(var i=1;i<=weeks.length;i++) {
+                                                data['out'+i] = Ext.getCmp("out"+i).getValue();
+                                            }
+
+                                            }else {
+                                                for(var i=1;i<=weeks.length;i++) {
+                                                data['capacity'+i] = Ext.getCmp("capacity"+i).getValue();
+                                            }
+
+                                            }
+
+                                            $.ajax({
+                                                url: '/ex/updatedata?year='+year+"&month="+month+"&id="+id+"&iscapacity="+iscapacity+"&weeks="+weeks.length+'&datas='+JSON.stringify(data),
+                                                type: 'get',
+                                                processData: false,
+                                                contentType: false,
+                                            }).then(function (rs) {
+                                                if (rs.status == "success") {
+                                                    addwin.close();
+                                                    Reload(true);
+
+                                                } else {
+                                                    alert('更新失败');
+                                                }
+                                            });
+                                            //}
+                                        }
+                                    },{
+                                        text: '关闭',  handler: function(){
+                                                        addwin.close();}}]
+
+                    });
+                    var addwin =new Ext.Window({
+                       title : '修改历史记录',
+                        closable : true,
+                        width : 220,
+                        autoHeight: true,
+                        border : false,
+                        plain : true,
+                        modal : true,
+                        layout : 'fit',
+                        bodyStyle : 'padding:5px;',
+                        maximizable : false,// 禁止最大化
+                        closable : true,// 是否有关闭
+                        collapsible : true,// 可折叠
+                        iconCls : 'bind',
+                        items: [uploadForm]
+                    }).show();
+
+            });
+
+
+
+
+        }
+        // 传入年月的相关周信息
+        function allWeeks(a,b) {
+            a = parseInt(a),b=parseInt(b);
+            var week_array = [];
+            var weekt_array = [];
+            var today = new Date(a,b-1,1);
+            var year = today.getFullYear();
+            var month = today.getMonth();
+            var i = 0;
+            var start = new Date(year, month, 1); // 得到当月第一天
+            var end = new Date(year, month+1, 0); // 得到当月最后一天
+            var start_day = start.getDay(); // 当月第一天是周几
+            switch(start_day)
+            {
+                case 0: i = 0 - 5; break;
+                case 1: i = 0 - 6; break;
+                case 2: i = 0 - 7; break;
+                case 3: i = 0 - 8; break;
+                case 4: i = 0 - 9; break;
+                case 5: i = 1-4; break;
+                case 6: i = 0-4; break;
+            }
+
+            while ( new Date(year, month, i) <= end) {
+                if(new Date(year, month, i + 6)<start){
+                }
+                else
+                {
+                    week_array.push([  new Date(year, month, i)<start?start:new Date(year, month, i),
+                                   new Date(year, month, i + 6)>end?end:new Date(year, month, i + 6)
+                                ]
+                            )
+                    weekt_array.push((new Date(year, month, i)<start?(start.getMonth()+1)+"."+start.getDate():(month+1)+"."+i )+"-" +
+                        (new Date(year, month, i + 6)>end?(end.getMonth()+1)+"."+end.getDate():(month+1)+"."+(i+6))
+                            )
+                }
+                i += 7;
+            }
+            //monthworks = weekt_array.length;
+            //console.log(weekt_array);
+            return weekt_array;
+        }
+    </script>
+
+{% endblock %}

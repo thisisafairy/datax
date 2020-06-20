@@ -1,0 +1,137 @@
+select {
+    border: 1px solid #A9A9A9;
+}
+
+.mian-olap {
+    width: 200px;
+    float: left;
+    padding: 8px;
+    background-color: #cddaea;
+    height: 100%;
+}
+
+.form-control[readonly] {
+    background-color: #ffffff;
+}
+.main-olap .labeltitle{
+    font-size:17px;
+    padding-top:3px;
+    padding-left:5px;
+}
+.mian-olap .mian-olap-select {
+    margin-top: 11px;
+    height: 40px;
+    border-bottom: 1px solid #bbbbbb;
+}
+
+.select-olap:hover>.olap-select {
+    height: 230px;
+    border: 1px solid #A9A9A9;
+}
+
+.select-olap select {
+    position: absolute;
+    width: 184px;
+    z-index: 900;
+    height: 0px;
+    border: none;
+}
+
+.mian-olap .main-olap-leader {
+    height: 20px;
+    margin-top: 10px;
+}
+
+.mian-olap .main-olap-col {
+    height: calc(100% - 85px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.main-olap-col .olap-item {
+    margin-bottom: 4px;
+}
+
+.olap-item span {
+    display: inline-block;
+    background-color: rgb(255, 255, 255);
+    font-weight: 500;
+    vertical-align: middle;
+    border-radius: 3px;
+    line-height: 18px;
+    box-sizing: border-box;
+    height: 20px;
+    margin-bottom: 0;
+    margin-right: 3px;
+    padding: 1px 3px;
+    font-size: 11px;
+    border: 1px solid transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    overflow: hidden;
+    width: 100%;
+}
+
+.ext-col-content {
+    position: absolute;
+    width: calc(100% - 220px);
+    background: white;
+    top: 10px;
+    left: 210px;
+    height: calc(100% - 20px);
+    overflow-y: auto;
+    transition: left 0.5s ease-in-out;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(180, 197, 217, 0.8);
+    padding: 15px;
+}
+
+.select-default-col {
+    height: 260px;
+}
+
+.olap-col-content {
+    position: absolute;
+    width: 355px;
+    height: 0px;
+    background-color: #ffffff;
+    display: block;
+    z-index: 99999;
+    overflow: auto;
+    overflow-x: hidden;
+    transition: height 1s;
+    -moz-transition: height 1s; /* Firefox 4 */
+    -webkit-transition: height 1s; /* Safari and Chrome */
+    -o-transition: height 1s; /* Opera */  
+}
+
+.olap-col-select:hover > .olap-col-content{
+    height: 300px;
+}
+
+.olap-col-content:hover {
+    height: 300px;
+}
+.trianglestyle{
+    background-image: url("triangle.png") !important;
+    background-repeat: no-repeat !important;
+    background-position: 97%,0px !important;
+    background-size: 11px 13px !important;
+}
+
+.dropdown-menu {
+    min-width: 80px;
+}
+
+.col-join-ext {
+    position: absolute;
+    width: 230px;
+    height: 80px;
+    background-color: #ffffff;
+    border: 1px solid rgba(0,0,0,.2);
+    top: -90px;
+    left: -80px;
+    padding: 10px 0px 10px 10px;
+}

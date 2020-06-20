@@ -1,0 +1,47 @@
+{% verbatim %}
+	<div class="form-horizontal">
+		<div class="form-group">
+		    <label for="name" class="col-sm-2 control-label">名称</label>
+		    <div class="col-sm-10">
+		      <input type="text"  ng-model="form.name" class="form-control" id="name" placeholder="名称">
+		    </div>
+		 </div>
+		 <div class="form-group">
+		 	<label for="desc" class="col-sm-2 control-label">表名</label>
+		 	<div class="col-sm-10">
+		 		<input type="text" ng-model="form.table" class="form-control" id="name" placeholder="表名">
+		 	</div>
+		 </div>
+		 <div class="form-group">
+		 	<label for="desc" class="col-sm-2 control-label">描述</label>
+		 	<div class="col-sm-10">
+		 		<textarea name="desc" ng-model="form.desc" class="form-control" rows="3"></textarea>
+		 	</div>
+		 </div>
+
+		 <div class="form-group" ng-repeat="(columnkey,columnvalue) in form.column track by columnkey">
+		 	<label  ng-if="columnkey == 0" class="col-sm-2 control-label">字段</label>
+		 	<label  ng-if="columnkey != 0" class="col-sm-2 control-label"></label>
+		 	<div class="col-sm-3">
+		 		<input type="text" class="form-control" readonly="true" ng-model="form.column[columnkey].title" />
+		 	</div>
+		 	<div class="col-sm-3">
+		 		<select name="" class="form-control" ng-model="form.column[columnkey].function">
+		 			<option ng-repeat="fucntionvalue in form.config.functionlist" value="{{ fucntionvalue.key }}">{{ fucntionvalue.value }}</option>
+		 		</select>
+		 	</div>
+		 	<div class="col-sm-2">
+		 		<select name="" class="form-control" ng-model="form.column[columnkey].order">
+		 			<option ng-repeat="ordervalue in form.config.orderlist" value="{{ ordervalue.key }}">{{ ordervalue.value }}</option>
+		 		</select>
+		 	</div>
+		 	<div class="col-sm-2 text-right">
+		 		<a href="javascript:void(0);" ng-click="deletecolumn(columnkey)">删除</a>
+		 	</div>
+
+		 </div>
+	</div>
+	<div class="drap-tips col-md-12 text-center" ng-if="form.column.length == 0">
+		 	点击左侧字段选择分析字段
+	</div>
+{% endverbatim %}

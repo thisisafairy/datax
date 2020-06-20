@@ -1,0 +1,161 @@
+ {% extends 'base.html' %} {% load staticfiles %} {% block title %}导出配置{% endblock %} {% block content %} {% verbatim %}
+<style>
+.searchboxstyle{
+    padding-left: 0px;
+}
+.exportbuttonstyle{
+    float: right;
+    padding-right: 20px;
+}
+.exportDtCountStyle{
+    display: inline-block;
+    min-width: 240px;
+    position: relative;
+    top: 2px;
+}
+.alertMsgBtn{
+    padding-right: 5px;
+    float:right;
+}
+.logshowarea{
+    height: 150px;
+    width:100%;
+    overflow-y:scroll
+}
+.tbodystyle{
+    height: 350px;
+    overflow-y:scroll;
+}
+</style>
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel" style="display: inline-block">
+        导出配置
+    </h1>
+    <div class="alertMsgBtn">
+        <!--<button popover-placement="bottom-right" uib-popover-html="warningInfo" type="button" class="btn btn-default">注意事项：</button>-->
+        <button type="button" class="btn btn-default" title="注意事项："
+                data-container="body" data-toggle="popover" data-placement="left" data-html="true"
+                data-content="1、主题、场景、组件有层级关系
+                                <br>2、选择主题后，主题包含的场景和组件都导出，对场景和组件的关系一样
+                                <br>3、勾选主题后去掉自动选择的场景或组件，最终还是会导出场景或组件">
+            注意事项：
+	    </button>
+    </div>
+</section>
+<div class="col-sm-12 user-list" ng-app="exportconfig">
+    <div class="box" ng-controller="exportconfigController">
+
+        <div class="box-body user-list-body" style="height: 480px;">
+            <!--<div class="col-md-3">
+                <a class="btn btn-default btn-usermanage" ng-click="open()">
+                    <i class="fa fa-plus"></i> 新增
+                </a>
+            </div>-->
+            <!--<div class="col-md-offset-6 col-md-3">
+                <div class="form-group">
+                    <div class="col-sm-6 cont-body-tabinput">
+                        <input type="text" ng-model="searchkey" ng-change="search()" class="form-control cont-bodyfrom-input" placeholder="搜索名称">
+                    </div>
+                </div>
+            </div>-->
+            <!--主题-->
+            <div class="col-md-4 userlist-table">
+                <div class="col-md-5 searchboxstyle">
+                    <input type="text" ng-model="themesearchkey" ng-change="search('theme')" class="form-control cont-bodyfrom-input" placeholder="搜索主题名称">
+                </div>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" name="themeselall" ng-click="selectAll('theme')">全选</th>
+                            <th data-field="themename" data-align="left">主题名称</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tbodystyle">
+                        <tr ng-repeat="themedata in themelist">
+                            <td><input type="checkbox" ng-model="themedata.check" name="themesel"></td>
+                            <td>{{ themedata.name }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--<div class="col-md-4">
+                    <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                        boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+                </div>-->
+                <!--<div>
+                    <button class="btn btn-default">导出</button>
+                </div>-->
+            </div>
+            <!--场景-->
+            <div class="col-md-4 userlist-table">
+                <div class="col-md-5 searchboxstyle">
+                    <input type="text" ng-model="scenesearchkey" ng-change="search('scene')" class="form-control cont-bodyfrom-input" placeholder="搜索场景名称">
+                </div>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" name="sceneselall" ng-click="selectAll('scene')">全选</th>
+                            <th data-field="scenename" data-align="left">场景名称</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tbodystyle">
+                        <tr ng-repeat="scenedata in scenelist">
+                            <td><input type="checkbox" ng-model="scenedata.check" name="scenesel" ></td>
+                            <td>{{ scenedata.name }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--<div class="col-md-4">
+                    <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                        boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+                </div>-->
+                <!--<div>
+                    <button class="btn btn-default">导出</button>
+                </div>-->
+            </div>
+            <!--组件-->
+            <div class="col-md-4 userlist-table">
+                <div class="col-md-5 searchboxstyle">
+                    <input type="text" ng-model="chartsearchkey" ng-change="search('chart')" class="form-control cont-bodyfrom-input" placeholder="搜索组件名称">
+                </div>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" name="chartselall" ng-click="selectAll('chart')">全选</th>
+                            <th data-field="chartname" data-align="left">组件名称</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tbodystyle">
+                        <tr ng-repeat="chartdata in chartlist">
+                            <td><input type="checkbox" ng-model="chartdata.check" name="chartsel" ></td>
+                            <td>{{ chartdata.name }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--<div class="col-md-4">
+                    <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                        boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+                </div>-->
+                <!--<div>
+                    <button class="btn btn-default">导出</button>
+                </div>-->
+            </div>
+            <div class="exportbuttonstyle">
+                <div class="exportDtCountStyle">
+                    <span class="float: left;">导出olap数据条数：</span>
+                    <input type="text" ng-model="olapExpNum" style="width: 70px;height: 33px;" placeholder="整数">
+                </div>
+                <button id="exportDataBtn" class="btn btn-default" ng-disable="olapExpNum<=0">导出</button>
+            </div>
+        </div>
+        <!--log show-->
+        <div class="box-body user-list-body">
+            <div class="col-md-12 userlist-table">
+                <textarea class="logshowarea" id="logsshow"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+{% endverbatim %}
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'system/exportdata/index.js' %}?v={{ nowversion }}1"></script> {% endblock %}

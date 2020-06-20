@@ -1,0 +1,147 @@
+.group-select-full-content {
+    height: 32px;
+    width: 100%;
+    position: relative;
+    user-select: none;
+    list-style: none;
+}
+
+/* 输入框 */
+.group-select-full-content .group-select-input {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.group-select-icon,
+.group-select-delete-icon {
+    position: absolute;
+    top: 50%;
+    margin: -8px 0 0 -8px;
+    right: 10px;
+    font-size: 16px;
+    color: rgba(0, 0, 0, .65);
+    z-index: 100;
+}
+
+.group-select-delete-icon:hover {
+    display: block;
+    cursor: pointer;
+}
+
+.group-select-delete-icon {
+    display: none;
+    z-index: 110;
+}
+
+.group-select-input:hover .group-select-delete-icon {
+    display: block;
+}
+
+.group-select-input:hover .group-select-icon {
+    display: none;
+}
+
+.input-focus {
+    background-color: rgba(236, 239, 244, 1);
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+}
+
+.group-select-value {
+    height: 100%;
+    width: 100%;
+    border: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 0 0 10px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.group-select-value:hover,
+.group-select-icon:hover {
+    cursor: pointer;
+}
+
+.group-select-full-content .input-focus:hover {
+    cursor: default;
+}
+
+.group-select-panel {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0px;
+    display: none;
+    width: 100%;
+    min-height: 25px;
+    max-height: 300px;
+    line-height: 1.5;
+    color: rgba(0, 0, 0, .85);
+    margin: 0;
+    padding: 0;
+    font-variant: initial;
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+    border-radius: 4px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 20200000;
+    -ms-overflow-style: none;
+    overflow: -moz-scrollbars-none;
+}
+
+.group-select-panel::-webkit-scrollbar { width: 0 !important }
+
+.group-select-panel .item-group-title {
+    color: rgba(0, 0, 0, .65);
+    padding: 0 12px;
+    height: 32px;
+    line-height: 32px;
+    font-size: 12px;
+}
+
+.group-select-panel .item-group-list-item {
+    position: relative;
+    display: block;
+    padding: 5px 12px;
+    padding-left: 20px;
+    line-height: 22px;
+    font-weight: 400;
+    white-space: nowrap;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background .3s ease;
+}
+
+.group-select-panel .item-group-list-item:hover {
+    background-color: rgba(237, 238, 240, 1);
+}
+
+.group-select-full-content .row-checked {
+    background-color: rgba(225, 225, 225, 1);
+}
+
+.panel-show {
+    display: block;
+}
+
+.panel-hidden {
+    display: none;
+}
+
+/* region 仿bootstrap主题方案 */
+.select-bootstrap {
+    border: 1px solid rgba(204, 204, 204, 1);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.select-bootstrap .multi-select-value{
+    border-radius: 4px;
+}
+
+/* endregion */

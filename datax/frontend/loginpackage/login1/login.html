@@ -1,0 +1,48 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  <head>
+    <meta charset="utf-8">
+    <title>数据眼后台登入页面</title>
+     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+      <link rel="stylesheet" href="{% static 'plugin/bootstrap/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/admin-lte/css/AdminLTE.min.css' %}">
+    <title>数据眼登入页面</title>
+      <link rel="stylesheet" href="{% static 'loginpackage/login1/css/login.css'%}">
+  </head>
+  <body>
+    <img src="{% static 'loginpackage/login1/image/0_0.png'%}" width="530px" height="480px" style="position: absolute; top: 15%; left: 20%; right: 40%;">
+    <div style="width:400px;height:100%;background:rgba(255,255,255,1);opacity:0.6;position: absolute;right: 0px;top: 0px;">
+        <img src="/frontend/loginpackage/login1/image/logo.png" width="200px" height="100px" style="position: absolute; top: 30px; left: 30px">
+        <div class="img_form">
+      <div class="wrap">
+        <div class="login_form" style="position: absolute;top: 35%">
+          <form action="{% url 'login' %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="nexturl" value="{{ next }}">
+              <div class="title">账号登录</div>
+                {% if errorcode %}
+                <p class="login-box-msg login-lg" style="position: absolute;top: 20%; left: 50px"><img class="login-errimg" src="{% static 'image/logo/errimg.png' %}">账号验证错误，请重新填写</p>
+                {% endif %}
+                <img src="/frontend/loginpackage/login1/image/input_1.png" style="float: left ;position: absolute;top: 28%; left: 18px" ><div style="position: relative; left: 21px" class="item"><input  placeholder="请输入账号" type="text" name="username"></div>
+                <img src="/frontend/loginpackage/login1/image/input_2.png" style="float: left;position: absolute;top: 43%; left: 18px"><div style="position: relative; left: 21px" class="item"><input placeholder="请输入密码" type="password" name="password"></div>
+                <button style="position: relative; left: 18px" type="submit" class="item login_but">登录</button>
+                <div style="position: relative; left: 21px" class="item fog_pas">忘记密码？</div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+    <div>
+          <p style="position: absolute; top: 600px;margin: auto; left: 30%;font-size: 12px;"align='center'> 商米网络科技(江苏)有限公司</p>
+      </div>
+    </div>
+
+  </body>
+
+</html>

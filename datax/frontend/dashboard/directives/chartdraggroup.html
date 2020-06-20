@@ -1,0 +1,35 @@
+<ul class="nav nav-list accordion-group" data-key="chart" ng-repeat="kind in kinds">
+    <li class="nav-header">
+        <i class="icon-plus icon-black"></i> {{kind.kind}}
+    </li>
+    <li style="display: none;" class="boxes" id="elmComponents">
+        <div class="box box-element ui-draggable chart " id="box_{{ data.charttype }}_{{data.id}}" ng-repeat="data in kind.data" title="{{ data.name }}">
+            <a href="#close" class="remove label label-important">
+                <i class="icon-remove icon-white"></i>删除</a>
+            <span class="drag label chartshow">
+                <i class="icon-move icon-white"></i>拖动</span>
+            <span class="configuration">
+                <button type="button" class="btn btn-mini" data-target="#editorModalChart" role="button" data-toggle="modal">编辑</button>
+            </span>
+            <div class="preview chart-title hiddenMoreCharacter">{{data.name}}</div>
+            <div class="view" style="width:170px;height:140px;overflow:hidden;position:absolute;left:-10px;top: -160px;z-index: 2;background:white;display:none;">
+                <img style="width:100%;height:100%;" ng-src="{{ data.imgpath }}" />
+                <div>
+                    <chart-drag data="data"></chart-drag>
+                    <span class="datatag" style="display:none;" id="chartdata_{{data.id}}">{{data.jsonconfig}}</span>
+                    <span class="tdatatag" style="display:none;" id="table_{{ data.id }}">{{ data.jsonconfig }}</span>
+                    <span class="ecdatatag" style="display:none;" id="echartdata_{{data.id}}">{{data.echartconfig}}</span>
+                </div>
+                <div class="addChartTagStyle">
+                    <div class="addChartTagBtnDiv">
+                        <button name="addChartTagBtn" class="addChartTagBtnStyle" onclick="showInputDialog(this)" addChartTagEditStatus="yes"><em class="glyphicon glyphicon-list graphicalStyle"></em></button>
+                        <!--<button data-target="#editorModal" role="button" data-toggle="modal" class="displayNoneStyle" style="display: none;"></button>-->
+                    </div>
+                    <div class="view displayNoneStyle summernote" style="display: none;">
+                        <span contenteditable="true" class="replaceAlertInfo">警告信息！</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </li>
+</ul>

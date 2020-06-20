@@ -1,0 +1,347 @@
+{% extends 'base_lite.html' %}
+{% block title %}
+    图表背景配置
+{% endblock %}
+{% block content %}
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static 'newdashboard/addscenebackgroud.css'  %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'newdashboard/toolbar-default.css'  %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'newdashboard/newdashboard.css'  %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-bootstrap-colorpicker/colorpicker.min.css'  %}">
+{% verbatim %}
+<div ng-app="chartsbgconfiglist" ng-controller="chartsbgconfigController">
+<!-- 编辑修改title -->
+<div class="style-title">
+    <stan style="font-size: larger;"> {{ modeltitle }} </stan>
+</div>
+    <!-- 左边配置 -->
+        <!-- 选项 -->
+    <div class="echarts-top">
+        <ul id="Tab" class="nav nav-tabs" style="padding: 4px;">
+            <li class="active">
+                <a href="#styleconfig" data-toggle="tab">
+                     全局样式配置
+                </a>
+            </li>
+            <li>
+                <a href="#code" data-toggle="tab">
+                    自定义代码段
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 配置 -->
+    <div class="echarts-left">
+        <div class="tab-content">
+            <!-- 全局样式配置 -->
+            <div class="tab-pane fade in active" id="styleconfig">
+                <form class="form-horizontal">
+                    <p>全局背景样式配置：</p>
+                    <div>
+                        <label>背景色：</label>
+                        <input type="text" colorpicker="rgba" ng-model="sceneConfigObj.options.globalStyle.backgroundColor"><br>
+                    </div>
+
+                    <div ng-init="useBgImg = false">
+                        <label>使用背景图：</label>
+                        <input type="checkbox" ng-model="useBgImg" ng-change="isUseBgImg1()"><br>
+                    </div>
+
+                    <div ng-if="useBgImg">
+                        <label>背景：</label><input type="text" ng-model="sceneConfigObj.options.globalStyle.backgroundImage" style='max-width: 100px;'>
+                        <div class=" btn btn-default" style="position: relative;">上传图片
+                        <input style="width: 100%; position: absolute; top: 0; opacity: 0;"
+                               type="file" id="scenesBgImg" custom-on-change="changePicture">
+                        </div>
+                    </div>
+
+                    <div ng-if="useBgImg">
+                        <label style="padding-top: 8px;">
+                            图片样式：
+                        </label>
+                        <div id="bgselect">
+                            <select class="form-control"  style="width: 158px;" ng-model="sceneConfigObj.options.globalStyle.backgroundSize">
+                                <option value="cover">按图片原长宽比拉伸并铺满背景</option>
+                                <option value="100% 100%">直接拉伸铺满背景(图片长宽比会改变)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div ng-if="useBgImg">
+                        <label>
+                            已上传：
+                        </label>
+                        <div>
+                            <user-imgs imgs="imgs" refresh-method="refreshStyle()" img-model="sceneConfigObj.options.globalStyle.backgroundImage"></user-imgs>
+                        </div>
+                    </div>
+
+                    <label>左右间距：</label>
+                    <input type="number" name="" ng-model="sceneConfigObj.options.componentMargin.marginLeft"><br>
+                    <label>上下间距：</label>
+                    <input type="number" name="" ng-model="sceneConfigObj.options.componentMargin.marginTop"><br>
+                    <label>文字颜色：</label>
+                    <input type="text" name="" colorpicker="rgba" ng-model="sceneConfigObj.options.globalStyle.color" ng-change="filterTxtcolor()"><br>
+                    <label>同步到子组件：</label>
+                    <input type="checkbox" name="" ng-model="sceneConfigObj.options.syncFontColor"><br>
+                    <!-- 组件背景样式配置 -->
+                    <p>组件背景样式配置：</p>
+                    <label>组件背景色：</label>
+                    <input type="text" name="" colorpicker="rgba" ng-model="sceneConfigObj.options.chartStyle.backgroundColor"><br>
+                    <label>圆弧角度：</label>
+                    <input type="text" name="" value="0px" id="sceneBorderRadius" ng-model="sceneConfigObj.options.chartStyle.borderRadius"
+                                        ng-change="fixPx('sceneConfigObj.options.chartStyle.borderRadius', sceneConfigObj.options.chartStyle.borderRadius, 'sceneBorderRadius')"><br>
+
+                    <div ng-init="sceneConfigObj.options.chartStyle.borderDisplay = false">
+                        <label>组件使用边框：</label>
+                        <input type="checkbox" name="" ng-model="sceneConfigObj.options.chartStyle.borderDisplay" ng-change="isUseCompBorder()"><br>
+                    </div>
+                    <div ng-if="sceneConfigObj.options.chartStyle.borderDisplay">
+                        <label style="padding-top: 8px;">边框样式：</label>
+                        <div id="bgselect">
+                            <select ng-model="sceneConfigObj.options.chartStyle.borderStyle">
+                                <option ng-repeat="obj in borderStyles" value="{{ obj.value }}">{{ obj.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div ng-if="sceneConfigObj.options.chartStyle.borderDisplay">
+                        <label>边框宽度：</label>
+                        <input type="text"  id="compBorderWidth" ng-model="sceneConfigObj.options.chartStyle.borderWidth"
+                                            ng-change="fixPx('sceneConfigObj.options.chartStyle.borderWidth', sceneConfigObj.options.chartStyle.borderWidth, 'compBorderWidth')">
+
+                    </div>
+                    <div ng-if="sceneConfigObj.options.chartStyle.borderDisplay">
+                        <label>边框颜色：</label>
+                        <input colorpicker="rgba" ng-model="sceneConfigObj.options.chartStyle.borderColor" type="text">
+                    </div>
+
+
+                    <div  ng-init="useChartsBgImg = false">
+                        <label>组件使用背景图：</label>
+                        <input type="checkbox" ng-model="useChartsBgImg" ng-change="isUseChartsBgImg()">
+                    </div>
+
+
+                    <div ng-if="useChartsBgImg">
+                        <label>组件背景图：</label><input type="text" ng-model="sceneConfigObj.options.chartStyle.backgroundImage" style='max-width: 100px;'>
+                        <div class=" btn btn-default" style="position: relative;">上传图片
+                        <input style="width: 100%; position: absolute; top: 0; opacity: 0;"
+                               type="file" id="scenesBgImg" custom-on-change="changeChartsPicture">
+                        </div>
+                    </div>
+
+                    <div ng-if="useChartsBgImg">
+                        <label style="padding-top: 8px;">图片样式：</label>
+                        <div id="bgselect">
+                            <select class="form-control" style="width: 158px;" ng-model="sceneConfigObj.options.chartStyle.backgroundSize">
+                                <option value="cover">按图片原长宽比拉伸并铺满背景</option>
+                                <option value="100% 100%">直接拉伸铺满背景(图片长宽比会改变)</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group" ng-if="useChartsBgImg">
+                        <label>已上传：</label>
+                        <div>
+                            <user-imgs imgs="charsimgs" refresh-method="refreshStyle()" img-model="sceneConfigObj.options.chartStyle.backgroundImage"></user-imgs>
+                        </div>
+                    </div>
+
+                    <p>过滤器背景样式配置：</p>
+                    <label>过滤器背景色：</label>
+                    <input type="text"  colorpicker="rgba" ng-model="sceneConfigObj.options.filterStyle.backgroundColor"><br>
+                    <label>过滤器文字颜色：</label>
+                    <input type="text" id="filterTxtcolor" colorpicker="rgba" ng-model="sceneConfigObj.options.filterStyle.color"><br>
+                    <label>圆弧角度：</label>
+                    <input type="text" id="filterBorderRadius" ng-model="sceneConfigObj.options.filterStyle.borderRadius"
+                                        ng-change="fixPx('sceneConfigObj.options.filterStyle.borderRadius', sceneConfigObj.options.filterStyle.borderRadius, 'filterBorderRadius')">
+
+                    <div ng-init="sceneConfigObj.options.filterStyle.borderDisplay = false">
+                        <label>使用边框：</label>
+                        <input type="checkbox" ng-model="sceneConfigObj.options.filterStyle.borderDisplay" ng-change="isUseFilterBorder()"><!--把使用状态记录到数据库以便回显,记得这里的名字需要和场景设计里的名字一样-->
+
+                    </div>
+                    <div class="form-group" ng-if="sceneConfigObj.options.filterStyle.borderDisplay">
+                        <label>边框样式：</label>
+                        <div id="bgselect">
+                            <select class="form-control" ng-model="sceneConfigObj.options.filterStyle.borderStyle">
+                                <option ng-repeat="obj in borderStyles" value="{{ obj.value }}">{{ obj.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-if="sceneConfigObj.options.filterStyle.borderDisplay">
+                        <label>边框宽度：</label>
+                        <input type="text" id="filterBorderWidth" ng-model="sceneConfigObj.options.filterStyle.borderWidth"
+                                            ng-change="fixPx('sceneConfigObj.options.filterStyle.borderWidth', sceneConfigObj.options.filterStyle.borderWidth, 'filterBorderWidth')">
+                    </div>
+                    <div class="form-group" ng-if="sceneConfigObj.options.filterStyle.borderDisplay">
+                        <label>边框颜色：</label>
+                            <input colorpicker="rgba" ng-model="sceneConfigObj.options.filterStyle.borderColor" type="text">
+                    </div>
+
+                    <div ng-init="sceneConfigObj.options.filterStyle.currCharsBgPicSts = false"><!--命名为currCharsBgPicSts是因为保持与场景设计里的变量名一致-->
+                        <label>使用背景图：</label>
+                        <input type="checkbox" ng-model="sceneConfigObj.options.filterStyle.currCharsBgPicSts" ng-change="isUseFiltersBgImg()">
+                    </div>
+                    <div ng-if="sceneConfigObj.options.filterStyle.currCharsBgPicSts">
+                        <label>过滤器背景图：</label>
+                        <input type="text" ng-model="sceneConfigObj.options.filterStyle.backgroundImage" style='max-width: 100px;'>
+                        <div class=" btn btn-default" style="position: relative;">上传图片
+                        <input style="width: 100%; position: absolute; top: 0; opacity: 0;"
+                               type="file" id="scenesBgImg" custom-on-change="changePicture">
+                        </div>
+                    </div>
+
+                    <div ng-if="sceneConfigObj.options.filterStyle.currCharsBgPicSts">
+                        <label style="padding-top: 8px;">
+                            图片样式：
+                        </label>
+                        <div id="bgselect">
+                            <select class="form-control"  style="width: 158px;" ng-model="sceneConfigObj.options.filterStyle.backgroundSize">
+                                <option value="cover">按图片原长宽比拉伸并铺满背景</option>
+                                <option value="100% 100%">直接拉伸铺满背景(图片长宽比会改变)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div >
+
+                    </div>
+
+                    <div ng-if="sceneConfigObj.options.filterStyle.currCharsBgPicSts">
+                        <label>
+                            已上传：
+                        </label>
+                        <user-imgs imgs="charsimgs" refresh-method="refreshStyle()" img-model="sceneConfigObj.options.filterStyle.backgroundImage"></user-imgs>
+                    </div>
+
+                    <p>保存配置：</p>
+                    <label>名称：</label>
+                    <input type="text" name="confname" ng-change="checkconfname()" ng-model="sceneConfigObj.confname" required id="confname" placeholder="请填写名称" maxlength="30">
+                    <i class="text-danger">{{ confnamemsg }}</i>
+                    <br>
+
+                    <label>禁用：</label>
+                    <div id="bgselect">
+                        <select ng-model="sceneConfigObj.status" ng-init="sceneConfigObj.status='0'" >
+                            <option value="0" ng-selected="1">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </div>
+                    <div  style="padding-top: 7px">
+                        <label >备注：</label>
+                        <div style="padding-left: 100px">
+                            <textarea type="text" name="remark" ng-model="sceneConfigObj.remark" id="remark" style="height: 87px" placeholder="请填写描述信息"></textarea>
+                        </div>
+                    </div>
+
+
+
+                    <div id="button-location">
+                        <button class="btn btn-primary btn-ok" type="button" ng-disabled="confnamemsg" ng-click="submit()">保存</button>
+                        <button class="btn btn-warning btn-cancel" type="button" ng-click="winclose()">退出</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 自定义代码段 -->
+            <div class="tab-pane fade" id="code">
+                <form class="form-horizontal">
+                    <div class="form-group"></div>
+                    <div class="form-group selfDesignCodeToolBarStyle" style="margin-left: 0px">
+                        <div class="btn-group">
+                            <button class="btn btn-default" ng-click="updateCustomCode('addMethod')">增加函数</button>
+                    <button class="btn btn-default" ng-click="updateCustomCode('userInfo')">获取用户信息</button>
+                    <button class="btn btn-default" ng-click="updateCustomCode('refresh')">重置</button>
+                        </div>
+                    </div>
+                    <div>
+                        <textarea style="width: 100%; height: 350px;">此功能暂不可用！！！</textarea>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 右边整块图示 -->
+    <div class="largerEchart" >
+        <!-- 调整边距 -->
+        <div ng-style="sceneBkStyle()">
+            <div class="echarts-show" ng-style="allComponentMarginBorder()">
+                <!-- 过滤条件 -->
+                <div class="echarts-top" ng-style="filterStyle()">
+                    <div class="top-filter">
+                        <stan>过滤器一：</stan> <input type="text">
+                    </div>
+                    <div class="top-filter">
+                        <stan>过滤器二：</stan> <select style="height: 27px">
+                                <option>请选择过滤条件</option>
+                                <option>过滤条件一</option>
+                                <option>过滤条件二</option>
+                                <option>过滤条件三</option>
+                            </select>
+                    </div>
+                </div>
+                <!-- 示例图一 -->
+                <div class="echarts-right" ng-style="charStyle()">
+                    <div id="fast" style="height: 100%" ></div>
+                </div>
+                <div style="width: 100%;height: 10px;"></div>
+                <!-- 示例图二 -->
+                <div class="echarts-right" ng-style="charStyle()">
+                    <div id="datax" style="height: 100%"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+{% endverbatim %}
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'plugin/echarts/echarts.min.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-bootstrap-colorpicker/bootstrap-colorpicker-module.min.js' %}"></script>
+<script src="{% static 'newdashboard/default_styles.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/modal-drag/datax-panel-drag.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'system/chartsbgconfig/newaddscenebg.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'system/chartsbgconfig/sampledata.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'dashboard/directives/select-img.js' %}?v={{ nowversion }}1"></script>
+
+<script type="text/javascript">
+function initEcharts(type) {
+        // 示例图一
+        let dom = document.getElementById("fast");
+        let myChart = echarts.init(dom);
+        if (optionOne && typeof optionOne === "object") {
+            if (type == 'refresh'){
+               let x = Math.random();
+            }
+            myChart.setOption(optionOne, true);
+    }
+        // 示例图二
+        var dom1 = document.getElementById("datax");
+        var myChart1 = echarts.init(dom1);
+        if (optionTwo && typeof optionTwo === "object") {
+            if (type == 'refresh'){
+               let x = Math.random();
+            }
+            myChart1.setOption(optionTwo, true);
+    }
+}
+initEcharts('refresh');
+
+</script>
+
+{% endblock %}
+
+

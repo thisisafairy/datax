@@ -1,0 +1,115 @@
+<div>
+    <style type="text/css">
+        .multiple-select-panel {
+            width: 100%;
+            height: 35px;
+            position: relative;
+        }
+
+        .multiple-select-panel .selected-datas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .multiple-select-panel .select-drop-down {
+            position: absolute;
+            width: 100%;
+            max-height: 230px;
+            list-style: none;
+            background-color: #FFFFFF;
+            box-shadow: 0 0 6px 0 rgba(0,0,0,.1), 0 10px 12px 0 rgba(170,180,205,.4);
+            border: rgb(169, 169, 169) 1px solid;
+            overflow-y: auto;
+            z-index: 101;
+            display: none;
+        }
+
+        .multiple-select-panel .select-drop-down .select-search{
+            height: 30px;
+            width: calc(100% - 20px);
+            margin: 3px;
+        }
+
+        .select-drop-down div span {
+            min-width: 80px;
+            max-width: 160px;
+            height: 30px;
+            display: inline-block;
+            margin: 3px;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .multiple-select-panel .selected-data {
+            border-color: #d2d6de;
+        }
+
+        .selected-data {
+            border: 1px solid #ccc;
+            width: 100%;
+            height: 100%;
+            line-height: 35px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -moz-text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .checked-item {
+            margin: 0px 3px 3px 0px;
+            color: rgb(85, 85, 85);
+            background-color: rgb(255, 255, 255);
+            background-image: none;
+            padding: 3px 6px;
+            border-width: 1px;
+            border-style: solid;
+            border-color: rgb(204, 204, 204);
+            border-image: initial;
+            border-radius: 4px;
+            transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+        }
+
+        .fa-close:hover {
+            cursor: pointer;
+        }
+
+        .click-blank {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background-color: #FFFFFF;
+        }
+
+        .select-input {
+            display: inline-block;
+            width: inherit;
+            height: 35px;
+        }
+
+        .select-input:hover {
+            cursor: text;
+        }
+
+    </style>
+    <div class="multiple-select-panel" >
+        <div class="selected-data">
+            <span class="checked-item" ng-repeat="($index, item) in selectDatas track by $index">
+                {{ item.text }}<i class="fa fa-close" ng-click="deleteChecked($index, item)"></i>
+            </span>
+            <span ng-click="showDropDown()" class="select-input" style="display: inline-block; width: inherit; height: 35px;">&nbsp;</span>
+        </div>
+        <div class="select-drop-down">
+            <input class="select-search" placeholder="请输入过滤字符......" ng-model="filterText" ng-change="filterChange()">
+            <div>
+                <span ng-if="item.show" ng-click="selectChange(item)" ng-class="{true : 'item-checked', false : 'item-unchecked'}[item.checked]"
+                      class="btn btn-default select-item" ng-repeat="(rowKey, item) in items track by rowKey">
+                    &nbsp;{{ item.name }} {{ item.count | fixBrackets }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

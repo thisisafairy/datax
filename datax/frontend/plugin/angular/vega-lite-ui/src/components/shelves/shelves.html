@@ -1,0 +1,593 @@
+<div class="card vflex shelves no-top-margin no-right-margin abs-100">
+  <div class="full-width" style="position: relative;" ng-mouseover="showmarktype=true" ng-mouseleave="showmarktype=false">
+    <button type="button" class="select-btn" ng-click="showmarktype = !showmarktype">
+        <i class="fa {{ markdetail.icon }}"> {{ markdetail.title }}</i>
+    </button>
+    <ul class="marktype-list" ng-show="showmarktype">
+      <li ng-repeat="type in marksWithAny track by $index" ng-click="changetype(type)" style="cursor:hand;">
+        <i class="fa {{ marksicon[type].icon }}" style="width:20px"></i> {{ marksicon[type].title }}
+      </li>
+    </ul>
+  </div>
+  <div class="shelf-pane shelf-encoding-pane full-width">
+    <h2 ng-show="spec.mark != 'single'" ng-click="titleShow = !titleShow">基础配置</h2>
+    <div class="shelf-pane shelf-positional-pane full-width" ng-show="spec.mark != 'single' && titleShow">
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">标题</div>
+          <div class="field-drop">
+            <input type="text" class="full-width" ng-blur="setNormalTitle('title');" ng-model="normalTitle">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">标题大小</div>
+          <div class="field-drop">
+            <div style="width: 80%;margin: 0;" range-slider min="5" max="100" model-max="ecconfig.title.textStyle.fontSize" pin-handle="min"></div>
+              <input type="text" style="width:25px;" ng-model="ecconfig.title.textStyle.fontSize">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group" ng-show="spec.mark != 'single'">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">颜色</div>
+          <div class="field-drop">
+            <input type="text" class="full-width color-input-title" ng-blur="setColor('bt')" rel="bt" ng-model="titletextcolor">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group" ng-show="spec.mark != 'single'">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">副标题</div>
+          <div class="field-drop">
+            <input type="text" class="full-width" ng-blur="setNormalTitle('sub_title');" ng-model="normalSubTitle">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group" ng-show="spec.mark != 'single'">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">标题大小</div>
+          <div class="field-drop">
+            <div style="width: 80%;margin: 0;" range-slider min="10" max="24" model-max="ecconfig.title.subtextStyle.fontSize" pin-handle="min"></div>
+              <input type="text" style="width:25px;" ng-model="ecconfig.title.subtextStyle.fontSize">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group" ng-show="spec.mark != 'single'">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">颜色</div>
+          <div class="field-drop">
+            <input type="text" class="full-width color-input-title" ng-blur="setColor('sbt')" rel="sbt" ng-model="subtitletextcolor">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group" ng-show="spec.mark != 'single'">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">显示位置</div>
+          <div class="field-drop">
+            <select class="full-width" ng-model="ecconfig.title.position">
+              <option value="upleft">左上</option>
+              <option value="upcenter">上中心</option>
+              <option value="upright">右上</option>
+              <option value="downleft">左下</option>
+              <option value="downcenter">下中心</option>
+              <option value="downright">右下</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--h2 ng-show=" spec.mark != 'single'" ng-click="themeShow = !themeShow">主题</h2-->
+    <div class="shelf-pane shelf-marks-pane full-width" ng-show="spec.mark != 'bmap' && spec.mark != 'single' && themeShow">
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">主题样式</div>
+          <div class="field-drop">
+            <select class="full-width" ng-model="ecconfig.theme">
+              <option value="def">默认</option>
+              <option value="rabow">彩虹</option>
+              <option value="warm">温暖</option>
+              <option value="lsoft">轻柔</option>
+              <option value="xc">炫彩</option>
+              <option value="blue">蓝色</option>
+              <option value="red">红色</option>
+              <option value="green">绿色</option>
+              <option value="daynt">晚霞</option>
+              <option value="sotc">柔彩</option>
+              <option value="soft">柔和</option>
+              <option value="busi">商务</option>
+              <option value="told">怀旧</option>
+              <option value="feture">未来</option>
+              <option value="ged">格调</option>
+              <option value="huol">活力</option>
+              <option value="rockq">石青</option>
+              <option value="modern">现代</option>
+              <option value="vitality">活力四射</option>
+              <option value="greenGarden">绿色花园</option>
+              <option value="roman">紫丁香</option>
+              <option value="purple">紫罗兰</option>
+              <option value="air">清新空气</option>
+              <option value="MT">MT标准色</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shelf-pane shelf-positional-pane full-width" ng-show="spec.mark == 'bmap' && ecconfig.mapdata.ifBmap != '1' && themeShow">
+      <div class="shelf-group">
+        <div class="shelf-label  drop-target">地图样式</div>
+        <div class="field-drop">
+          <select class="full-width" ng-model="ecconfig.mapdata.map_theme">
+            <option value="light">明</option>
+            <option value="dark">暗</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <h2 ng-click="propShow = !propShow">数据关联</h2>
+    <div class="shelf-pane shelf-marks-pane full-width" ng-show="spec.mark == 'single' && propShow">
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">标题</div>
+          <div class="field-drop">
+            <input type="text" class="full-width" ng-blur="setNormalTitle('title');" ng-model="normalTitle">
+          </div>
+        </div>
+      </div>
+        <ec-channel channel-title="'维度'" can-drag="'1'" field="ecconfig.field.x" modal="ecconfig"  remove-action="removeMix('x','0')" ng-show="ecconfig.field.y[0]&&ecconfig.field.y[0].aggregate=='rank'"></ec-channel>
+        <ec-channel channel-title="'分组'" can-drag="'1'" field="ecconfig.field.group" modal="ecconfig"  remove-action="removeMix('group','1')" ng-show="ecconfig.field.y[0]&&ecconfig.field.y[0].aggregate=='rank'"></ec-channel>
+      <ec-channel drop-type="'single'" can-drop="'1'" channel-title="'度量'" can-drag="'0'" channel-key="yval" remove-action="removeMix('y',$index)"
+        ng-repeat="yval in ecconfig.field.y track by $index" field="yval" modal="ecconfig"></ec-channel>
+      <div class="shelf-group" ng-show="ecconfig.field.y.length < 4">
+        <div class="shelf">
+          <div class="field-drop" ng-model="singleModel" data-drop="true" jqyoui-droppable="{onDrop:'singleFieldDrop'}" data-jqyoui-options="{activeClass: 'drop-active'}">
+            <span class="placeholder">拖动字段到此处统计度量度</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shelf-pane shelf-echart-pane full-width" ng-show="spec.mark == 'pie'  && propShow">
+      <ec-channel channel-title="'维度'" drop-type="'label'" can-drop="'1'" can-drag="'0'" channel-key="xkey" remove-action="removeMix('x',$index)"
+        ng-repeat="xval in ecconfig.field.x track by $index" field="xval" modal="ecconfig"></ec-channel>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="field-drop" ng-model="piexmodel" data-drop="true" jqyoui-droppable="{onDrop:'piexFieldDrop'}" data-jqyoui-options="{activeClass: 'drop-active'}">
+            <span class="placeholder">拖动字段到此处统计维度</span>
+          </div>
+        </div>
+      </div>
+      <ec-channel channel-title="'度量'" can-drag="'1'" channel-key="'0'" can-drop="'1'" remove-action="removeMix('y','0')" field="ecconfig.field.y"
+        modal="ecconfig"></ec-channel>
+
+    </div>
+
+    <div class="shelf-pane shelf-marks-pane full-width" ng-show="spec.mark == 'mixed' && propShow">
+      <ec-channel channel-title="'维度'" can-drag="'1'" channel-key="'0'" can-drop="'1'"  more-drag="'true'" drop-type="'mixedtype'" remove-action="removeMix('x','0')" field="ecconfig.field.x"
+        modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'度量'" drop-type="'type'" can-drop="'1'" can-drag="'0'" remove-action="removeMix('y',$index)" ng-repeat="yval in ecconfig.field.y track by $index"
+        field="yval" modal="ecconfig"></ec-channel>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="field-drop" ng-model="ymodel" data-drop="true" jqyoui-droppable="{onDrop:'mixedyFieldDrop'}" data-jqyoui-options="{activeClass: 'drop-active'}">
+            <span class="placeholder">拖动数值类字段到此处统计度量</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <div class="shelf-pane shelf-marks-pane full-width" ng-show="spec.mark == 'candlestick' && propShow">
+      <ec-channel channel-title="'维度'" can-drag="'1'" channel-key="'0'" more-drag="'true'" drop-type="'candlestick'" remove-action="removeMix('x','0')" field="ecconfig.field.x"
+        modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'start'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('start','0')" field="ecconfig.field.start" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'end'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('end','0')" field="ecconfig.field.end" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'max'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('max','0')" field="ecconfig.field.max" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'min'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('min','0')" field="ecconfig.field.min" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'度量'" drop-type="'candlesticktype'" can-drop="'1'" can-drag="'0'" remove-action="removeMix('y',$index)" ng-repeat="yval in ecconfig.field.y track by $index"
+        field="yval" modal="ecconfig"></ec-channel>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="field-drop" ng-model="ymodel" data-drop="true" jqyoui-droppable="{onDrop:'kyFieldDrop'}" data-jqyoui-options="{activeClass: 'drop-active'}">
+            <span class="placeholder">拖动数值类字段到此处统计度量</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="shelf-pane shelf-echart-pane full-width" ng-show="spec.mark == 'wordCloud' && propShow">
+      <ec-channel channel-title="'维度'" can-drag="'1'" remove-action="removeMix('x','0')" field="ecconfig.field.x[0]" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'度量'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('y','0')" field="ecconfig.field.y" modal="ecconfig"></ec-channel>
+    </div>
+    <div class="shelf-pane shelf-echart-pane full-width" ng-show="spec.mark == 'treemap' && propShow">
+      <ec-channel channel-title="'维度'" can-drag="'1'" remove-action="removeMix('x','0')" field="ecconfig.field.x[0]" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'度量'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('y','0')" field="ecconfig.field.y" modal="ecconfig"></ec-channel>
+    </div>
+    <div class="shelf-pane shelf-echart-pane full-width" ng-show="spec.mark == 'tree' && propShow">
+      <ec-channel channel-title="'维度'" can-drag="'1'" remove-action="removeMix('x','0')" field="ecconfig.field.x" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'度量'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('y','0')" field="ecconfig.field.y" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'关联'" can-drag="'1'" can-drop="'0'" remove-action="removeMix('relate','0')" field="ecconfig.field.relate" modal="ecconfig"></ec-channel>
+    </div>
+    <div class="shelf-pane shelf-echart-pane full-width" ng-show="spec.mark == 'graph' && propShow">
+      <ec-channel channel-title="'维度'" can-drag="'1'" remove-action="removeMix('x','0')" field="ecconfig.field.x[0]" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'度量'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('y','0')" field="ecconfig.field.y" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'关联'" can-drag="'1'" can-drop="'0'" remove-action="removeMix('relate','0')" field="ecconfig.field.relate" modal="ecconfig"></ec-channel>
+    </div>
+    <div class="shelf-pane shelf-echart-pane full-width" ng-show="spec.mark == 'sunburst' && propShow">
+      <ec-channel channel-title="'维度'" can-drag="'1'" remove-action="removeMix('x','0')" field="ecconfig.field.x[0]" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'度量'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('y','0')" field="ecconfig.field.y" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'关联'" can-drag="'1'" can-drop="'0'" remove-action="removeMix('relate','0')" field="ecconfig.field.relate" modal="ecconfig"></ec-channel>
+    </div>
+    <div class="shelf-pane shelf-echart-pane full-width" ng-show="spec.mark == 'funnel' && propShow">
+      <ec-channel channel-title="'维度'" can-drag="'1'" remove-action="removeMix('x','0')" field="ecconfig.field.x[0]" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'度量'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('y','0')" field="ecconfig.field.y" modal="ecconfig"></ec-channel>
+    </div>
+
+    <div class="shelf-pane shelf-positional-pane full-width" ng-show="spec.mark == 'gauge' && propShow">
+      <ec-channel channel-title="'度量'+($index+1)" can-drag="'1'" more-drag="'true'" drop-type="'style'" can-drop="'1'" channel-key="'0'"
+        remove-action="removeMix('y',$index)" ng-repeat="gaugemodal in ecconfig.field.y track by $index" field="gaugemodal"
+        modal="ecconfig"></ec-channel>
+      <div class="shelf-group" ng-show='ecconfig.field.y.length < 3 '>
+        <div class="shelf">
+          <div class="field-drop" ng-model="gaugeY" can-drop="'1'" data-drop="true" jqyoui-droppable="{onDrop:'gaugeYFieldDrop'}" data-jqyoui-options="{activeClass: 'drop-active'}">
+            <span class="placeholder">拖动数值类字段到此处统计度量</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="shelf-pane shelf-positional-pane full-width" ng-show="spec.mark == 'bmap' && propShow">
+      <div class="shelf-group">
+        <div class="tab active" ng-class="{'tab1':'tab-active'}[tab]" ng-click="setTab('tab1');">区域</div>
+        <div class="tab " ng-class="{'tab2':'tab-active'}[tab]" ng-click="setTab('tab2');">标记</div>
+      </div>
+    </div>
+    <div class="shelf-pane shelf-positional-pane full-width" ng-show="spec.mark == 'bmap' && tab == 'tab1' && propShow ">
+      <div class="shelf-group" ng-if="ecconfig.mapdata.ifBmap == '1'">
+        百度地图不支持区域数据展示
+      </div>
+      <ec-channel channel-title="'区域地区'" can-drag="'1'" channel-key="'0'" remove-action="removeArea('x')" field="ecconfig.area.x"
+        modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'区域数值'"  can-drop="'1'"can-drag="'1'" channel-key="'0'" remove-action="removeArea('y')" field="ecconfig.area.y"
+        modal="ecconfig"></ec-channel>
+    </div>
+    <div class="shelf-pane shelf-positional-pane full-width" ng-repeat="pointrow in ecconfig.point track by $index" ng-show="spec.mark == 'bmap' && tab == 'tab2' && propShow">
+      <ec-channel channel-title="'标记地区'" drop-type="'mappoint'" can-drop="'1'" can-drag="'1'" channel-key="'0'" remove-action="removePoint('x',$index)"
+        field="pointrow.x" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'标记数值'" can-drop="'1'" can-drag="'1'" channel-key="'0'" remove-action="removePoint('y',$index)" field="pointrow.y"
+        modal="ecconfig"></ec-channel>
+        <ec-channel channel-title="'经度'" can-drop="'0'" can-drag="'1'" channel-key="'0'" remove-action="removePoint('lon',$index)" field="pointrow.lon"
+        modal="ecconfig"></ec-channel>
+        <ec-channel channel-title="'纬度'" can-drop="'0'" can-drag="'1'" channel-key="'0'" remove-action="removePoint('lat',$index)" field="pointrow.lat"
+        modal="ecconfig"></ec-channel>
+    </div>
+    <div class="shelf-pane shelf-positional-pane full-width" ng-show="spec.mark == 'bmap' && tab == 'tab2' && propShow">
+      <div class="shelf-group" ng-show='ecconfig.point.length < 3 '>
+        <div class="shelf">
+          <div class="field-drop" ng-model="pointModel" data-drop="true" jqyoui-droppable="{onDrop:'pointFieldDrop'}" data-jqyoui-options="{activeClass: 'drop-active'}">
+            <span class="placeholder">拖动地区字段到此处增加标记</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shelf-pane shelf-positional-pane full-width" ng-if="spec.mark == 'bmap' && propShow">
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">地图包</div>
+          <div class="field-drop">
+              <select class="full-width" ng-model="ecconfig.mapbag">
+                <option value="china">中国</option>
+                <option value="shanghai">上海</option>
+              </select>
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">百度地图</div>
+          <div class="field-drop">
+            <input type="checkbox" ng-true-value="'1'" ng-false-value="'2'" ng-model="ecconfig.mapdata.ifBmap">
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="shelf-pane shelf-marks-pane full-width" ng-show="spec.mark == 'dbar' && propShow">
+      <ec-channel channel-title="'维度'" can-drag="'1'" channel-key="'0'" remove-action="removeMix('x','0')" field="ecconfig.field.x"
+        modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'横轴度量'" can-drag="'1'" can-drop="'0'" remove-action="removeMix('y','0')" field="ecconfig.field.y[0]" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'纵轴度量'" can-drag="'1'" can-drop="'1'" drop-type="'dbar'" remove-action="removeMix('y','1')" field="ecconfig.field.y[1]" modal="ecconfig"></ec-channel>
+    </div>
+
+    <div class="shelf-pane shelf-marks-pane full-width" ng-show="spec.mark == 'scatter' && propShow">
+      <ec-channel channel-title="'维度'" can-drag="'1'" channel-key="'0'" remove-action="removeMix('x','0')" field="ecconfig.field.x"
+        modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'横轴度量'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('y','0')" field="ecconfig.field.y[0]" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'纵轴度量'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('y','1')" field="ecconfig.field.y[1]" modal="ecconfig"></ec-channel>
+    </div>
+
+    <div class="shelf-pane shelf-marks-pane full-width" ng-show="spec.mark == 'radar' && propShow ">
+      <ec-channel channel-title="'分类'" can-drag="'1'" remove-action="removeMix('legend','0')" field="ecconfig.field.legend" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'维度'" can-drag="'1'" remove-action="removeMix('x','0')" field="ecconfig.field.x" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'度量'" can-drag="'1'" can-drop="'1'" remove-action="removeMix('y','0')" field="ecconfig.field.y" modal="ecconfig"></ec-channel>
+    </div>
+    <h2 ng-show="hasOption(spec.mark)" ng-click="optionShow = !optionShow">扩展选项</h2>
+    <div class="shelf-pane shelf-marks-pane full-width" ng-show="spec.mark == 'mixed' && optionShow ">
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">合并</div>
+          <div class="field-drop">
+            <input type="checkbox" ng-true-value="'1'" ng-false-value="'2'" ng-model="ecconfig.ifmerge">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">缩放</div>
+          <div class="field-drop">
+            <input type="checkbox" ng-true-value="'1'" ng-false-value="'2'" ng-model="ecconfig.roominout">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">转置</div>
+          <div class="field-drop">
+            <input type="checkbox" ng-true-value="'1'" ng-false-value="'2'" ng-model="ecconfig.transpose">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">美化高低值</div>
+          <div class="field-drop">
+            <input type="checkbox" ng-true-value="'1'" ng-false-value="'2'" ng-model="ecconfig.beauty">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">倾斜标签</div>
+          <div class="field-drop">
+            <input type="checkbox" ng-true-value="'1'" ng-false-value="'2'" ng-model="ecconfig.roatetext">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">隐藏坐标系</div>
+          <div class="field-drop">
+            <input type="checkbox" ng-true-value="'1'" ng-false-value="'2'" ng-model="ecconfig.showaxis">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">坐标系内置</div>
+          <div class="field-drop">
+            <input type="checkbox" ng-true-value="'1'" ng-false-value="'2'" ng-model="ecconfig.axisin">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">隐藏分隔线</div>
+          <div class="field-drop">
+            <input type="checkbox" ng-true-value="'1'" ng-false-value="'2'" ng-model="ecconfig.showaxissplitline">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">柱角弧度</div>
+          <div class="field-drop">
+            <div style="width: 80%;margin: 0;" range-slider min="0" max="100" model-max="ecconfig.barradius" pin-handle="min"></div>
+              <input type="text" style="width:25px;" ng-model="ecconfig.barradius">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="shelf-pane shelf-marks-pane full-width" ng-if="spec.mark == 'wordCloud' && optionShow">
+        <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">词云形状</div>
+          <div class="field-drop">
+            <select class="full-width" ng-model="ecconfig.shape">
+              <option value="circle">circle</option>
+              <option value="cardioid">cardioid</option>
+              <option value="diamond">diamond</option>
+              <option value="triangle-forward">triangle-forward</option>
+              <option value="triangle">triangle</option>
+              <option value="pentagon">pentagon</option>
+              <option value="star">star</option>
+            </select>
+          </div>
+        </div>
+      </div>
+       <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label ">单词大小</div>
+          <div class="field-drop">
+              <div range-slider  style="width: 100%;margin: 0;" show-values="true" step="1" min="10" max="100" model-min="ecconfig.sizeRange[0]" model-max="ecconfig.sizeRange[1]"></div>
+          </div>
+        </div>
+       </div>
+    </div>
+    <div class="shelf-pane shelf-marks-pane full-width" ng-if="spec.mark == 'single' && optionShow">
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">形式</div>
+          <div class="field-drop">
+            <select class="full-width" ng-model="ecconfig.type">
+              <option value="card">指标卡</option>
+              <option value="list">指标条</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">小数点</div>
+          <div class="field-drop">
+            <input type="text" class="full-width" ng-model="ecconfig.option.fixed">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">显示千分位</div>
+          <div class="field-drop">
+            <input type="checkbox"  ng-true-value="true" ng-false-value="false"  ng-model="ecconfig.option.thousands">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group" ng-show="ecconfig.type == 'card'">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">外框颜色</div>
+          <div class="field-drop">
+            <input type="text" class="full-width color-input-single" ng-blur="setColor('stroke')" rel="stroke" ng-model="stroke_color">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group" ng-show="ecconfig.type == 'card'">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">背景颜色</div>
+          <div class="field-drop">
+            <input type="text" class="full-width color-input-single" ng-blur="setColor('fill')" rel="fill" ng-model="fill_color">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shelf-pane shelf-echart-pane full-width" ng-show=" spec.mark == 'pie' && optionShow">
+        <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">圆心距离</div>
+          <div class="field-drop">
+            <div range-slider min="0" max="100" model-max="ecconfig.start_radius" pin-handle="min" style="width:80%;margin:0px"></div>
+              <input type="text" style="width:25px;" ng-model="ecconfig.start_radius">
+          </div>
+        </div>
+        <div class="shelf">
+          <div class="shelf-label  drop-target">嵌套间隔</div>
+          <div class="field-drop">
+            <div range-slider min="0" max="100" model-max="ecconfig.radius_range" pin-handle="min" style="width:80%;margin:0px"></div>
+              <input type="text" style="width:25px;" ng-model="ecconfig.radius_range">
+          </div>
+        </div>
+        <div class="shelf">
+          <div class="shelf-label  drop-target">填充宽度</div>
+          <div class="field-drop">
+            <div range-slider min="0" max="100" model-max="ecconfig.radius_interval" pin-handle="min" style="width:80%;margin:0px"></div>
+              <input type="text" style="width:25px;" ng-model="ecconfig.radius_interval">
+          </div>
+        </div>
+        <div class="shelf">
+          <div class="shelf-label  drop-target">分断显示</div>
+          <div class="field-drop">
+            <div range-slider min="0" max="10" model-max="ecconfig.radius_split" pin-handle="min" style="width:80%;margin:0px"></div>
+              <input type="text" style="width:25px;" ng-model="ecconfig.radius_split">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--<div class="shelf-pane shelf-echart-pane full-width" ng-show=" spec.mark == 'pie' && optionShow">
+      <h4>圆心距离</h4>
+      <div range-slider min="0" max="20" model-max="ecconfig.start_radius" pin-handle="min"></div>
+      <h4>间隔</h4>
+      <div range-slider min="0" max="20" model-max="ecconfig.radius_range" pin-handle="min"></div>
+      <h4>填充宽度</h4>
+      <div range-slider min="0" max="80" model-max="ecconfig.radius_interval" pin-handle="min"></div>
+    </div>-->
+
+    <div class="shelf-pane shelf-echart-pane full-width" ng-show=" spec.mark == 'gauge' && optionShow">
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">合并</div>
+          <div claF="field-drop">
+            <input type="checkbox" ng-true-value="'1'" ng-false-value="'2'" ng-model="ecconfig.ifmerge">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 ng-show="hasLegend(spec.mark)" ng-click="legendShow = !legendShow">图例</h2>
+    <div class="shelf-pane shelf-echart-pane full-width" ng-show="hasLegend(spec.mark) && legendShow">
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">显示图例</div>
+          <div class="field-drop">
+            <input type="checkbox" ng-true-value="'1'" ng-false-value="'2'" ng-model="ecconfig.legend.show">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">图例平铺</div>
+          <div class="field-drop">
+            <input type="checkbox" ng-true-value="'horizontal'" ng-false-value="'vertical'" ng-model="ecconfig.legend.orient">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">滚动图例</div>
+          <div class="field-drop">
+            <input type="checkbox" ng-true-value="'scroll'" ng-false-value="'plain'" ng-model="ecconfig.legend.type">
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group">
+        <div class="shelf">
+          <div class="shelf-label  drop-target">图例位置</div>
+          <div class="field-drop">
+            <select class="full-width" ng-model="ecconfig.legend.position">
+              <option value="upleft">左上</option>
+              <option value="upcenter">上中心</option>
+              <option value="upright">右上</option>
+              <option value="downleft">左下</option>
+              <option value="downcenter">下中心</option>
+              <option value="downright">右下</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="shelf-group" >
+        <div class="shelf">
+          <div class="shelf-label  drop-target">图例文字</div>
+          <div class="field-drop">
+            <div style="width: 80%;margin: 0;" range-slider min="4" max="100" model-max="ecconfig.legend.fontSize" pin-handle="min"></div>
+              <input type="text" style="width:25px;" ng-model="ecconfig.legend.fontSize">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 ng-click="filterShow = !filterShow">过滤条件</h2>
+    <div class="shelf-pane shelf-marks-pane full-width" ng-show="filterShow">
+      <ec-channel channel-title="'年份'" drop-type="'filter'" can-drop="'1'" can-drag="'1'" remove-action="removeFilter('year')"
+        field="ecconfig.filter.year.field" modal="ecconfig"></ec-channel>
+      <ec-channel channel-title="'月份'" drop-type="'filter'" can-drop="'1'" can-drag="'1'" remove-action="removeFilter('month')"
+        field="ecconfig.filter.month.field" modal="ecconfig"></ec-channel>
+       <ec-channel channel-title="'过滤字段'+($index+1)" can-drag="'1'" more-drag="'true'" drop-type="'filters'" can-drop="'1'" channel-key="'filters'"
+        remove-action="removeFilter('filters',$index)" ng-repeat="filtermodal in ecconfig.filter.filters track by $index" field="filtermodal"
+        modal="ecconfig"></ec-channel>
+      <div class="shelf-group" >
+        <div class="shelf">
+          <div class="field-drop" ng-model="filtermodal" can-drop="'1'" data-drop="true" jqyoui-droppable="{onDrop:'filterFieldDrop'}" data-jqyoui-options="{activeClass: 'drop-active'}">
+            <span class="placeholder">拖动字段到此处进行过滤</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="shelf-pane shelf-filter-pane full-width" ng-if="!preview" ng-show="!ifechart">
+    <filter-shelves spec="spec"></filter-shelves>
+  </div> -->
+  <!-- <select class="markselect" ng-model="spec.mark" ng-class="{auto: spec.mark === ANY}"
+  ng-change="markChange()">
+  <option ng-repeat="type in marksicon" value="{{type.mark}}">
+    <i class="fa {{ type.icon }}"></i>  {{ type.title }}
+  </option>
+</select> -->
+</div>

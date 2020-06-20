@@ -1,0 +1,273 @@
+{% extends 'base_lite.html' %} {% load staticfiles %}
+     {% block content %}
+<!--<editor-fold desc="静态资源">-->
+<link rel="stylesheet" href="{% static 'plugin/colorpicker/bootstrap-colorpicker.min.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-bootstrap-colorpicker/colorpicker.min.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/angular/angularjs-datepicker/angular-datepicker.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/handsontable/handsontable.full.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'css/common.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'componets/groupselect/group-select.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'componets/multi-select/multi-select.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'dashboard/datatables/report-design.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'css/jquery.mloading.css' %}">
+<script src="{% static 'plugin/jquery/jquery.mloading.js' %}"></script>
+
+{% verbatim %}
+<style type="text/css">
+    .olap-col-content {
+        position: absolute;
+        width: 780px;
+        height: 0px;
+        background-color: #ffffff;
+        display: block;
+        z-index: 99999;
+        overflow: auto;
+        overflow-x: hidden;
+        transition: height 1.5s;
+        -moz-transition: height 1.5s; /* Firefox 4 */
+        -webkit-transition: height 1.5s; /* Safari and Chrome */
+        -o-transition: height 1.5s; /* Opera */
+    }
+
+    .olap-col-select:hover > .olap-col-content{
+        height: 400px;
+    }
+
+    .olap-col-content:hover {
+        height: 400px;
+
+    }
+    .field-item {
+	position: relative;
+	display: inline-block;
+	background-color: rgb(51, 153, 255);
+	font-weight: 500;
+	vertical-align: middle;
+	border-radius: 3px;
+	line-height: 18px;
+	box-sizing: border-box;
+	height: 20px;
+	margin-bottom: 0;
+	margin-right: 3px;
+	padding: 1px 3px;
+	font-size: 11px;
+	border: 1px solid transparent;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	overflow: hidden;
+    }
+
+    .full-width {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: initial;
+    }
+    .group-select-content {
+    width: 210px;
+    height: 32px;
+    top: 50px;
+    left: 5px;
+    position: absolute;
+    z-index: 100;
+}
+
+
+    .simulate-textarea {
+      margin-left: 84px;
+      display: inline-block;
+      width: calc(100% - 84px);
+      border: 1px solid #dddddd;
+      min-height:20px;
+      _height: 20px;
+      max-height: 120px;
+      border-radius: 4px;
+      padding: 4px 6px;
+      outline: 0;
+      word-break:break-all;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      overflow-x: hidden;
+      overflow-y: auto;
+      line-height: 20px;
+      font-size: 12px;
+    }
+</style>
+
+
+
+
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title">预警定义</h3>
+    <!--弹出框的关闭按钮-->
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form action="#" class="form-horizontal clearfix condition-row " method="post">
+        <div class="form-group clearfix">
+            <label for="title" class="col-sm-1 control-label">预警名称</label>
+            <div class="col-sm-3 form-input-add">
+                <input type="text" name="tagname" ng-model="detailrows.tagname" class="form-control">
+            </div>
+            <label for="title" class="col-sm-1 control-label">预警颜色</label>
+            <div class="col-sm-2 form-input-add">
+                <input type="text" id="color" name="color" ng-model="detailrows.color" class="form-control">
+            </div>
+            <label for="title" class="col-sm-2 control-label">是否邮件提醒</label>
+            <div class="col-sm-1 form-input-add">
+                <select class="form-control" name="issend" ng-model="detailrows.issend">
+                    <option value="">--</option>
+                    <option value="y">是</option>
+                    <option value="n">否</option>
+                </select>
+            </div>
+            <div  class="col-sm-1 form-input-add">
+                <select class="form-control" name="msg_type" ng-model="detailrows.msg_type">
+                    <option value="">等级</option>
+                    <option value="0">一般</option>
+                    <option value="1">危险</option>
+                </select>
+            </div>
+
+        </div>
+
+
+
+        <div class="form-group clearfix" ng-repeat="(rowkey,rowval) in detailrows.condition track by rowkey">
+            <div style="float:left;width:180px;">
+                <!--<select  name="olaplist" id="olaplist" ng-model="rowval.eqOlap" style="width: 208px;height: 40px" class="selectpicker"
+                         ng-change="changeOlap(rowval.eqOlap, rowval)" ng-options="olap.id as olap.name for olap in olaplist">
+                    <option value="">请选择olap</option>
+                </select>-->
+                   <group-select items="sourceList"  value="dataSourceIds"
+                      group-field="'olaptype'" display-field="'name'" value-field="'id'" multiple="true"
+                      class="col-sm-2">
+                    </group-select>
+
+                <!--<select style="width:200px;height:600px;" value="{{ columnrow.fullname }}"  multiple="multiple"  ng-click="changeOlapCol(rowval.eqOlapCol, rowval, 1, selectArea)"
+                         class="current-dataset"   ng-model="rowval.eqOlapCol" ng-options="olapCol.title for olapCol in olapCols" >
+                </select>-->
+                <div style="width: 212px;height: 500px">
+                    <div class="cursor-move ng-scope" ng-repeat="olapCol in olapCols">
+                        <span class="field-item full-width" ng-drag="true" ng-drag-data="col" draggable="false" id="{{olap.id}}"
+                            ng-model="rowval.eqOlapCol" ng-drag-success="onDragComplete($data, $event)">{{olapCol.title}}</span>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <!--<div style="float:left;width:160px;">
+                        <p class="form-lable-p">指标名</p>
+                        <select style="width:160px;height:300px;" value="{{ columnrow.fullname }}"  multiple="multiple"  ng-click="changeOlapCol(rowval.eqOlapCol, rowval, 1, selectArea)"
+                            ng-model="rowval.eqOlapCol" ng-options="olapCol.title for olapCol in olapCols">
+                        </select>
+            </div>-->
+
+            <div class="col-sm-3 form-input-add olap-col-select">
+
+                <div class="olap-col-content" style="position: absolute; margin-left: -50px">
+
+                    <!--<div style="float:left;width:160px;">
+                        <p class="form-lable-p">指标名</p>
+                        <select style="width:160px;height:300px;" value="{{ columnrow.fullname }}"  multiple="multiple"  ng-click="changeOlapCol(rowval.eqOlapCol, rowval, 1, selectArea)"
+                            ng-model="rowval.eqOlapCol" ng-options="olapCol.title for olapCol in olapCols">
+                        </select>
+                    </div>-->
+
+
+
+                    <!--<div style="float:left;width:350px;">
+                        <a href="javascript:void(0)" ng-click="addJoinRow(rowval);">&nbsp;&nbsp;新增关联字段</a><br>
+                        <div style="width: 100%;" ng-repeat="(colIndex, joinRow) in rowval.joinRow track by colIndex">
+                            <div class="col-sm-5 form-input-add">
+                                <select class="form-control" ng-model="joinRow.col1">
+                                    <option value="{{ columnrow.table }}.{{ columnrow.fullname }}" ng-repeat="columnrow in columnlist">{{ columnrow.title }}</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-5 form-input-add">
+                                <select class="form-control" ng-model="joinRow.aimCol1">
+                                    <option value="{{ olapCol.table }}.{{ olapCol.fullname }}" ng-repeat="olapCol in olapCols">{{ olapCol.title }}</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-2 form-input-add">
+                                <a href="javascript:void(0)" class="btn btn-default" ng-click="delJoinRow(rowval, colIndex);">删除</a><br>
+                            </div>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
+            <!-- <div class="col-sm-1 form-input-add">
+                <select class="form-control" ng-model="rowval.function">
+                    <option value="<">&lt;</option>
+                    <option value="<=">&lt;=</option>
+                    <option value="=">=</option>
+                    <option value=">">&gt;</option>
+                    <option value=">=">&gt;=</option>
+                    <option value="exists">exists</option>
+                    <option value="not exists">not exists</option>
+                    <option value="between">between</option>
+                    <option value="not between">not between</option>
+                    <option value="like">like</option>
+                    <option value="is null">is null</option>
+                    <option></option>
+                </select>
+            </div>-->
+
+
+
+            <!--<div class="col-sm-1 form-input-add">
+                <select class="form-control" ng-model="rowval.link" style="width: 67px">
+                    <option value="and">and</option>
+                    <option value="or">or</option>
+                </select>
+            </div>
+            <div class="col-sm-1 form-input-add" style="padding-left: 10px;">
+                <a href="javascript:void(0)" class="btn btn-default" ng-click="deleteRow(rowkey);">删除</a>
+            </div>-->
+
+        </div>
+
+        <!--<textarea class="simulate-textarea col-sm-1 form-input-add"
+            ng-model="detailrows.advice_content" contenteditable="true" placeholder="意见or建议">
+
+        </textarea>-->
+
+    </form>
+</div>
+
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>
+
+
+
+{% endverbatim %}
+<!--<editor-fold desc="静态资源2">-->
+<script type="text/javascript" src="{% static 'plugin/angular/i18n/angular-locale_zh-cn.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'plugin/moment/moment.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/moment/locale/zh-cn.js' %}"></script>
+<script>
+    moment.locale('zh-cn');
+</script>
+<script src="{% static 'js/ngDraggable.js' %}"></script>
+<script src="{% static 'plugin/angular/angularjs-datepicker/angular-datepicker.min.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-bootstrap-colorpicker/bootstrap-colorpicker-module.min.js' %}"></script>
+<script src="{% static 'js/constant.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'plugin/handsontable/handsontable.full.js' %}"></script>
+<script src="{% static 'plugin/handsontable/languages/zh-CN.js' %}"></script>
+<script src="{% static 'componets/groupselect/group-select.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/multi-select/multi-select.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'dashboard/datatables/handsontable.main.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'dashboard/datatables/handsontable.utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'dashboard/datatables/report-design.js' %}?v={{ nowversion }}1"></script>
+<!--</editor-fold>-->
+
+{% endblock %}

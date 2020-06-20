@@ -1,0 +1,40 @@
+{% verbatim %}
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title">业务经验(<font style="color:red;">填入数字对应处理之前的数据</font>)</h3>
+    <!--弹出框的关闭按钮-->
+    <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form action="#" method="post" class="form-horizontal">
+        <div class="form-group clearfix" ng-repeat="(rowkey,rowval) in monitors.rows track by rowkey">
+            <label for="title" class="col-sm-1 control-label" ng-if="rowkey == '0'">
+                <a href="javascript:void(0)" ng-click="addRow();">新增一行</a>
+            </label>
+            <label for="title" class="col-sm-1 control-label" ng-if="rowkey != '0'"></label>
+            <label for="title" class="col-sm-1 control-label">数据范围:</label>
+            <div class="col-sm-2 form-input-add">
+                <input type="text" class="form-control" ng-model="rowval.min">
+            </div>
+            <label for="title" class="col-sm-1 control-label">到:</label>
+            <div class="col-sm-2 form-input-add">
+                <input type="text" class="form-control" ng-model="rowval.max">
+            </div>
+            <label for="title" class="col-sm-1 control-label">显示颜色:</label>
+            <div class="col-sm-2 form-input-add">
+                <input colorpicker type="text" class="form-control" ng-model="rowval.color">
+            </div>
+            <dlabeliv class="col-sm-1 control-label">
+                <a href="javascript:void(0)" ng-click="deleteRow(rowkey);">删除</a>
+            </label>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>
+
+{% endverbatim %}

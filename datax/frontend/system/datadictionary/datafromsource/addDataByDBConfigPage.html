@@ -1,0 +1,175 @@
+<style>
+    .modal-body [class^=col-md-], .modal-body [class^=col-sm-]{
+        padding-right: 0px;
+    }
+    .form-horizontal .form-group{
+        margin-left: 0px;
+    }
+    .modal-body .form-input{
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    .selfDesignBtn{
+        margin-right: 0px !important;
+    }
+    .modal-content{
+        max-height: 600px;
+        overflow-y: scroll;
+    }
+    .pageLimitInputFeild{
+        height: 27px;
+        width: 68px;
+        display: inline;
+        margin-top: 2px;
+    }
+    .tableAreaSelfStyle{
+        max-height: 300px;
+        overflow-y: scroll;
+    }
+</style>
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title">从数据集添加</h3>
+    {#  弹出框的关闭按钮  #}
+    <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body open-body">
+    <form action="#" method="post" id="configModle" class="form-horizontal">
+        <div class="col-sm-12">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">类型</label>
+                    <div class="col-sm-10 form-input">
+                        <select class="form-control" ng-model="configObj.type" required
+                                ng-options="dbType.value as dbType.name for dbType in dbTypes" ng-change="getDatabase()">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label form-lable">ip</label>
+                    <div class="col-sm-10 form-input">
+                        <input type="text" name="ip" ng-change="getDatabase()" ng-model='configObj.ip'
+                               class="form-control" style="width: 67%;display: inline" required>
+                        <span style="width: 3%">:</span>
+                        <input type="text" name="port" ng-change="getDatabase()" ng-model='configObj.port'
+                               class="form-control" style="width: 28%;display: inline" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label form-lable">用户名</label>
+                    <div class="col-sm-10 form-input">
+                        <input type="text" name="user_name" ng-change="getDatabase()"
+                               ng-model='configObj.user_name' class="form-control" maxlength="30" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label form-lable">密码</label>
+                    <div class="col-sm-10 form-input">
+                        <input type="password" name="password" ng-change="getDatabase()"
+                               ng-model='configObj.password' class="form-control" maxlength="30" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label form-lable">数据库</label>
+                    <div class="col-sm-10 form-input">
+                        <select ng-if="configObj.type != 'oracle'" ng-model='configObj.database' class="form-control" ng-change="getTableAndColumnNamesByConnInfo('1')"
+                                ng-options="list for list in lists" required>
+                        </select>
+                        <input type="text" class="form-control" ng-model="configObj.database"
+                               ng-if="configObj.type == 'oracle'" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label form-lable">表名</label>
+                    <div class="col-sm-10 form-input">
+                        <select ng-model="configObj.tablename" class="form-control" ng-change="getTableAndColumnNamesByConnInfo('2')"
+                                ng-options="tbname for tbname in tableNames">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label form-lable">字段名</label>
+                    <div class="col-sm-10 form-input">
+                        <select ng-model="configObj.currSeleTbColumn" class="form-control" ng-change="columnChange()"
+                                ng-options="column.feild as column.name for column in currTbColumns">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-8" style="padding-left: 15px;">
+                <div class="col-sm-3" style="text-align: right">
+                    <label class="col-sm-12">筛选条件:</label>
+                    <button class="col-sm-12 btn btn-primary btn-ok selfDesignBtn" style="float: right;min-width: 85px" type="button" ng-click="addNewWhere()">新增条件</button>
+                    <button class="col-sm-12 btn btn-primary btn-ok selfDesignBtn" style="float: left;min-width: 92px;margin-top: 137px;" type="button" ng-click="getDatabase()">获取数据库</button>
+                    <button class="col-sm-12 btn btn-primary btn-ok selfDesignBtn" style="float: left;min-width: 92px;margin-top: 16px;" type="button" ng-click="getTableAndColumnNamesByConnInfo('1')">获取表名</button>
+                    <button class="col-sm-12 btn btn-primary btn-ok selfDesignBtn" style="float: left;min-width: 92px;margin-top: 16px;" type="button" ng-click="getTableAndColumnNamesByConnInfo('2')">获取表字段</button>
+                </div>
+                <div class="col-sm-9">
+                    <div class="col-sm-12">
+                        <div class="col-sm-4">
+                            <label class="control-label">字段</label>
+                        </div>
+                        <div class="col-sm-3">
+                            <label class="control-label">条件</label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="control-label">值</label>
+                        </div>
+                        <div class="col-sm-1">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div ng-repeat="(key,itemObj) in whereOptions">
+                            <div class="col-sm-4">
+                                <select class="form-control" ng-model="itemObj.column" ng-options="column.feild as column.name for column in currTbColumns">
+                                    <option value="">选择一个字段</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <select class="form-control" ng-model="itemObj.operator">
+                                    <option value="">选择一个运算符</option>
+                                    <option value="=">等于</option>
+                                    <option value=">">大于</option>
+                                    <option value="<">小于</option>
+                                    <option value=">=">大于等于</option>
+                                    <option value="<=">小于等于</option>
+                                    <option value="!=">不等于</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" required ng-model="itemObj.optvalue">
+                            </div>
+                            <div class="col-sm-1" ng-click="removeWhereItem(key)">
+                                <span class="glyphicon glyphicon-remove myIconStyle" style="font-size: 25px;padding-top: 4px;"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="col-sm-12">
+        <button class="col-sm-12 btn btn-primary btn-ok" type="button" ng-disabled="getDataDisableBut == 1" ng-click="getDataByConnInfoSql()">获取数据</button>
+        &nbsp;&nbsp;&nbsp;<span>前 </span><input type="text" class="form-control pageLimitInputFeild" ng-model="configObj.pagelimit"> <span>行</span>
+    </div>
+    <div class="col-sm-12 tableAreaSelfStyle">
+        <table class="table table-bordered table-hover" id="source-table">
+            <thead>
+                <tr>
+                    <th data-field="title" width="15%">字段值{{ dictData }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="value in dictData">
+                    <td><span ng-bind="value.dictDt"></span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" ng-disabled="!dictData || dictData.length == 0" type="button" ng-click="yesyesyes()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="nonono()">取消</button>
+</div>

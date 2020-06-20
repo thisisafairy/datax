@@ -1,0 +1,275 @@
+
+ <style type="text/css">
+    .field-item {
+	position: relative;
+        left: 23px;
+	display: inline-block;
+	background-color: rgb(121 ,205 ,205);
+	font-weight: 500;
+	vertical-align: middle;
+	border-radius: 3px;
+	line-height: 18px;
+	box-sizing: border-box;
+	height: 20px;
+	margin-bottom: 0;
+	margin-right: 3px;
+	padding: 1px 3px;
+	font-size: 11px;
+	border: 1px solid transparent;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	overflow: hidden;
+    }
+    .field-item2 {
+	position: relative;
+        left: 5px;
+	display: inline-block;
+	background-color: rgb(121 ,205 ,205);
+	font-weight: 500;
+	vertical-align: middle;
+	border-radius: 3px;
+	line-height: 18px;
+	box-sizing: border-box;
+	height: 20px;
+	margin-bottom: 0;
+	margin-right: 3px;
+	padding: 1px 3px;
+	font-size: 11px;
+	border: 1px solid transparent;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	overflow: hidden;
+    }
+
+    .full-width {
+	width: 200px;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: initial;
+    }
+
+
+</style>
+
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel">
+        业务经验设置
+    </h1>
+</section>
+<div class=" form-panel form-panel-monitor" ng-app="monitorapp" ng-controller="addController">
+    <form role="form" class="form-horizontal monitor-add" name="myForm">
+        <div class="step-loading" ng-show="step=='loading'">
+                <div class="circle-loading">
+
+                </div>
+        </div>
+        <div class="step2" ng-show="step == 'step2'">
+
+            <div class="form-group ">
+                <label class="col-sm-2 control-label lable-title">基础信息</label>
+            </div>
+            <div style="position: absolute;right: 70px;top: 75px;">
+                <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+            </div>
+            <div class="form-group">
+                <font style="color:red;"> * </font><label class="col-sm-2 control-label">预警名称 </label>
+                <div class="col-sm-4">
+                    <input type="text" name="title" class="form-control" required ng-model="monitordetail.warning_name" placeholder="名称">
+                </div>
+                <label class="col-sm-1 control-label">预警分类</label>
+                <div class="col-sm-3">
+                    <select class="form-control" name="monitortype" ng-options="type.id as type.title for type in monitortypes"  ng-model="monitordetail.warning_type" ng-change="monitorselector(); ">
+                        <option value="">请选择</option>
+                        <option value="new">新增</option>
+                        <option value="disabled" disabled>————————</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="form-group">
+                 <label for="title" class="col-sm-2 control-label">收件人</label>
+                <div class="col-sm-4 form-input-add">
+                    <input type="text" id="receive_user" name="receive_user" ng-model="monitordetail.addressee" readonly="readonly" class="form-control" ng-click="select_user('mail_to')" placeholder="点击选择">
+                </div>
+                <label for="title" class="col-sm-1 control-label">预警颜色</label>
+            <div class="col-sm-3 form-input-add">
+                <input type="text" id="color" name="color" ng-model="monitordetail.warning_color" class="form-control">
+            </div>
+
+            </div>
+            <style type="text/css">
+                #receive_user {
+                    background-color: white;
+                }
+                #cc_user {
+                    background-color: white;
+                }
+            </style>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">意见/建议</label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" ng-model="monitordetail.proposal_content">
+
+                </textarea>
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-sm-2 control-label lable-title">预警配置</label>
+            </div>
+        </div>
+
+        <div ng-app="monitorapp" ng-controller="addController">
+            <div >
+                <button class="btn btn-default  ">预警检测</button>
+                <group-select items="sourceList" value="dataSourceIds"  ng-model="selectValue" value-change="loadDataSourceCols()"
+                           group-field="'olaptype'" display-field="'name'" value-field="'id'" multiple="true"
+                          class="col-sm-3" style=" z-index: 1000;">
+                 </group-select >
+                <div  style="width:260px;height:400px;overflow-x:auto;overflow-y:auto" >
+
+                    <div class="left-block-olap-list" ng-repeat="olap in olaps"  >
+                        <span ng-bind="olap.name"></span>
+                            <div class="cursor-move ng-scope "  ng-repeat="col in olap.cols" >
+                                <span class="field-item full-width"  draggable="true" id="box_{{col.col}}"
+                                       ruby-dragstart="dragstart(col)"  ng-bind="col.name"></span>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div ng-if="olaps != ''">
+             <div style=" height: 400px;width: 400px; position: absolute; left: 293px;top: 380px;">
+                    <p>指标</p>
+                     <p>分组字段:</p>
+                     <div id="group_left"  style="border:1px solid; width: 330px;height: 30px" ruby-drop="drop(event)"  ruby-dragover="dragover(event)" ng-model="monitorconfig.group_column_left" contenteditable=true ng-keyup="keybordSearch($event)"></div>
+                     <p>计算字段:</p>
+                     <div style=" border:1px solid; width: 330px;height: 30px" >
+                         <ul class="cursor-move ng-scope ">
+                            <li style="float: left;width: 30px"  draggable="true" ruby-dragstart="dragstart('+')" >+</li>
+                            <li style="float: left;width: 30px"  draggable="true" ruby-dragstart="dragstart('-')" >-</li>
+                            <li style="float: left;width: 30px"  draggable="true" ruby-dragstart="dragstart('*')" >*</li>
+                            <li style="float: left;width: 30px"  draggable="true" ruby-dragstart="dragstart('/')" >/</li>
+                            <li style="float: left;width: 30px"  draggable="true" ruby-dragstart="dragstart('(')" >(</li>
+                            <li style="float: left;width: 30px"  draggable="true" ruby-dragstart="dragstart(')')" >)</li>
+                        </ul>
+                         <select ng-model="monitordetail.quick" ng-change="quick($event)">
+                            <option value="">快捷计算</option>
+                             <option value="y_yp">年同比</option>
+                             <option value="m_yp">月同比</option>
+                             <option value="mp">环比</option>
+                             <option value="max">最大</option>
+                             <option value="min">最小</option>
+                             <option value="avg">平均</option>
+                         </select>
+                     </div>
+
+                     <div>
+                         <div id="Calculation_left" style=" border:1px solid; width: 330px;height: 150px" ruby-drop="drop(event)" ruby-dragover="dragover(event)" contenteditable="true" ng-keyup="keybordSearch($event)">
+                         </div>
+                     </div>
+
+                     <p>过滤条件:</p>
+                     <div id="where_left" style=" border:1px solid;width: 330px;height: 30px" ruby-drop="drop(event)" ruby-dragover="dragover(event)" ng-model="where" contenteditable="true" ng-keyup="keybordSearch($event)"></div>
+
+             </div>
+             <div  style="position: absolute;left: 645px;top: 380px;">
+                 <select ng-model="monitordetail.contrast_mode" ng-change="contrast($event)">
+                    <option value=""></option>
+                    <option value="<">小于</option>
+                    <option value="<=">小于等于</option>
+                    <option value="=">等于</option>
+                    <option value=">">大于</option>
+                    <option value=">=">大于等于</option>
+                    <option value="in">存在</option>
+                    <option value="not in">不存在</option>
+
+                </select>
+             </div>
+             <div style=" height: 400px;width: 400px; position: absolute; left: 775px;top: 373px">
+                 <div class="checkbox">
+                     <input style="width: 270px" ng-show="!monitordetail.is_tarfet" ng-model="monitorconfig.ordinary_value" ng-change="ordinary($event)">
+                     <label>
+                        <input type="checkbox" ng-model="monitordetail.is_tarfet">指标
+                     </label>
+                 </div>
+                 <div ng-show="monitordetail.is_tarfet">
+                 <p>分组字段:</p>
+                     <div id="group_right"  style="border:1px solid; width: 330px;height: 30px" ruby-drop="drop(event)"  ruby-dragover="dragover(event)" ng-model="group" contenteditable=true ng-keyup="keybordSearch($event)"></div>
+                     <p>指标:</p>
+                     <div style=" border:1px solid; width: 330px;height: 30px" >
+                         <ul class="cursor-move ng-scope ">
+                            <li style="float: left;width: 30px"  draggable="true" ruby-dragstart="dragstart('+')" >+</li>
+                            <li style="float: left;width: 30px"  draggable="true" ruby-dragstart="dragstart('-')" >-</li>
+                            <li style="float: left;width: 30px"  draggable="true" ruby-dragstart="dragstart('*')" >*</li>
+                            <li style="float: left;width: 30px"  draggable="true" ruby-dragstart="dragstart('/')" >/</li>
+                            <li style="float: left;width: 30px"  draggable="true" ruby-dragstart="dragstart('(')" >(</li>
+                            <li style="float: left;width: 30px"  draggable="true" ruby-dragstart="dragstart(')')" >)</li>
+                        </ul>
+                     </div>
+                     <div id="Calculation_right" style=" border:1px solid; width: 330px;height: 150px" ruby-drop="drop(event)" ruby-dragover="dragover(event)" contenteditable="true" ng-keyup="keybordSearch($event)">
+                     </div>
+
+                     <p>过滤条件:</p>
+                     <div id="where_right" style=" border:1px solid;width: 330px;height: 30px" ruby-drop="drop(event)" ruby-dragover="dragover(event)" ng-model="where" contenteditable="true" ng-keyup="keybordSearch($event)"></div>
+                 </div>
+             </div>
+             </div>
+            <div id="exampleSheet" ng-drop="true"
+             ng-drop-success="onDropComplete($data,$event)" ng-drag-move="onDragMove($data,$event)"
+             ng-drag-start="onDragStart($data,$event)" ng-drag-stop="onDragStop($data,$event)">
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<script type="text/ng-template" id="select_user_page.html">
+    <div class="modal-header open-header">
+        <h3 class="modal-title open-header-title">选择用户</h3>
+        <!--  弹出框的关闭按钮  -->
+        <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    </div>
+    <div class="modal-body open-body">
+        <form class="form-horizontal" id="userform" name="userform">
+        <div class="form-group">
+          <label class="col-sm-2 control-label form-lable-add">用户</label>
+            <div class="col-sm-10 form-input-add">
+                <div style="float:left;width:200px;">
+                    <p class="form-lable-p">所有用户</p>
+                    <select style="width:200px;height:200px;" name="allusers" class="filtered" id="allusers"  multiple="multiple"
+                    ng-model="selusers" ng-options="user.username for user in allusers">
+                    </select>
+                </div>
+                <div style="float:left;width:50px;padding-left: 5px;margin-top: 58px;">
+                    <br>
+                    <div><a title=">>" href="javascript:void(0)" id="id_user_add_link" ng-click="add()"> 添加<span class="glyphicon glyphicon-arrow-right"></span></a></div><br>
+                    <div><a title="<<" href="javascript:void(0)" id="id_user_remove_link" ng-click="remove()"> 移除<span class="glyphicon glyphicon-arrow-left"></span></a></div>
+                </div>
+                <div style="float:left;width:200px;">
+                    <p class="form-lable-p">已选用户</p>
+                    <select style="width:200px;height:200px;" id="selusers" multiple="multiple" size="0" name="selusers"
+                      ng-model="seledusers" ng-options="user.username for user in users">
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        </form>
+        <div class="modal-footer footer-btn">
+        <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+        <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+    </div>
+    </div>
+
+
+</script>
+
+
+
+
+

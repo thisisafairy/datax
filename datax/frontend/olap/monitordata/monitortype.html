@@ -1,0 +1,28 @@
+{% verbatim %} 
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title">新增业务规则类型</h3>
+   <!--弹出框的关闭按钮-->
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body">
+    <form action="#" class="form-horizontal clearfix" method="post">
+        <div class="form-group clearfix">
+            <label for="title" class="col-sm-2 control-label">名称</label>
+            <div class="col-sm-10 form-input-add">
+               <input type="text" name="title" ng-model="title" class="form-control">
+            </div>
+        </div>
+        <div class="form-group clearfix">
+            <label for="desc" class="col-sm-2 control-label">描述</label>
+            <div class="col-sm-10 form-input-add">
+                <textarea name="desc" ng-model="desc" class="form-control" cols="30" rows="10"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>
+{% endverbatim %}

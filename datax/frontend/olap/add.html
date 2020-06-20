@@ -1,0 +1,799 @@
+{% verbatim %}
+<style>
+    .expand {
+        bottom: 0px !important;
+    }
+
+    @media (min-width: 768px) {
+        .form-label {
+            padding-top: 0px !important;
+            margin-bottom: 0;
+            text-align: right;
+        }
+    }
+
+    /*基础信息-字段，将首行下调5px*/
+
+    .downXpx {
+        padding-top: 5px;
+    }
+
+    .modal-dialog {
+        /*设置弹出框的宽度，弹出框最外层使用了这个类，但本html里没有这个类，*/
+        width: 500px;
+    }
+
+    .buttonstyle {
+        /*新增调度的按钮的布局*/
+        display: inline-block;
+        width: 450px;
+    }
+
+    .text-center {
+        text-align: center !important;
+    }
+
+    .readonly-white {
+        background-color: #ffffff !important;
+    }
+    /*预览表头显示*/
+    .tableTitleStyle{
+        /*overflow: hidden;
+        text-overflow: ellipsis;*/
+        white-space: nowrap;
+        min-width: 100px;
+        height: 20px;
+        display: block;
+    }
+    .previewcontent{
+        position: absolute;
+        top: 230px;
+    }
+    .uib-datepicker-popup{/*日期选择器的box-shadow样式*/
+        box-shadow: #666 0px 0px 6px;
+    }
+</style>
+<div class="main-block olap-content" ng-style="style()" resize>
+    <div class="step-progress">
+        <img src="/frontend/plugin/SVG-Loaders/svg-loaders/oval1.svg" ng-if="ajaxing">
+        <img src="/frontend/plugin/SVG-Loaders/svg-loaders/check.svg" ng-if="!ajaxing&&ajaxdone">
+        <img src="/frontend/plugin/SVG-Loaders/svg-loaders/error.svg" ng-if="!ajaxing&&ajaxerror">
+    </div>
+    <div class="left-block">
+        <div class="left-card">
+            <div class="left-select" style="margin-top: 15px;">
+                <div ng-mousemove="editsource(true);" ng-mouseleave="editsource(false);">
+                    <select ng-model="form.sourcekey" id="source-select" ng-change="getColumn();" ng-class="{true:'col-md-8',false:'col-md-12'}[showedit]"
+                        ng-options="value.id as value.title group by value.datatypename for value in sourcelist">
+                    </select>
+                    <div id="editbtn" class="btn btn-default" ng-click="goedit()" ng-class="{true:'col-md-offset-1 col-md-3 ',false:'hide'}[showedit]">
+                        修改
+                    </div>
+                </div>
+            </div>
+            <div class="left-block-list-header">
+                <div class="left-block-list-search" ng-if="onsearch">
+                    <input type="text" ng-model="searched" ng-change="dosearch(searched)" class="dataTable" >
+                </div>
+                <span>字段</span>
+                <div class="search smallbtn" ng-click="onsearch = !onsearch">
+                    <i class="fa fa-search"></i>
+                </div>
+            </div>
+            <div class="left-block-column-list" ng-class="{olapshowList:!onsearch,olapList:onsearch}">
+                <div class="loadding" ng-if="loadding">
+                    <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div class="schema-item " ng-class="{'step2':'cursor-move','step1':'cursor-click'}" ng-repeat="(columnkey,column) in form.config.columns track by columnkey">
+                    <span class="field-item full-width" data-drag="active_li == 'step2'" data-jqyoui-options="{revert: 'invalid', helper: 'clone'}"
+                        jqyoui-draggable="{index:'{{ columnkey }}',placeholder: 'keep'}" ng-model="form.config.columns" class="cursor-click"
+                        ng-click="toData(column);">
+                        <span class="field-row" title="{{ column.title }}">
+                            <span class="type-target">
+                                <i class="fa fa-font" ng-if="column.ifnum == '0'"></i>
+                                <i class="fa fa-hashtag" ng-if="column.ifnum == '1'"></i>
+                            </span>
+                            <span class="field-name">
+                                <span class="field-text">
+                                    {{ column.title }}
+                                </span>
+                            </span>
+                        </span>
+                    </span>
+                </div>
+                <!-- <ul ng-style="style()" resize>
+                <li ng-if="active_li == 'step2'" data-drag="true" data-jqyoui-options="{revert: 'invalid', helper: 'clone'}" ng-model="form.config.columns"
+                    jqyoui-draggable="{index:'{{ columnkey }}',placeholder: 'keep'}" class="cursor-click" ng-click="toData(column);"
+                    ng-repeat="(columnkey,column) in form.config.columns track by columnkey">
+                    <i class="fa fa-font" ng-if="column.ifnum == '0'"></i>
+                    <i class="fa fa-hashtag" ng-if="column.ifnum == '1'"></i>
+                    <div class="div-span">{{ column.title }}</div>
+                    <div class="clearfix"></div>
+                </li>
+                <li ng-if="active_li != 'step2'" class="cursor-click" ng-click="toData(column);" ng-repeat="(columnkey,column) in form.config.columns track by columnkey">
+                    <i class="fa fa-font" ng-if="column.ifnum == '0'"></i>
+                    <i class="fa fa-hashtag" ng-if="column.ifnum == '1'"></i>
+                    <div class="div-span">{{ column.title }}</div>
+                    <div class="clearfix"></div>
+                </li>
+            </ul> -->
+            </div>
+        </div>
+    </div>
+    <form name="myForm">
+        <div class="right-block">
+            <div class="titletag clearfix" id="contentresize">
+                <ul style="max-width: 950px;">
+                    <li class="col-md-2 " ng-class="{'step1': 'active'}[active_li]">
+                        <div class="progress-circle-bg"></div>
+                        <div class="progress-circle">1</div>
+                        <a ng-click="changestep('step1')">基础信息</a>
+                    </li>
+                    <li class="col-md-2 " ng-class="{'step2': 'active'}[active_li]">
+                        <div class="progress-circle-bg"></div>
+                        <div class="progress-circle">2</div>
+                        <a ng-click="changestep('step2')">筛选条件</a>
+                    </li>
+                    <li class="col-md-2" ng-class="{'step3': 'active'}[active_li]">
+                        <div class="progress-circle-bg"></div>
+                        <div class="progress-circle">3</div>
+                        <a ng-click="changestep('step3')">数据权限</a>
+                    </li>
+                    <li class="col-md-2" ng-class="{'step4': 'active'}[active_li]">
+                        <div class="progress-circle-bg"></div>
+                        <div class="progress-circle">4</div>
+                        <a ng-click="changestep('step4')">任务计划设置</a>
+                    </li>
+                </ul>
+                <div id="tagArrow" class="tagarrow {{ active_li }}"></div>
+                <div class="priviewbtn">
+                    <button type="button" onclick="window.history.go(-1)" class="btn btn-default">返回</button>
+                    <button type="button" ng-click="preview()" class="btn btn-default">预览</button>
+                    <button type="button" ng-disabled="myForm.$invalid ||!hascolumn||validating||!tableisvalidate" ng-click="save()" class="btn btn-default">保存</button>
+                    &nbsp;&nbsp;
+                    <button type="button" popover-placement="bottom-right" uib-popover-html="moduleInfo" class="btn btn-default">注意事项</button>
+                </div>
+            </div>
+
+            <div class="config-content" contentresize ng-style="contentstyle()">
+                <dl class="{{ active_li }}">
+                    <dd ng-class="{'step1': 'active'}[active_li]">
+                        <div class="notedit"></div>
+                        <div class="expand" ng-class="{true:'expand-active'}[expandstatus]">
+                            <div class="expand-btn" ng-click="expandstatus = !expandstatus"> 》 </div>
+                            <div class="expand-header">扩展字段</div>
+                            <div class="expand-content" style="height: 358px;OVERFLOW-Y: auto; OVERFLOW-X:hidden;">
+                                <div class="form-horizontal">
+                                    <div class="has-warning">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="form.ifexpand" />增加同比\环比(增长率)
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="margin-top: 15px;" ng-show="form.ifexpand == 'true'">
+                                        <label class="control-label col-md-2" for="inputWarning1">年份</label>
+                                        <div class="col-md-8">
+                                            <select class="full-width" ng-model="form.expand.year">
+                                                <option value="{{ $index }}" ng-repeat="row in form.column track by $index">
+                                                    {{ row.title }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="margin-top: 15px;" ng-show="form.ifexpand == 'true'">
+                                        <label class="control-label col-md-2" for="inputWarning1">月份</label>
+                                        <div class="col-md-8">
+                                            <select class="full-width" ng-model="form.expand.month">
+                                                <option value="{{ $index }}" ng-repeat="row in form.column track by $index">
+                                                    {{ row.title }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="margin-top: 15px;" ng-show="form.ifexpand == 'true'">
+                                        <label class="control-label col-md-2" for="inputWarning1">数值</label>
+                                        <div class="col-md-8">
+                                            <select multiple="multiple" style="height: 100px;" class="full-width" ng-model="form.expand.value">
+                                                <option value="{{ $index }}" ng-repeat="row in form.column track by $index">
+                                                    {{ row.title }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- add 20180330 -->
+                                    <!-- 将这两个ng-show="form.ifexpand == 'true'"修改为false -->
+                                    <div class="form-group" style="margin-top: 15px;" ng-show="false">
+                                        <h4>设定指标的年目标值</h4>
+                                        <a href="javascript:void(0)" ng-click="addQuotaRow();">新增一行</a>
+                                    </div>
+                                    <div ng-show="false" ng-repeat="quota in form.expand.quota track by $index">
+
+                                        <div class="form-group" style="margin-top: 15px;">
+                                            <label class="control-label col-md-2" for="inputWarning1">年</label>
+                                            <div class="col-md-8">
+                                                <select class="full-width" ng-model="quota.year">
+                                                    <option value="{{ quotayear }}" ng-repeat="quotayear in form.quotayears track by $index">
+                                                        {{ quotayear }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-top: 15px;">
+                                            <label class="control-label col-md-2" for="inputWarning1">指标</label>
+                                            <div class="col-md-8">
+                                                <select class="full-width" ng-model="quota.column">
+                                                    <option value="{{ $index }}" ng-repeat="row in form.column track by $index" ng-if="form.expand.value.in_array($index)">
+                                                        {{ row.title }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-top: 15px;">
+                                            <label class="control-label col-md-2" for="inputWarning1">指标值</label>
+                                            <div class="col-md-8">
+                                                <input type="number" name="quota.quotavalue" ng-model="quota.quotavalue">
+                                            </div>
+                                        </div>
+                                        <a href="javascript:void(0)" ng-click="delQuotaRow($index);">删除</a>
+
+                                        <!--<div class="form-group">
+                                            <label class="control-label" for="inputWarning1">年份</label>
+                                            <div class="col-md-2">
+                                                <select class="full-width" ng-model="quota.year">
+                                                    <option value="{{ quotayear }}" ng-repeat="quotayear in form.quotayears track by $index">
+                                                        {{ quotayear }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <label class="control-label col-md-2" for="inputWarning1">指标</label>
+                                            <div class="col-md-2">
+                                                <select class="full-width" ng-model="quota.column">
+                                                    <option value="{{ $index }}" ng-repeat="row in form.column track by $index" ng-if="form.expand.value.in_array($index)">
+                                                        {{ row.title }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <label class="control-label" for="inputWarning1">指标值</label>
+                                            <div class="form-input-add">
+                                                <input type="number" name="quota.quotavalue" ng-model="quota.quotavalue" class="control-label col-md-2">
+                                            </div>
+                                            <label>
+                                                <a href="javascript:void(0)" ng-click="delQuotaRow($index);">删除</a>
+                                            </label>
+
+                                        </div>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 form-horizontal kpi-form clearfix">
+                            <div class="next navbtn" ng-click="changestep('step2')">
+                                <i class="fa fa-angle-right"></i>
+                            </div>
+                            <div class="form-group">
+                                <label for="name" class="col-md-2 control-label form-label">名称
+                                    <font color="#ff0000"> * </font>
+                                </label>
+                                <div class="col-md-4">
+                                    <input type="text" required ng-model="form.name" class="form-control" id="name" placeholder="名称">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="desc" class="col-md-2 control-label form-label">表名
+                                    <font color="#ff0000"> * </font>
+                                </label>
+                                <div class="col-md-4">
+                                    <input type="text" required id="form-tablename" ng-class="{false:'error-input'}[tableisvalidate]" ng-model="form.table" ng-change="validatetable()"
+                                        class="form-control" placeholder="表名">
+                                    <div class="validating" ng-if="validating">
+                                        <img src="/frontend/plugin/SVG-Loaders/svg-loaders/oval1.svg">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group notes">
+                                <div class="col-md-offset-2 col-md-9">
+                                    <small>{{ tablevalidatemsg }}</small>
+                                </div>
+                            </div>
+                            <!-- 添加合同类型 -->
+                            <div class="form-group">
+                                <label for="desc" class="col-md-2 control-label form-label" style="padding-top: 25px">类型
+                                    <font color="#ff0000"> * </font>
+                                </label>
+                                <div class="col-md-4">
+                                    <!--<select class="form-control" name="form.charttype" ng-model="form.charttype" ng-change="charttypeselector();">
+                                        <option value="">请选择</option>
+                                        <option value="new">新增</option>
+                                        <option value="disabled" disabled>————————</option>
+                                        <option value="{{ type.id }}" ng-selected="form.charttype==type.id" ng-repeat="type in charttypes">{{ type.name }}</option>
+                                    </select>-->
+                                    <select class="form-control" required name="form.charttype" ng-model="form.charttype" ng-change="charttypeselector();">
+                                        <option value="">请选择</option>
+                                        <option value="new">新增</option>
+                                        <option value="disabled" disabled>————————</option>
+                                        <option value="{{ type.id }}" ng-repeat="type in charttypes">{{ type.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="desc" class="col-md-2 control-label">描述</label>
+                                <div class="col-md-6">
+                                    <textarea name="desc" ng-model="form.desc" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div ui-sortable="sortableOptions" class="list-group" ng-model="form.column">
+                                <div class="form-group olapColumnStyle" ng-repeat="(columnkey,columnvalue) in form.column track by columnkey">
+                                    <label ng-if="columnkey == 0" class="col-md-2 control-label">字段</label>
+                                    <label ng-if="columnkey != 0" class="col-md-2 control-label glyphicon glyphicon-move"></label>
+                                    <div class="col-md-3 downXpx">
+                                        <input ng-dblclick="edittitle(columnkey)" type="text" class="form-control" ng-if="columnvalue.isedit == '0'" readonly="true" title="{{ form.column[columnkey].title }}"
+                                            ng-model="form.column[columnkey].title" />
+                                        <input type="text" class="form-control" placeholder="显示名称" ng-if="columnvalue.isedit == '1'" ng-blur="edited(columnkey)" title="{{ form.column[columnkey].olaptitle }}"
+                                            ng-model="form.column[columnkey].olaptitle" />
+                                    </div>
+                                    <div class="col-md-3 downXpx">
+                                        <select name="" class="form-control" ng-model="form.column[columnkey].function" ng-options="fucntionvalue.key as fucntionvalue.value for fucntionvalue in form.config.functionlist">
+                                            <option value="">请选择</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 downXpx">
+                                        <select name="" class="form-control" ng-model="form.column[columnkey].order" ng-init="form.column[columnkey].order==''?form.column[columnkey].order='asc':form.column[columnkey].order"
+                                            ng-options="ordervalue.key as ordervalue.value for ordervalue in form.config.orderlist">
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 downXpx">
+                                        <a href="javascript:void(0);" ng-click="deletecolumn(columnkey)">删除</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-if="showExtLabel" class="form-group" style="margin-top: 15px;">
+                                <div class="col-md-1"></div>
+                                <button class="btn btn-default">额外扩展列：</button>
+                            </div>
+                            <div ng-if="showExtLabel" class="form-group" style="margin-top: 5px;">
+                                <style type="text/css">
+                                    .col-head {
+                                        overflow: hidden;
+                                        border-right: 1px solid #ccc;
+                                    }
+                                    .col-head div {
+                                        text-align: center;
+                                        float: left;
+                                        padding: 2px;
+                                        border-left: 1px solid #ccc;
+                                    }
+
+                                    .col-body {
+                                        overflow: hidden;
+                                        border-right: 1px solid #ccc;
+                                    }
+
+                                    .col-body div {
+                                        text-align: left;
+                                        float: left;
+                                        padding-left: 2px;
+                                        padding-right: 2px;
+                                        padding-top: 4px;
+                                        padding-bottom: 1px;
+                                        border-left: 1px solid #ccc;
+                                    }
+
+                                    .col-body div span {
+                                        display: block;
+                                        width: 100%;
+                                        word-break: keep-all;
+                                        /* 不换行 */
+                                        white-space: nowrap;
+                                        /* 不换行 */
+                                        overflow: hidden;
+                                        /* 内容超出宽度时隐藏超出部分的内容 */
+                                        text-overflow: ellipsis;
+                                    }
+
+                                    .col-name {
+                                        width: 30%;
+                                    }
+
+                                    .col-source {
+                                        width: 40%;
+                                    }
+
+                                    .col-source-olap {
+                                        width: 30%;
+                                    }
+
+                                    .tooltip.customClass .tooltip-inner {
+                                        color: #000000;
+                                        background-color: #EEEEEE;
+                                        box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+                                    }
+
+                                    .tooltip.customClass .tooltip-arrow {
+                                        display: none;
+                                    }
+                                </style>
+                                <div class="col-md-1"></div>
+                                <div class="col-md-10">
+                                    <div  style="border-bottom: 1px solid #ccc; border-top: 1px solid #ccc; width: 100%; height: 100%; overflow: hidden;">
+                                        <div class="col-head">
+                                            <div class="col-name table-head">扩展的列名</div>
+                                            <div class="col-source table-head">列的来源</div>
+                                            <div class="col-source-olap table-head">来源所在的olap</div>
+                                        </div>
+                                        <div class="col-body" ng-repeat="col in extCols">
+                                            <div class="col-name table-body" uib-tooltip="{{col.name}}" tooltip-class="customClass"><span>{{col.name}}</span></div>
+                                            <div class="col-source table-body" uib-tooltip="{{col.sourceCol}}" tooltip-class="customClass"><span>{{col.sourceCol}}</span></div>
+                                            <div class="col-source-olap table-body" uib-tooltip="{{col.sourceOlap}}" tooltip-class="customClass">
+                                                <span>{{col.sourceOlap}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1"></div>
+                            </div>
+                            <div class="drap-tips col-md-12 text-center" ng-if="form.column.length == 0">
+                                点击左侧字段选择分析字段
+                            </div>
+                        </div>
+
+                    </dd>
+                    <dd ng-class="{'step2': 'active'}[active_li]">
+                        <div class="notedit"></div>
+                        <div class="col-md-12 form-horizontal kpi-form clearfix">
+                            <div class="next navbtn" ng-click="changestep('step3')">
+                                <i class="fa fa-angle-right"></i>
+                            </div>
+                            <div class="pre navbtn" ng-click="changestep('step1')">
+                                <i class="fa fa-angle-left"></i>
+                            </div>
+                            <div class="filter-group" ng-repeat="(groupkey, groupvalue) in form.filters track by groupkey" data-drop="true" ng-model='resultlist'
+                                jqyoui-droppable="{multiple:true,onDrop:'dropInGroup(groupkey)'}">
+                                <div class="form-group " ng-repeat="(filterkey,filter) in groupvalue.group track by filterkey">
+                                    <div class="col-md-3">
+                                        <input type="text" readonly="true" class="form-control" ng-model="filter.title">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control" ng-model="filter.model">
+                                            <option ng-repeat="filtervalue in form.config.filterlist" value="{{filtervalue.key}}" ng-if="filtervalue.used == 'all' || filtervalue[filter.filtertype]">
+                                                {{filtervalue.value}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="name" ng-if="filter.filtertype != 'date'" class="form-control" ng-model="filter.value">
+                                        <!-- <datetimepicker ng-if="filter.filtertype == 'date'" data-datetimepicker-config="{ dropdownSelector: '.dropdown-toggle' }" data-ng-model="filter.value"></datetimepicker> -->
+                                        <!--<div class="dropdown" ng-if="filter.filtertype == 'date'">
+                                            <a class="dropdown-toggle" id="aaa" data-toggle="dropdown" data-target=".aaa" href="javascript:void(0);">
+                                                <div class="input-group">
+                                                    <input type="text" id="date" name="date" class="form-control" data-ng-model="filter.value">
+                                                    <span class="input-group-addon">
+                                                        <i class="glyphicon glyphicon-calendar"></i>
+                                                    </span>
+                                                </div>
+                                            </a>
+                                            <ul class="dropdown-menu" aria-labelledby="aaa">
+                                                <datetimepicker id="dateTimePickerTag" data-on-set-time="endDateOnSetTime(filter.value,groupkey,filterkey)" data-ng-model="filter.value"  data-datetimepicker-config="{ dropdownSelector: '#dropdown'}"></datetimepicker>
+                                            </ul>
+                                        </div>-->
+                                        <div class="dropdown" ng-if="filter.filtertype == 'date'">
+                                            <a class="dropdown-toggle" id="aaa" data-toggle="dropdown" data-target=".aaa" href="javascript:void(0);">
+                                                <div class="input-group">
+                                                    <input type="text" id="date" name="date" class="form-control" uib-datepicker-popup="{{format}}" ng-model="filter.value" is-open="popup1.opened"
+                                                        datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats"/>
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-default" ng-click="openDatePicker()">
+                                                            <i class="glyphicon glyphicon-calendar"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control" ng-model="filter.linkas">
+                                            <option value="or">or</option>
+                                            <option value="and">and</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <a href="javascript:void(0);" ng-click="deleteGroup(groupkey,filterkey)">删除</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="drap-tips col-md-12 text-center" data-drop="true" ng-model='resultlist' jqyoui-droppable="{multiple:true,onDrop:'dropCallback'}">
+                                将字段拖拽到此处新增筛选分组
+                            </div>
+                        </div>
+                    </dd>
+                    <dd ng-class="{'step3': 'active'}[active_li]">
+                        <div class="notedit"></div>
+                        <div class="col-md-12 form-horizontal kpi-form clearfix">
+                            <div class="next navbtn" ng-click="changestep('step4')">
+                                <i class="fa fa-angle-right"></i>
+                            </div>
+                            <div class="pre navbtn" ng-click="changestep('step2')">
+                                <i class="fa fa-angle-left"></i>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">
+                                    <a class="btn btn-default" ng-click="addTag()" style="height:34px;line-height:20px;">
+                                        <i class="fa fa-plus"></i> 新增数据权限
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-repeat="(tagkey,tagrow) in form.tag_config track by tagkey">
+                                <label for="desc" class="col-md-1 control-label" style="margin-top: -6px">分类</label>
+                                <div class="col-md-3">
+                                    <select class="form-control" ng-model="tagrow.tagid">
+                                        <option value="">选择权限类型</option>
+                                        <option value="{{row.id}}" ng-repeat="row in usertag track by $index">{{ row.name }}</option>
+                                    </select>
+                                </div>
+                                <label for="desc" class="col-md-1 control-label" style="margin-top: -6px">字段</label>
+                                <div class="col-md-5">
+                                    <select class="form-control" ng-model="tagrow.columns">
+                                        <option value="">选择对应字段</option>
+                                        <option value="{{cRow.fullname}}" ng-repeat="cRow in form.column track by $index">{{ cRow.title }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <a class="btn btn-default" ng-click="deleteTag(tagkey)" style="height:34px;line-height:20px;">
+                                        <i class="fa fa-trash-o"></i>删除
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </dd>
+                    <dd ng-class="{'step4': 'active'}[active_li]">
+                        <div class="notedit"></div>
+                        <div class="col-md-12 form-horizontal kpi-form clearfix">
+                            <div class="pre navbtn" ng-click="changestep('step3')">
+                                <i class="fa fa-angle-left"></i>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-5">
+                                    <select class="form-control" ng-model="form.dispatch">
+                                        <option value="0">选择调度</option>
+                                        <option ng-repeat="(dispatchkey, value10) in dispatchlists track by dispatchkey" value="{{value10.id}}">
+                                            {{value10.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <a class="btn btn-default" ng-click="addDispatch()" style="height:34px;line-height:20px;">
+                                        <i class="fa fa-plus"></i> 新增调度
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- <div class="form-group" ng-if="form.dispatch > 0">
+                                    <div class="col-md-12">
+                                        <select class="form-control" ng-change="changedispatchcolumn()" ng-model="form.dispatchconfig.dispatchcolumn" ng-options="dispatchrow.title for dispatchrow in form.config.columns">
+                                            
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <small>选择调度基准字段</small>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-if="form.dispatch > 0">
+                                        <div class="col-md-12">
+                                            <select class="form-control" ng-model="form.dispatchconfig.dispatchrule">
+                                                <option value="1">比现有值大</option>
+                                                <option value="2">比现有值小</option>
+                                            </select>
+                                        </div>
+                                </div> -->
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+            <div class="previewcontent" ng-if="isPreview">
+                <div class="close-preview" ng-click="closePreview();">x</div>
+                <div class="table-block">
+                    <div class="table-body">
+                        <table class="table sourcedata table-bordered" id="datainsert-table">
+                            <thead>
+                                <tr>
+                                    <th ng-repeat="(thkey,thvalue) in form.column track by thkey" title="{{ thvalue.title }}">
+                                        <span class="tableTitleStyle" ng-if="thvalue.olaptitle == '' ">{{ thvalue.title }}</span>
+                                        <span class="tableTitleStyle" ng-if="thvalue.olaptitle != '' ">{{ thvalue.olaptitle }}</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="(trkey, trvalue) in previewlists">
+                                    <td ng-repeat="(trthkey, trthvalue) in form.column" title="{{ trvalue[trthvalue.fullname] }}">
+                                        <span> {{ trvalue[trthvalue.fullname] }}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="table-pagenation">
+                    <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-md"
+                        boundary-link-numbers="true" rotate="false" ng-change="pageChanged(currentPage)"></ul>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+<script type="text/ng-template" id="addDispatch.html">
+    <div class="modal-header open-header">
+        <h3 class="modal-title open-header-title" style="width: 90%;">新增调度</h3>
+        <!--  弹出框的关闭按钮  -->
+        <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+
+    </div>
+    <div class="modal-body open-body">
+        <form role="form" class="form-horizontal olapdispatch-add" name="myForm">
+            <input type="hidden" ng-model="dispatch.id" />
+            <div class="form-group form-group-first">
+                <label class="col-sm-2 control-label">名称</label>
+                <div class="col-sm-5">
+                    <input type="text" name="name" class="form-control" required ng-model="dispatch.name" placeholder="名称">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">描述</label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" ng-model="dispatch.desc" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">频率</label>
+                <div class="col-sm-5">
+                    <select class="form-control" required ng-model="dispatch.quency">
+                        <option value="once">单次执行</option>
+                        <option value="loop">循环执行</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" ng-if="dispatch.quency == 'once'">
+                <label class="col-sm-2 control-label">日期</label>
+                <div class="col-sm-5">
+                    <p class="input-group">
+                        <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dispatch.once.date" is-open="popup1.opened"
+                            datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats"
+                        />
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="open1()">
+                                <i class="glyphicon glyphicon-calendar"></i>
+                            </button>
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <div class="form-group" ng-if="dispatch.quency == 'loop'">
+                <label class="col-sm-2 control-label">执行频率</label>
+                <div class="col-sm-5">
+                    <select class="form-control" ng-model="dispatch.loop.frequency">
+                        <option value="intervals">每隔多久</option>
+                        <option value="day">每天</option>
+                        <option value="week">每星期</option>
+                        <option value="month">每月</option>
+                        <option value="year">每年</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" ng-if="dispatch.quency == 'loop'&&dispatch.loop.frequency == 'intervals'">
+                <label class="col-sm-2 control-label">每</label>
+                <div class="col-sm-5">
+                    <input type="text" class="form-control" ng-model="dispatch.loop.intervalsdetail">
+                </div>
+            </div>
+            <div class="form-group" ng-if="dispatch.quency == 'loop'&&dispatch.loop.frequency == 'intervals'">
+                <label class="col-sm-2 control-label">周期</label>
+                <div class="col-sm-5">
+                    <select ng-model="dispatch.loop.intervals" class="form-control">
+                        <option value="days">天</option>
+                        <option value="hours">小时</option>
+                        <option value="minutes">分钟</option>
+                        <option value="seconds">秒</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" ng-if="dispatch.quency == 'loop'&& dispatch.loop.frequency == 'week'">
+                <label class="col-sm-2 control-label">选择星期</label>
+                <div class="col-sm-5">
+                    <select multiple class="form-control" ng-model="dispatch.loop.date">
+                        <option value="0">周日</option>
+                        <option value="1">周一</option>
+                        <option value="2">周二</option>
+                        <option value="3">周三</option>
+                        <option value="4">周四</option>
+                        <option value="5">周五</option>
+                        <option value="6">周六</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" ng-if="dispatch.quency == 'loop'&& dispatch.loop.frequency == 'month'">
+                <label class="col-sm-2 control-label">选择日期</label>
+                <div class="col-sm-3">
+                    <input type="text" ng-model="dispatch.loop.date" class="form-control col-sm-2" style="width: 50px" placeholder="1" max="12">
+                    <div style="padding-top: 7px;">号</div>
+                </div>
+            </div>
+            <div class="form-group" ng-if="dispatch.quency == 'loop'&& dispatch.loop.frequency == 'year'">
+                <label class="col-sm-2 control-label">填写日期</label>
+                <div class="col-sm-4">
+                    <input type="text" ng-model="dispatch.loop.month" class="form-control" placeholder="月（02）" name="">
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" ng-model="dispatch.loop.day" class="form-control" placeholder="日（04）" name="">
+                </div>
+            </div>
+            <div class="form-group" ng-if="!(dispatch.quency == 'loop'&&dispatch.loop.frequency == 'intervals')">
+                <label class="col-sm-2 control-label">时间</label>
+                <div class="col-sm-5">
+                    <div uib-timepicker ng-model="dispatch.time" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <!--<label  class="col-sm-7 control-label"></label>-->
+                <div class="col-sm-12 dispatch-addbtn buttonstyle">
+                    <button type="button" ng-click="cancel();" class="btn btn-warning btn-cancel">取消</button>
+                    <button type="button" ng-disabled="!myForm.$valid" class="btn btn-primary btn-ok" ng-click="save();">保存</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="addChartType.html">
+    <div class="modal-header open-header">
+        <h3 class="modal-title open-header-title" id="modal-title">业务类型编辑</h3>
+        <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body open-body">
+        <form action="#" method="post" id="editType" class="form-horizontal">
+            <div class="form-group" style="display: none;">
+                <label></label>
+                <input type="text" name="id" ng-model='type.id'>
+                <input type="text" name="parent_id" ng-model="type.parent_id">
+                <input type="text" name="level" ng-model="type.level">
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label form-lable-modal">上级名称：</label>
+                <div class="col-sm-10 form-input-add">
+                    <input type="text" name="parent_name" readonly required ng-model='type.parent_name' class="form-control" maxlength="30">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label form-lable-modal">类型名称：</label>
+                <div class="col-sm-10 form-input-add">
+                    <input type="text" name="type_name" required ng-model='type.type_name' class="form-control" maxlength="30">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label form-lable-modal">排序：</label>
+                <div class="col-sm-10 form-input-add">
+                    <input type="text" name="orderby" required ng-model='type.orderby' class="form-control" maxlength="30">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label form-lable-modal">状态：</label>
+                <div class="col-sm-10 form-input-add">
+                    启用：
+                    <input type="radio" name="status" value="1" ng-model="type.status"> 不启用：
+                    <input type="radio" name="status" value="0" ng-model="type.status">
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer footer-btn">
+        <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+        <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+    </div>
+</script> {% endverbatim %}

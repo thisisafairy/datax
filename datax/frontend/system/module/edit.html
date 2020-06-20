@@ -1,0 +1,36 @@
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title">模板编辑</h3>
+    {#  弹出框的关闭按钮  #}
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body open-body">
+    <form action="#" method="post" id="editModule" class="form-horizontal">
+        <div class="form-group" style="display: none;">
+            <label></label>
+            <input type="text" name="id"  ng-model='module.id'>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label form-lable-modal">模板名称</label>
+            <div class="col-sm-10 form-input-add">
+                <input type="text" name="name" required="" ng-model='module.name'  class="form-control" maxlength="30">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label form-lable-modal">url</label>
+            <div class="col-sm-10 form-input-add">
+                <input type="text" name="url" required="" ng-model='module.url' class="form-control" maxlength="30">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label form-lable-modal">icon</label>
+            <div class="col-sm-10 form-input-add">
+                <input type="email" name="icon" required=""  ng-model='module.icon' class="form-control" maxlength="30">
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>

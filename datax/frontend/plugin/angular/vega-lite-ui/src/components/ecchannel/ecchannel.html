@@ -1,0 +1,794 @@
+<div>
+  <div class="shelf-group">
+    <div class="shelf">
+      <div class="shelf-label"> {{ channelTitle }} </div>
+      <div class="field-drop" ng-model="thismodal" data-drop="canDrag == '1'" jqyoui-droppable="{onDrop:'FieldDropped()'}" data-jqyoui-options="{activeClass: 'drop-active'}">
+        <span class="selected full-width field-info" ng-show="field.field">
+          <span class="hflex full-width">
+            <span class="type-caret drop-target active" ng-show="canDrop == '1'">
+              <i ng-if="dropType!='filters'"  class="fa fa-caret-down"></i><i ng-if="dropType=='filters'" class="fa fa-filter"></i>
+            </span>
+            <span title="{{ field.field }}" class="field-info-text">
+              {{ field.field }}
+            </span>
+            <span title="计算表达式配置" class="count-caret drop-target active" ng-show="field.aggregate == 'count'">
+              <i class="fa fa-calculator" style="cursor:pointer;"></i>&nbsp;
+            </span>
+            <span class="no-shrink remove">
+              <a class="remove-field" ng-click="removeAction()">
+                <i class="fa fa-times"></i>
+              </a>
+            </span>
+          </span>
+        </span>
+        <span class="placeholder" ng-show="!field.field && canDrag == '1'">将字段拖到此处</span>
+      </div>
+    </div>
+    <div class="drop-container">
+      <div class="popup-menu echart-type ">
+        <div ng-if="field.type == 'temporal'">
+          <div class="form-group clearfix">
+            <label class="col-sm-5">日期取值</label>
+            <div class="col-sm-5">
+              <select ng-model="field.vtype" style="width:110px">
+                <option value="year">年</option>
+                <option value="month">月</option>
+                <option value="day">日</option>
+                <option value="quate">季度</option>
+                <option value=">">年月日</option>
+                <option value=">=">年月</option>
+                <option value="<">年季度</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group clearfix" >
+            <label class="col-sm-5">时间格式</label>
+            <div class="col-sm-5">
+              <select ng-model="field.dateformat" style="width:110px">
+                <option value="year">yyyy-MM-dd</option>
+                <option value="month">yyyy/MM/dd</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-group clearfix" ng-if="dropType!='filter'&&dropType!='filters'&&field.aggregate!='count'&&field.aggregate!='count_sum'&&channelTitle.indexOf('维度')<0&&channelTitle.indexOf('地区')<0" style="width:200px">
+            <label class="col-sm-6">统计方式</label>
+            <div class="col-sm-4">
+              <select class="full-width" ng-model="field.aggregate">
+                <option value="sum">加总</option>
+                <option value="mean">平均</option>
+                <option value="max">最大</option>
+                <option value="min">最小</option>
+                <!-- 后台提供结果直接排序功能排序-->
+                <option value="rank">排名</option>
+                <option value="grouprank">组内排名</option>
+                <option value="topn">前N名</option>
+                <option value="lastn">后N名</option>
+                <option value="topnp">前N%名</option>
+                <option value="lastnp">后N%名</option>
+                <option value="yp">同期数值</option>
+                <option value="yppercent">同比%</option>
+                <option value="mp">环比数值</option>
+                <option value="mppercent">环比%</option>
+              </select>
+            </div>
+              <div class="col-sm-2">
+                  <input placeholder="N" ng-model="field.aggregatevalue" style="width:100%" type="text" ng-show="field.aggregate=='topn'||field.aggregate=='lastn'||field.aggregate=='topnp'||field.aggregate=='lastnp'">
+              </div>
+          </div>
+        <div ng-if="dropType == 'type'" style="width:230px">
+          <div class="form-group clearfix">
+            <label class="col-sm-5">文字显示</label>
+            <div class="col-sm-5">
+              <input type="text" class="full-width" ng-model="field.rename" style="width:110px">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-5">颜色默认</label>
+            <div class="col-sm-5">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.autoColor">
+            </div>
+          </div>
+          <div class="form-group clearfix" ng-show="field.autoColor == 'false'">
+              <label class="col-sm-5">颜色</label>
+            <div class="col-sm-5">
+              <input type="text" class="full-width color-input" ng-blur="setMixColor()" ng-model="mix_color">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-5">数据形状</label>
+            <div class="col-sm-5">
+              <select ng-model="field.truetype" style="width:110px">
+                <option value="bar">柱状</option>
+                <option value="line">线性</option>
+                <option value="area">区域图</option>
+                <option value="linestep">阶梯</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group clearfix" ng-show="field.truetype=='bar'">
+            <label class="col-sm-5">度量位置</label>
+            <div class="col-sm-5">
+              <select ng-model="field.label.normal.position" style="width:110px">
+                <option value="left">left</option>
+                <option value="right">right</option>
+                <option value="top">top</option>
+                <option value="bottom">bottom</option>
+                <option value="inside">inside</option>
+                <option value="insideTop">insideTop</option>
+                <option value="insideLeft">insideLeft</option>
+                <option value="insideRight">insideRight</option>
+                <option value="insideBottom">insideBottom</option>
+                <option value="insideTopLeft">insideTopLeft</option>
+                <option value="insideTopRight">insideTopRight</option>
+                <option value="insideBottomLeft">insideBottomLeft</option>
+                <option value="insideBottomRight">insideBottomRight</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">度量显示</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.label.normal.show">
+            </div>
+            <label class="col-sm-4">度量单位</label>
+            <div class="col-sm-2">
+                <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.ylabelunit">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">度量翻转</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="'90'" ng-false-value="'0'" ng-model="field.label.normal.rotate">
+            </div>
+            <label class="col-sm-4">度量倾斜</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="'45'" ng-false-value="'0'" ng-model="field.label.normal.rotate">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">度量偏移量</label>
+            <div class="col-sm-2">
+              <input type="text" class="full-width" ng-model="field.label.offset" >
+            </div>
+            <label class="col-sm-4">度量颜色</label>
+            <div class="col-sm-2">
+              <input type="text" class="full-width color-label" ng-model="field.label.normal.color" >
+            </div>
+          </div>
+          <div class="form-group clearfix" ng-show="field.truetype!='bar'">
+            <label class="col-sm-4">是否平滑</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.smooth">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">坐标单位</label>
+            <div class="col-sm-2">
+              <input type="text" class="full-width" ng-model="field.yunit">
+            </div>
+            <label class="col-sm-4">小数位数</label>
+            <div class="col-sm-2">
+              <input type="text" class="full-width" ng-model="field.unitcount">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">Max标志</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.showmax">
+            </div>
+            <label class="col-sm-4">Min标志</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.showmin">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">阶梯显示</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.basebar">
+            </div>
+            <label class="col-sm-4">累计显示</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.sumbar">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+          </div>
+          <div class="form-group clearfix" ng-show="field.truetype=='bar'">
+            <label class="col-sm-4">对比背景柱</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.shadowbar">
+            </div>
+            <label class="col-sm-4">对比柱前置</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.shadowbarfront" >
+            </div>
+          </div>
+          <div class="form-group clearfix" ng-show="field.truetype=='bar'">
+            <label class="col-sm-4">对比红线</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.shadowline">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+          </div>
+          <div class="form-group clearfix" ng-show="field.shownewy">
+            <label class="col-sm-4">右Y轴</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.newy">
+            </div>
+            <label class="col-sm-4">右Y轴反转</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.inversey">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">均值线</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.showline">
+            </div>
+            <label class="col-sm-4">警示线条数</label>
+            <div class="col-sm-2">
+              <input type="text" class="full-width" ng-model="field.alertscount" ng-blur="alertBlur()">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">柱不同色</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.diffcolors">
+            </div>
+            <label class="col-sm-4">限制单柱宽</label>
+            <div class="col-sm-2">
+              <input type="text" class="full-width" ng-model="field.maxwidth">
+            </div>
+          </div>
+          <div class="form-group clearfix" ng-repeat="alertModel in field.alertsConfigs track by $index">
+            <label class="col-sm-3"> <input type="text"  ng-model="alertModel.name" style="width:50px"></label>
+              <div class="col-sm-4">
+              值<input type="text"  ng-model="alertModel.value" style="width:50px">
+              </div>
+              <div class="col-sm-5">
+              颜色<input type="text" class="full-width alertcolor"  ng-model="alertModel.color" style="width:60px" idx="{{ $index }}">
+              </div>
+          </div>
+        </div>
+        <div style="width: 250px;" ng-if="dropType == 'dbar'">
+          <div class="form-group clearfix">
+            <label class="col-sm-4">定义均值线</label>
+            <div class="col-sm-2">
+              <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="field.showavgline">
+            </div>
+          </div>
+            <div class="form-group clearfix" ng-show="field.showavgline==true">
+            <label class="col-sm-4">纵轴均值</label>
+            <div class="col-sm-4">
+              <input type="text"  class="full-width alertcolor"  ng-model="field.avglinevalue" style="width:30px">%
+            </div>
+          </div>
+        </div>
+        <div style="width: 250px;" ng-if="dropType == 'label'">
+          <div class="form-group clearfix">
+            <label class="col-sm-5">文字显示</label>
+            <div class="col-sm-5">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.label.show">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-5">文本位置</label>
+            <div class="col-sm-5">
+              <select class="full-width" ng-model="field.label.position">
+                <option value="outside">外侧</option>
+                <option value="inside">内部</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-5">百分比显示</label>
+            <div class="col-sm-5">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.label.showpercent">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-5">数值显示</label>
+            <div class="col-sm-5">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.label.showsums">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-5">文本显示</label>
+            <div class="col-sm-5">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.label.showDimeno">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-5">玫瑰图</label>
+            <div class="col-sm-5">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.label.showrose">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-5">南丁格尔玫瑰</label>
+            <div class="col-sm-5">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.label.showrosend">
+            </div>
+          </div>
+        </div>
+        <div style="width: 250px;" ng-if="dropType == 'mixedtype'">
+          <div class="form-group clearfix">
+            <label class="col-sm-6">维度分组</label>
+            <div class="col-sm-6">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.isgroup">
+            </div>
+          </div>
+        </div>
+        <div style="width: 250px;" ng-if="dropType == 'mixedtype'">
+          <div class="form-group clearfix">
+            <label class="col-sm-4">维度文字大小</label>
+            <div class="col-sm-2">
+                <input type="input" ng-model="field.xlabelsize" style="width:45px">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">度量文字大小</label>
+            <div class="col-sm-2">
+                <input type="input" ng-model="field.ylabelsize" style="width:45px">
+            </div>
+          </div>
+        </div>
+        <div style="width: 250px;" ng-if="dropType == 'mixedtype'||dropType == 'label'">
+          <div class="form-group clearfix">
+            <label class="col-sm-5">维度值合并</label>
+            <div class="col-sm-5">
+              合并成<input type="text" class="full-width" ng-model="field.selfgroupcount" style="width:30px" ng-blur="groupcountBlur()">组
+            </div>
+          </div>
+          <div class="form-group clearfix" ng-repeat="groupModel in field.groupConfigs track by $index">
+            <label class="col-sm-4"> <input type="text"  ng-model="groupModel.name" style="width:60px"></label>
+              <div class="col-sm-4">
+              初值<input type="text"  ng-model="groupModel.valuestart" style="width:45px">
+              </div>
+              <div class="col-sm-4">
+              终值<input type="text"  ng-model="groupModel.valueend" style="width:45px">
+              </div>
+          </div>
+        </div>
+        <div style="width:180px" ng-if="dropType == 'style'">
+          <div class="form-group clearfix">
+            <label class="col-sm-6">极简模式</label>
+            <div class="col-sm-6">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.simplemode">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">文字显示</label>
+            <div class="col-sm-5">
+              <input type="text" class="full-width" ng-model="field.name">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">文本位置</label>
+            <div class="col-sm-6">
+              <select ng-model="field.style.title.verticalAlign" style="width:70%">
+                <option value="top">上</option>
+                <option value="bottom">下</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">百分比</label>
+            <div class="col-sm-5">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.showPercent">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">小数点位数</label>
+            <div class="col-sm-6">
+              <div range-slider style="margin: 0; padding: 0;width:70%;float:left;" min="0" max="3" model-max="field.decimals" pin-handle="min"></div>
+              <input type="text" style="width:20px;height:16px" ng-model="field.decimals">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">数值大小</label>
+            <div class="col-sm-6">
+              <div range-slider style="margin: 0; padding: 0;width:70%;float:left;" min="10" max="50" model-max="field.style.detail.fontSize" pin-handle="min"></div>
+              <input type="text" style="width:20px;height:16px" ng-model="field.style.detail.fontSize">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">文本大小</label>
+            <div class="col-sm-6">
+              <div range-slider style="margin: 0;padding: 0;width:70%;float:left;" min="10" max="50" model-max="field.style.title.fontSize" pin-handle="min"></div>
+              <input type="text" style="width:20px;height:16px" ng-model="field.style.title.fontSize">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">表盘粗细</label>
+            <div class="col-sm-6">
+              <div range-slider style="margin: 0;padding: 0;width:70%;float:left;" min="1" max="60" model-max="field.style.axisLine.lineStyle.width" pin-handle="min"></div>
+              <input type="text" style="width:20px;height:16px" ng-model="field.style.axisLine.lineStyle.width">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">隐藏刻度</label>
+            <div class="col-sm-6">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.hidesplits">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">刻度长度</label>
+            <div class="col-sm-6">
+              <div range-slider style="margin: 0;padding: 0;width:70%;float:left;" min="1" max="100" model-max="field.style.axisTick.length" pin-handle="min"></div>
+              <input type="text" style="width:20px;height:16px" ng-model="field.style.axisTick.length">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">分割长度</label>
+            <div class="col-sm-6">
+              <div range-slider style="margin: 0;padding: 0;width:70%;float:left;" min="5" max="100" model-max="field.style.splitLine.length" pin-handle="min"></div>
+              <input type="text" style="width:20px;height:16px" ng-model="field.style.splitLine.length">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">填充宽度</label>
+            <div class="col-sm-6">
+              <div range-slider style="margin: 0;padding: 0;width:70%;float:left;" min="8" max="100" model-max="field.fullwidth" pin-handle="min"></div>
+              <input type="text" style="width:20px;height:16px" ng-model="field.fullwidth">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">指针颜色</label>
+            <div class="col-sm-6">
+              <input type="text" class="full-width split-color-input" rel='pointer' ng-blur="setPointColor('pointer')" ng-model="field.style.itemStyle.normal.color">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">刻度颜色</label>
+            <div class="col-sm-6">
+              <input type="text" class="full-width split-color-input" rel='normal' ng-blur="setPointColor('split')" ng-model="field.splitcolor">
+            </div>
+          </div>
+          <div class="form-group clearfix" style="display:none;">
+            <label class="col-sm-6">分段</label>
+            <div class="col-sm-6">
+              <input type="text" class="full-width" ng-model="field.range">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">动态分段</label>
+            <div class="col-sm-6">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.autoSplit">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">动态最大值</label>
+            <div class="col-sm-6">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.autoMax">
+            </div>
+          </div>
+          <div class="form-group clearfix" ng-if="field.autoMax == 'false'">
+            <label class="col-sm-6">最大值</label>
+            <div class="col-sm-6">
+              <input type="text" class="full-width" ng-model="field.max">
+            </div>
+          </div>
+        </div>
+        <div style="width: 200px;" ng-if="dropType == 'mappoint'">
+          <div class="form-group clearfix">
+            <label class="col-sm-4">颜色</label>
+            <div class="col-sm-4">
+              <input type="text" class="full-width point-color-input" rel='normal' ng-blur="setPointColor('normal')" ng-model="point_color">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">突出显示</label>
+            <div class="col-sm-4">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.iftop">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">排序</label>
+            <div class="col-sm-4">
+              <select class="full-width" ng-model="field.order">
+                <option value="asc">顺序</option>
+                <option value="desc">倒序</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">显示数量</label>
+            <div class="col-sm-4">
+              <input type="text" class="full-width" ng-model="field.order_num">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">突出颜色</label>
+            <div class="col-sm-4">
+              <input type="text" class="full-width point-color-input" rel='top' ng-blur="setPointColor('top')" ng-model="point_top_color">
+            </div>
+          </div>
+        </div>
+        <div style="width: 200px;" ng-if="dropType == 'single'">
+          <div class="form-group clearfix">
+            <label class="col-sm-4">标题</label>
+            <div class="col-sm-8">
+              <input type="text" class="full-width" ng-model="field.label">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">标题大小</label>
+            <div class="col-sm-8">
+              <div style="width: 80%;margin: 0;float:left" range-slider min="12" max="24" model-max="field._titleFontsize" pin-handle="min"></div>
+              <input type="text" style="width:22px;height:18px" ng-model="field._titleFontsize">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">标题颜色</label>
+            <div class="col-sm-4">
+              <input type="text" class="full-width single-color" rel='single_title' ng-blur="setPointColor('single_title')" ng-model="single_title_color">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">数值大小</label>
+            <div class="col-sm-8">
+              <div style="width: 80%;margin: 0;float:left" range-slider min="12" max="24" model-max="field._valueFontsize" pin-handle="min"></div>
+              <input type="text" style="width:22px;height:18px" ng-model="field._valueFontsize">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">数值颜色</label>
+            <div class="col-sm-4">
+              <input type="text" class="full-width single-color" rel='single_value' ng-blur="setPointColor('single_value')" ng-model="single_value_color">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">单位</label>
+            <div class="col-sm-8">
+              <input type="text" class="full-width" ng-model="field.unit">
+            </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-6">增长图标</label>
+            <div class="col-sm-6">
+              <input type="checkbox" ng-true-value="'true'" ng-false-value="'false'" ng-model="field.plusicon">
+            </div>
+          </div>
+          </div>
+        </div>
+        <div style="width: 200px;" ng-if="dropType == 'filter'">
+          <div class="form-group clearfix">
+            <label class="col-sm-4">当前日期</label>
+            <div class="col-sm-8">
+              <input type="checkbox" ng-true-value="'1'" ng-false-value="'0'" ng-model="field.ifAuto">
+            </div>
+          </div>
+
+          <div class="form-group clearfix">
+            <label class="col-sm-4">手动日期</label>
+            <div class="col-sm-8">
+              <input type="text" ng-model="field.value" ng-disabled="field.ifAuto == '1'">
+            </div>
+          </div>
+        </div>
+        <!--<div style="width: 200px;" ng-if="dropType == 'filters'">
+          <div class="form-group clearfix">
+            <label class="col-sm-4">过滤方式</label>
+            <div class="col-sm-8">
+              <select ng-model="field.rule" style="width:110px">
+                <option value="==">等于</option>
+                <option value="!=">不等于</option>
+                <option value="like">包含</option>
+                <option value="notlike">不包含</option>
+                <option value="in">属于</option>
+                <option value="notin">不属于</option>
+                <option value="null">空</option>
+                <option value="notnull">非空</option>
+                <option value=">">大于</option>
+                <option value=">=">大于等于</option>
+                <option value="<">小于</option>
+                <option value="<=">小于等于</option>
+                <option value="s=">以..开始</option>
+                <option value="e=">以..结束</option>
+                <option value="nots=">不以..开始</option>
+                <option value="note=">不以..结束</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">过滤值</label>
+            <div class="col-sm-8">
+              <input type="text" ng-model="field.value"  ng-model-options="{updateOn: 'blur'}">
+            </div>
+          </div>
+        </div>-->
+          <div style="width: 550px;max-height:500px;overflow-y: auto;" ng-if="dropType == 'filters'">
+              <div class="form-group clearfix">
+                <label class="col-sm-2">自定义过滤</label>
+                <div class="col-sm-6">
+                  <a ng-click="addAnd()" style="cursor:pointer;">
+                    <i class="fa fa-plus"></i>增加条件
+                  </a>
+                </div>
+              </div>
+            <table style="width:100%;border-collapse: collapse;border-left: 1px solid #e8eaed;border-top: 1px solid #e8eaed;" cellspacing="0" cellpadding="0">
+              <tr  ng-repeat="eachrule in getChilds('0') track by crule.id"  ng-init="eachrule = eachrule"  ng-include="'item_renderer.html'">
+              </tr>
+            </table>
+        </div>
+          <script id="item_renderer.html"  type="text/ng-template">
+            <td>
+                <table style="width:100%;border-collapse:collapse"  cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td rowspan="{{ getChilds(eachrule.id).length }}" ng-if="getChilds(eachrule.id).length>1" style="vertical-align: middle;width:20px;border-bottom: 1px solid #e8eaed;border-right: 1px solid #e8eaed;padding:3px;">
+                            <div>{{ eachrule.relate=="and"?"且":"或" }}</div>
+                        </td>
+                         <td ng-if="eachrule.rule!=''" style="width:120px;border-bottom: 1px solid #e8eaed;padding:5px;" ng-click="filterRowClick($event,eachrule,parentRule)">
+                             <select ng-model="eachrule.name" style="width:110px" ng-options="vale.field as vale.field for vale in getAllCols() | orderBy : orderBy"></select>
+                         </td>
+                        <td ng-if="eachrule.rule!=''" style="width:90px;border-bottom: 1px solid #e8eaed;padding:5px;" ng-click="filterRowClick($event,eachrule,parentRule)">
+                           <select ng-model="eachrule.rule" style="width:80px">
+                            <option value="==">等于</option>
+                            <option value="!=">不等于</option>
+                            <option value="like">包含</option>
+                            <option value="notlike">不包含</option>
+                            <option value="in">属于</option>
+                            <option value="notin">不属于</option>
+                            <option value="null">空</option>
+                            <option value="notnull">非空</option>
+                            <option value=">">大于</option>
+                            <option value=">=">大于等于</option>
+                            <option value="<">小于</option>
+                            <option value="<=">小于等于</option>
+                            <option value="s=">以..开始</option>
+                            <option value="e=">以..结束</option>
+                            <option value="nots=">不以..开始</option>
+                            <option value="note=">不以..结束</option>
+                          </select>
+                        </td>
+                        <td ng-if="eachrule.rule!=''"  style="border-bottom: 1px solid #e8eaed;padding:5px;" ng-click="filterRowClick($event,eachrule,parentRule)">
+                          <input type="text" ng-model="eachrule.value"  ng-model-options="{updateOn: 'blur'}" style="width:100%" ng-show="eachrule.rule!='null'&&eachrule.rule!='notnull'">
+                        </td>
+                        <td ng-if="eachrule.rule!=''"  style="width:70px;border-bottom: 1px solid #e8eaed;border-right: 1px solid #e8eaed;padding:5px;" ng-click="filterRowClick($event,eachrule,parentRule)">
+                             <a title="增加同级且条件" ng-click="addAnd(eachrule)" style="cursor:pointer;">
+                                <i class="fa fa-plus"></i>
+                              </a>&nbsp;
+                              <a title="增加同级或条件" ng-click="addOr(eachrule)" style="cursor:pointer;">
+                                <i class="fa fa-plus-circle"></i>
+                              </a>&nbsp;
+                              <a title="删除条件" ng-click="removeFilter(eachrule)" style="cursor:pointer;">
+                                <i class="fa fa-minus"></i>
+                              </a>
+                        </td>
+                        <td>
+                            <table style="width:100%;border-collapse:collapse"  cellspacing="0" cellpadding="0">
+                                <tr ng-repeat="crule in getChilds(eachrule.id) track by crule.id"   ng-init="eachrule = crule"  ng-include="'item_renderer.html'"></tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </script>
+      </div>
+
+      <div class="popup-menu count-type ">
+        <div style="width: 450px;" ng-if="field.aggregate == 'count'">
+          <div class="form-group clearfix">
+            <label class="col-sm-2">指标重命名</label>
+            <div class="col-sm-4">
+              <input type="text" class="full-width" ng-model="field.field">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-4">可用计算字段(点选)
+            </label>
+            <div class="col-sm-8"> 运算符(点选) &nbsp;&nbsp;
+                <span class="field-func"  ng-click="addFieldCalc('+')" style="cursor:pointer;font-size:14px;">+</span>&nbsp;&nbsp;&nbsp;
+                <span class="field-func"  ng-click="addFieldCalc('-')" style="cursor:pointer;font-size:14px;">-</span> &nbsp;&nbsp;&nbsp;
+                <span class="field-func"  ng-click="addFieldCalc('*')" style="cursor:pointer;font-size:14px;">*</span>&nbsp;&nbsp;&nbsp;
+                <span class="field-func"  ng-click="addFieldCalc('/')" style="cursor:pointer;font-size:14px;">/</span>&nbsp;&nbsp;&nbsp;
+                <span class="field-func"  ng-click="addFieldCalc('(')" style="cursor:pointer;font-size:14px;">(</span>&nbsp;&nbsp;&nbsp;
+                <span class="field-func"  ng-click="addFieldCalc(')')" style="cursor:pointer;font-size:14px;">)</span>
+            </div>
+          </div>
+
+          <div class="form-group clearfix">
+            <div class="col-sm-4 calc_div_fields scroll-y" style="max-height:250px;">
+                <div ng-click="addFieldCalc(value.field)" data-drag="true" style="margin-top:3px;width:120px;overflow-x: hidden;cursor:pointer"
+    jqyoui-draggable="{deepCopy:  true, onStart: 'dragstart', onStop:'dragstop'}"
+    data-jqyoui-options="{revert: 'invalid', helper: 'clone'}" class="selected full-width field-info"  ng-repeat="value in getAllCols() | orderBy : orderBy">{{value.field}}</div>
+            </div>
+            <div class="col-sm-8 field-drop"  data-jqyoui-options="{activeClass: 'drop-active'}" data-drop="true" jqyoui-droppable="{onDrop:'dropComplete'}">
+                <textarea style="width:100%;height:220px;font-size:12px;" ng-keydown="deleteWords($event)" ng-model="field.calcrules" placeholder="例:已完成额/目标值"></textarea>
+                <div>公式校验: {{ calcheck }}</div>
+            </div>
+          </div>
+        </div>
+       </div>
+    </div>
+  </div>
+  <div class="shelf-group" ng-if="moreDrag && field.autoMax == 'true'">
+    <div class="shelf">
+      <div class="shelf-label"> 最大值 </div>
+      <div class="field-drop" ng-model="field.maxField" data-drop="true" jqyoui-droppable="{}" data-jqyoui-options="{activeClass: 'drop-active'}">
+        <span class="selected full-width field-info">
+          <span class="hflex full-width">
+            <span class="field-info-text">
+              {{ field.maxField.field }}
+            </span>
+          </span>
+        </span>
+        <span class="placeholder" ng-show="!field.field && canDrag == '1'">此为 {{ field.field }} 的 最大值</span>
+      </div>
+    </div>
+  </div>
+    <div class="shelf-group" ng-if="moreDrag && field.isgroup == 'true'||field.aggregate=='grouprank'">
+            <span class="field-info-text">
+    <div class="shelf">
+      <div class="shelf-label"> 分组字段 </div>
+      <div class="field-drop" ng-model="field.groupField" data-drop="true" jqyoui-droppable="{}" data-jqyoui-options="{activeClass: 'drop-active'}">
+        <span class="selected full-width field-info">
+          <span class="hflex full-width">
+              {{ field.groupField.field }}
+            </span>
+          </span>
+        <span class="placeholder" ng-show="!field.field && canDrag == '1'">此为 {{ field.field }} 的 最大值</span>
+      </div>
+    </div>
+        </span>
+  </div>
+    <div class="shelf-pane shelf-positional-pane full-width"  ng-show="moreDrag && field.autoSplit == 'true'">
+      <div class="shelf-group" >
+        <div class="shelf" ng-repeat="splitModel in field.splitField track by $index">
+          <div class="shelf-label"> 刻度分段{{ ($index+1) }} </div>
+          <div class="field-drop">
+            <span class="selected full-width field-info">
+              <span class="hflex full-width">
+                <span class="type-caret{{ $index }} drop-target active" ng-show="canDrop == '1'" ng-click="showSplitPop($index)">
+                  <i class="fa fa-caret-down"></i>
+                </span>
+                <span title="{{ splitModel.field }}" class="field-info-text">
+                  {{ splitModel.field }}
+                </span>
+                <span class="no-shrink remove">
+                  <a class="remove-field" ng-click="removeSplit()">
+                    <i class="fa fa-times"></i>
+                  </a>
+                </span>
+              </span>
+            </span>
+          </div>
+            <div class="drop-container">
+              <div class="popup-menu echart-type{{ $index }} ">
+                <div ng-if="field.autoSplit == 'true'">
+                  <div class="form-group clearfix">
+                    <label class="col-sm-4">分段颜色</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="full-width split-color{{ $index }}" ng-blur="setSplitColor('split',$index)" ng-model="splitModel.color">
+                    </div>
+                  </div>
+                  <div class="form-group clearfix">
+                    <label class="col-sm-6">指定分段长度</label>
+                    <div class="col-sm-6">
+                      <input type="checkbox" ng-true-value="true" ng-false-value="false" ng-model="splitModel.giveLength">
+                    </div>
+                  </div>
+                  <div class="form-group clearfix" ng-show="splitModel.giveLength==true">
+                    <label class="col-sm-6">分段长度</label>
+                    <div class="col-sm-6">
+                      <div range-slider style="margin: 0;padding: 0;" min="0" max="50"  model-max="splitModel.length" pin-handle="min"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="shelf-group" >
+        <div class="shelf">
+          <div class="field-drop" ng-model="newmodel" data-drop="true" jqyoui-droppable="{onDrop:'SplitDropped()'}" data-jqyoui-options="{activeClass: 'drop-active'}">
+            <span class="placeholder">拖动刻度分段字段到此处</span>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+

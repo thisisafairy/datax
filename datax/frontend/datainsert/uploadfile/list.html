@@ -1,0 +1,52 @@
+{% verbatim %}
+<style>
+    .operatFeildMinWidth{
+         min-width: 150px;
+    }
+</style>
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel">
+        上传文件列表
+    </h1>
+</section>
+<div class="col-md-12">
+    <div class="box ">
+        <div class="box-body">
+            <div class="col-md-3"></div>
+            <div class="col-md-offset-6 col-md-3">
+                <div class="form-group">
+                    <div class="col-sm-6 cont-body-tabinput">
+                        <input type="text" ng-model="searchkey" ng-change="search()" class="form-control cont-bodyfrom-input" placeholder="搜索名称">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 olaplist">
+                <table class="table table-bordered table-hover" id="source-table">
+                    <thead>
+                        <tr>
+                            <th data-field="name" width="15%">文件名称</th>
+                            <th data-field="tables" width="15%">文件类型</th>
+                            <th data-field="dispatch" width="15%">数据源操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(key,value) in sourcelists track by key">
+                            <td>{{ value.name }}</td>
+                            <td>{{ value.tables | nameToType }}</td>
+                            <td class="operatFeildMinWidth">
+                                <a href="#/edit/{{ value['id'] }}" class="btn btn-primary editable-table-button btn-xs btn-edit">编辑</a>
+                                <a href="#" ng-click="delete_source(value['id'])" class="btn btn-primary editable-table-button btn-xs btn-edit">删除</a>
+                                <a href="#" ng-click="uploadExistFile(value['tables'],value['id'])" ng-if="value['tables'].split('_') && value['tables'].split('_')[0] == 'excel'" class="btn btn-primary editable-table-button btn-xs btn-edit">上传数据</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-12">
+                <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm" boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endverbatim %}

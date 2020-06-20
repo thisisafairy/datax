@@ -1,0 +1,37 @@
+<br>
+<h4 align="center">新增模板配置</h4>
+<div>
+    <table style="border-collapse:separate; border-spacing:30px;" align="center">
+        <tr>
+            <td>
+                <label>模板名称:</label>
+            </td>
+            <td>
+                <input type="text" ng-model="template.templatename" style="width: 400px" class="cont-bodyfrom-input" placeholder="请输入模板名称">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>模板标题:</label>
+            </td>
+            <td>
+                <input type="text" ng-model="template.templatetitle" style="width: 400px" class="cont-bodyfrom-input" placeholder="请输入模板标题名称">
+            </td>
+
+        </tr>
+        <tr>
+            <td>
+                <label>模板内容:</label>
+            </td>
+            <td>
+                <input type="text" ng-model="template.templatecontent" style="width: 400px" class="cont-bodyfrom-input" placeholder="请输入模板内容">
+            </td>
+
+
+        </tr>
+    </table>
+</div>
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" type="button" ng-click="ok('emailtemplate')">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>

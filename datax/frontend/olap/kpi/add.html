@@ -1,0 +1,356 @@
+{% verbatim %}
+<div class="main-block kpi-content" ng-style="style()" resize>
+    <div class="step-progress">
+        <img src="/frontend/plugin/SVG-Loaders/svg-loaders/oval1.svg" ng-if="ajaxing">
+        <img src="/frontend/plugin/SVG-Loaders/svg-loaders/check.svg" ng-if="!ajaxing&&ajaxdone">
+        <img src="/frontend/plugin/SVG-Loaders/svg-loaders/error.svg" ng-if="!ajaxing&&ajaxerror">
+    </div>
+    <div class="msg-content {{ httpstatus }}  {{ showmsg }}">
+        {{ msg }}
+    </div>
+    <div class="left-block">
+        <div class="left-card">
+            <div class="left-select" style="margin-top: 15px;">
+                <div  ng-mousemove="editsource(true);" ng-mouseleave="editsource(false);">
+                    <select ng-model="form.sourcekey" id="source-select" ng-change="getColumn();" ng-class="{true:'col-md-8',false:'col-md-12'}[showedit]">
+                        <option value="0">请选择元数据</option>
+                        <option ng-repeat="value in sourcelist" value="{{ value.id }}">
+                            {{value.title}}
+                        </option>
+                    </select>
+                    <div id="editbtn" class="btn btn-default" ng-click="goedit()" ng-class="{true:'col-md-offset-1 col-md-3 ',false:'hide'}[showedit]">
+                        修改
+                    </div>
+                </div>
+            </div>
+            <div class="left-block-list-header">
+                <div class="left-block-list-search" ng-if="onsearch">
+                    <input type="text" ng-model="searched" ng-change="dosearch(searched)">
+                </div>
+                <span>字段</span>
+                <div class="search smallbtn" ng-click="onsearch = !onsearch">
+                    <i class="fa fa-search"></i>
+                </div>
+            </div>
+            <div class="left-block-column-list"  ng-class="{olapshowList:!onsearch,olapList:onsearch}">
+                <div class="loadding" ng-if="loadding">
+                    <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div class="schema-item " ng-class="{'step2':'cursor-move','step1':'cursor-click'}" ng-repeat="(columnkey,column) in form.config.columns track by columnkey">
+                    <span class="field-item full-width" data-drag="active_li == 'step3'" data-jqyoui-options="{revert: 'invalid', helper: 'clone'}"
+                        jqyoui-draggable="{index:'{{ columnkey }}',placeholder: 'keep'}" ng-model="form.config.columns" class="cursor-click"
+                        ng-click="toData(column);">
+                        <span class="field-row" title="{{ column.title }}">
+                            <span class="type-target">
+                                <i class="fa fa-font" ng-if="column.ifnum == '0'"></i>
+                                <i class="fa fa-hashtag" ng-if="column.ifnum == '1'"></i>
+                            </span>
+                            <span class="field-name">
+                                <span class="field-text">
+                                    {{ column.title }}
+                                </span>
+                            </span>
+                        </span>
+                    </span>
+                </div>
+                <!-- <ul ng-style="style()" resize>
+                        <li ng-if="active_li == 'step3'" data-drag="true"
+                            data-jqyoui-options="{revert: 'invalid', helper: 'clone'}" ng-model="form.config.columns"
+                            jqyoui-draggable="{index:'{{ columnkey }}',placeholder: 'keep'}" class="cursor-click"
+                            ng-repeat="(columnkey,column) in form.config.columns track by columnkey">
+                            <i class="fa fa-font" ng-if="column.ifnum == 0"></i>
+                            <i class="fa fa-hashtag" ng-if="column.ifnum == 1"></i>
+                            <div class="div-span">{{ column.title }}</div>
+                            <div class="clearfix"></div>
+                        </li>
+                        <li ng-if="active_li != 'step3'" class="cursor-click" 
+                            ng-repeat="(columnkey,column) in form.config.columns track by columnkey">
+                            <i class="fa fa-font" ng-if="column.ifnum == 0"></i>
+                            <i class="fa fa-hashtag" ng-if="column.ifnum == 1"></i>
+                            <div class="div-span">{{ column.title }}</div>
+                            <div class="clearfix"></div>
+                        </li>
+                    </ul> -->
+            </div>
+        </div>
+    </div>
+    <form name="myForm">
+        <div class="right-block">
+            <div class="titletag clearfix" id="contentresize">
+                <ul>
+                    <li class="col-md-2 " ng-class="{'step1': 'active'}[active_li]">
+                        <div class="progress-circle-bg"></div>
+                        <div class="progress-circle">1</div>
+                        <a ng-click="changestep('step1')">指标定义</a>
+                    </li>
+                    <li class="col-md-2 " ng-class="{'step2': 'active'}[active_li]">
+                        <div class="progress-circle-bg"></div>
+                        <div class="progress-circle">2</div>
+                        <a ng-click="changestep('step2')">维度选择</a>
+                    </li>
+                    <li class="col-md-2" ng-class="{'step3': 'active'}[active_li]">
+                        <div class="progress-circle-bg"></div>
+                        <div class="progress-circle">3</div>
+                        <a ng-click="changestep('step3')">统计范围</a>
+                    </li>
+                </ul>
+                <div class="tagarrow {{ active_li }}"></div>
+                <div class="priviewbtn">
+                    <button type="button" onclick="window.history.go(-1)" class="btn btn-default">返回</button>
+                    <button type="button" ng-click="preview()" ng-disabled="myForm.$invalid ==true||hasdimension==false" class="btn btn-default">预览</button>
+                    <button type="button" ng-click="save()" ng-disabled="myForm.$invalid ==true||hasdimension==false||validating||!tableisvalidate"
+                        class="btn btn-default">保存</button>
+                </div>
+            </div>
+            <div class="config-content" contentresize ng-style="contentstyle()">
+                <dl class="{{ active_li }}">
+                    <dd ng-class="{'step1': 'active'}[active_li]">
+                        <div class="notedit"></div>
+                        <div class="col-md-12 form-horizontal kpi-form clearfix">
+                            <div class="next navbtn" ng-click="changestep('step2')">
+                                <i class="fa fa-angle-right"></i>
+                            </div>
+                            <!-- <div class="pre navbtn">
+                                    <i class="fa fa-angle-double-left"></i>
+                                </div>  -->
+                            <div class="form-group">
+                                <div class="kpi-title col-md-offset-1 col-md-2 ">
+                                    基本信息
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="name" class=" col-md-2 ">名称</label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-model="form.name" required class="form-control" ng-pattern="/^[a-zA-Z][a-zA-Z0-9_]{3,30}$/" id="name" placeholder="名称">
+                                </div>
+                            </div>
+                            <div class="form-group notes">
+                                <div class="col-md-offset-2 col-md-9">
+                                    <small>支持英文字母、数字、下划线，30字符内</small>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="table" class="col-md-2 ">表名</label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-class="{false:'error-input'}[tableisvalidate]" ng-change="validatetable()" ng-pattern="/^[a-zA-Z][a-zA-Z0-9_]{3,30}$/" ng-model="form.table" required
+                                        class="form-control" id="table" placeholder="表名">
+                                    <div class="validating" ng-if="validating">
+                                        <img src="/frontend/plugin/SVG-Loaders/svg-loaders/oval1.svg">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group notes">
+                                <div class="col-md-offset-2 col-md-9">
+                                    <small>{{ tablevalidatemsg }}</small>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="desc" class="col-md-2 ">描述</label>
+                                <div class="col-md-9">
+                                    <textarea name="desc" ng-model="form.desc" class="form-control" rows="3" ng-change="checktextarea()"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group notes">
+                                <div class="col-md-offset-2 col-md-9">
+                                    <small>50字符内</small>
+                                </div>
+                            </div>
+                            <!--<hr>-->
+                            <div class="form-group">
+                                <div class="kpi-title col-md-offset-1 col-md-2 ">
+                                    指标设置
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="indicators" class="col-md-2 ">统计对象</label>
+                                <div class="col-md-9">
+                                    <select ng-model="form.indicators" ng-change="changeIndicator()" required class="form-control" id="indicators" ng-options="indicator.title for indicator in form.config.columns">
+
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="indicators" class="col-md-2 ">字段别名</label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-model="form.indicatorname" class="form-control" id="table" placeholder="字段别名">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="statistic" class="col-md-2 ">统计方式</label>
+                                <div class="col-md-9">
+                                    <select ng-model="form.statistic" required class="form-control" id="statistic">
+                                        <option value="none">无</option>
+                                        <option value="sum">sum</option>
+                                        <option value="min">min</option>
+                                        <option value="max">max</option>
+                                        <option value="avg">average</option>
+                                        <!-- <option value="median">median</option> -->
+                                        <!-- <option value="bin">bin</option> -->
+                                        <option value="count">count</option>
+                                        <!-- <option value="topN">topN</option>
+                                        <option value="自定义">自定义</option> -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </dd>
+                    <dd ng-class="{'step2': 'active'}[active_li]">
+                        <div class="notedit"></div>
+                        <div class="col-md-12 form-horizontal kpi-form clearfix">
+                            <div class="next navbtn" ng-click="changestep('step3')">
+                                <i class="fa fa-angle-right"></i>
+                            </div>
+                            <div class="pre navbtn" ng-click="changestep('step1')">
+                                <i class="fa fa-angle-left"></i>
+                            </div>
+                            <div class="form-group">
+                                <div class="kpi-title col-md-offset-1 col-md-2 ">
+                                    维度设置
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="indicators" class=" col-md-2 ">维度选择</label>
+                                <div class="col-md-4">
+                                    <select style="height:200px;" class="form-control" id="allusers" multiple="multiple" ng-model="selectingcolumn" ng-options="columnrow.title for columnrow in form.toselectlists">
+                                    </select>
+                                </div>
+                                <div class="col-md-1 selectbtn">
+                                    <button type="button" ng-click="removeRow()" class="btn btn-default">
+                                        <i class="fa fa-angle-left"></i>
+                                    </button>
+                                    <button type="button" ng-click="add()" class="btn btn-default">
+                                        <i class="fa fa-angle-right"></i>
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <select style="height:200px;" name="selectedcolumn" class="form-control" id="allusers" multiple="multiple" ng-model="selectedcolumn"
+                                        ng-options="columnedrow.title for columnedrow in form.selectedlists">
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="kpi-title col-md-offset-1 col-md-2 ">
+                                    任务计划设置
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="name" class=" col-md-2">选择任务计划</label>
+                                <div class="col-md-9">
+                                    <select class="form-control" ng-model="form.dispatch">
+                                        <option ng-repeat="(dispatchkey, value10) in dispatchlists track by dispatchkey" value="{{value10.id}}">
+                                            {{value10.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </dd>
+                    <dd ng-class="{'step3': 'active'}[active_li]">
+                        <div class="notedit"></div>
+                        <div class="col-md-12 form-horizontal kpi-form clearfix">
+                            <!-- <div class="next navbtn">
+                                    <i class="fa fa-angle-double-right"></i>
+                                </div> -->
+                            <div class="pre navbtn" ng-click="changestep('step2')">
+                                <i class="fa fa-angle-left"></i>
+                            </div>
+                            <div class="form-group">
+                                <div class="kpi-title col-md-offset-1 col-md-2 ">
+                                    统计范围
+                                </div>
+                            </div>
+                            <div class=" drap-tips  text-center col-md-12" data-drop="true" ng-model='resultlist' jqyoui-droppable="{multiple:true,onDrop:'dropCallback'}">
+                                将字段拖拽到此处新增筛选分组
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="filter-group" ng-repeat="(groupkey, groupvalue) in form.filters track by groupkey" data-drop="true" ng-model='resultlist'
+                                jqyoui-droppable="{multiple:true,onDrop:'dropInGroup(groupkey)'}">
+                                <div class="form-group " ng-repeat="(filterkey,filter) in groupvalue.group track by filterkey">
+                                    <div class="col-md-3">
+                                        <input type="text" readonly="true" class="form-control" ng-model="filter.title">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control" ng-model="filter.model">
+                                            <option ng-repeat="filtervalue in form.config.filterlist" value="{{filtervalue.key}}" ng-if="filtervalue.used == 'all' || filtervalue[filter.filtertype]">{{filtervalue.value}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="name" ng-if="filter.filtertype != 'date'" class="form-control" ng-model="filter.value">
+                                        <!-- <datetimepicker ng-if="filter.filtertype == 'date'" data-datetimepicker-config="{ dropdownSelector: '.dropdown-toggle' }" data-ng-model="filter.value"></datetimepicker> -->
+                                        <!--<div class="dropdown" ng-if="filter.filtertype == 'date'">
+                                            <a class="dropdown-toggle" id="aaa" data-toggle="dropdown" data-target=".aaa" href="javascript:void(0);">
+                                                <div class="input-group">
+                                                    <input type="text" id="date" name="date" class="form-control" data-ng-model="filter.value">
+                                                    <span class="input-group-addon">
+                                                        <i class="glyphicon glyphicon-calendar"></i>
+                                                    </span>
+                                                </div>
+                                            </a>
+                                            <ul class="dropdown-menu" aria-labelledby="aaa">
+                                                <datetimepicker data-on-set-time="endDateOnSetTime(filter.value,groupkey,filterkey)" data-ng-model="filter.value" data-datetimepicker-config="{ dropdownSelector: '#dropdown' }"></datetimepicker>
+                                            </ul>
+                                        </div>-->
+                                        <div class="dropdown" ng-if="filter.filtertype == 'date'">
+                                            <a class="dropdown-toggle" id="aaa" data-toggle="dropdown" data-target=".aaa" href="javascript:void(0);">
+                                                <div class="input-group">
+                                                    <input type="text" id="date" name="date" class="form-control" uib-datepicker-popup="{{format}}" ng-model="filter.value" is-open="popup1.opened"
+                                                        datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats"/>
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-default" ng-click="openDatePicker()">
+                                                            <i class="glyphicon glyphicon-calendar"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select class="form-control" ng-model="filter.linkas">
+                                            <option value="or">or</option>
+                                            <option value="and">and</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a href="javascript:void(0);" ng-click="deleteGroup(groupkey,filterkey)">删除</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+            <div class="previewcontent" ng-if="isPreview">
+                <div class="close-preview" ng-click="closePreview();">x</div>
+                <div class="table-block">
+                    <div class="table-body">
+                        <table class="table sourcedata table-bordered" id="datainsert-table">
+                            <thead>
+                                <tr>
+                                    <th ng-repeat="(thkey,thvalue) in form.column track by thkey">
+                                        <span ng-if="thvalue.olaptitle == '' ">{{ thvalue.title }}</span>
+                                        <span ng-if="thvalue.olaptitle != '' ">{{ thvalue.olaptitle }}</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="(trkey, trvalue) in previewlists">
+                                    <td ng-repeat="(trthkey, trthvalue) in form.column">
+                                        <span> {{ trvalue[trthvalue.fullname] }}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="table-pagenation">
+                    <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                        boundary-link-numbers="true" rotate="false" ng-change="pageChanged(currentPage)"></ul>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endverbatim %}   

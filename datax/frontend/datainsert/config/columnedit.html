@@ -1,0 +1,202 @@
+{% verbatim %}
+<style>
+.modal-body [class^=col-md-], .modal-body [class^=col-sm-] {
+	padding-left: 0px;
+}
+</style>
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title">修改</h3>
+   <!--弹出框的关闭按钮-->
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body" style="height: 500px;overflow-y: auto;">
+    <form action="#" class="form-horizontal clearfix" method="post" >
+        <div class="form-group clearfix">
+            <label  class="col-sm-2 control-label form-lable-modal">列名称</label>
+            <div class="col-sm-10 form-input-add">
+                <input type="text" readonly="readonly" class="form-control" ng-model="column.field" />
+            </div>
+        </div>
+        <div class="form-group clearfix">
+            <label  class="col-sm-2 control-label form-lable-modal">列别名</label>
+            <div class="col-sm-10 form-input-add">
+                <input type="text" class="form-control" ng-model="column.title" />
+            </div>
+        </div>
+        <!-- <div class="form-group clearfix">
+            <label  class="col-sm-2 control-label form-lable-modal">列类别</label>
+            <div class="col-sm-10 form-input-add">
+                <select class="form-control" ng-model="column.type">
+                    <option value="nvarchar">字符串</option>
+                    <option value="int">数字</option>
+                    <option value="date">时间</option>
+                    <option value="timestamp">时间戳</option>
+                </select>
+            </div>
+        </div>-->
+        <div class="form-group clearfix">
+            <label  class="col-sm-2 control-label form-lable-modal">列拼接与计算(<fonnt style="color: red;">仅支持数字类型的列</fonnt>)</label>
+            <div class="col-sm-10 form-input-add">
+                <textarea class="form-control" rows='3' ng-model="column.formatcolumn" 
+                           ng-focus="show_column(column.formatcolumn,'mouse')" ng-keyup="show_column(column.formatcolumn,'key')" id="format_column"/>
+            </div>
+        </div>
+        <div class="form-group clearfix">
+            <label  class="col-sm-2 control-label form-lable-modal">高级数据处理</label>
+            <div class="col-sm-10 form-input-add">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="请输入正则表达式" ng-model="column.formula" >
+                    <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">常用正则表达式<span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li ng-click="set_formula('get_year')"><a>截取字段中的年份</a></li>
+                        <li ng-click="set_formula('get_month')"><a>截取字段中的月份</a></li>
+                        <li ng-click="set_formula('get_day')"><a>截取字段中的本月的天数</a></li>
+                        <li ng-click="set_formula('only_numeral')"><a>保留只有数字的数据</a></li>
+                        <li ng-click="set_formula('include_numeral')"><a>保留包含数字的数据</a></li>
+                        <li ng-click="set_formula('keep_numeral')"><a>保留包含数字的数据并删除数据中除数字之外的字符</a></li>
+                        <!-- <li role="separator" class="divider"></li> -->
+                        <li ng-click="set_formula('keep___xx')"><a>保留包含XX的数据(请自行将XX替换成需要的字符,支持正则)</a></li>
+                        <li ng-click="set_formula('delete___xx')"><a>删除包含XX的数据(请自行将XX替换成需要的字符,支持正则)</a></li>
+                        <li ng-click="set_formula('replace___xx___to___yy')"><a>将数据中的XX替换成YY(请自行将XX和YY替换成需要的字符,支持正则)</a></li>
+                        <li ng-click="set_formula('group___xx___get___y,z___separator')"><a>使用正则表达式(xx)分组,取第(y,z)组数据,删除分隔符(separator)</a></li>
+                    </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="form-group clearfix tips-row">
+            <div class="tips" ng-if="tips == '1'">
+               <span>1.全局模式</span>
+               <p>同数据源的数据集合均适用</p>
+               <span>2.局部模式</span>
+               <p>只对当前数据集合适用</p>
+            </div>
+            <label class="col-sm-2 control-label form-lable-modal">
+                    <i class="fa " ng-class="{'1':'fa-question-circle','0':'fa-question-circle-o'}[tips]" ng-mouseover="showtips()" ng-mouseleave="hidetips()"></i>映射模式
+            </label>
+            <div class="col-sm-4 text-center">
+                <button type="button" class="btn " ng-class="{'globa':'btn-primary','local':'btn-default'}[disttype]" ng-click="changedisttype('globa')">全局模式</button>
+            </div>
+            <div class="col-sm-4 text-center">
+                <button type="button" class="btn " ng-class="{'local':'btn-primary','globa':'btn-default'}[disttype]" ng-click="changedisttype('local')">局部模式</button>
+            </div>
+        </div> -->
+        <div class="form-group clearfix">
+            <label  class="col-sm-2 control-label form-lable-modal">字典关系列</label>
+            <div class="col-sm-3 text-center">表</div>
+            <div class="col-sm-3 text-center">键(key)字段</div>
+            <div class="col-sm-3 text-center">值(value)字段</div>
+        </div>
+        <div class="form-group clearfix">
+            <label  class="col-sm-2 control-label form-lable-modal"></label>
+            <div class="col-sm-3 text-center">
+                <select name="datadicttable" class="form-control" ng-model="column.datadict.table"
+                    ng-options="tb.table as tb.tablename for tb in tablelist" ng-change="getColumnByTable()">
+                </select>
+            </div>
+            <div class="col-sm-3 text-center">
+                <select name="datadictkeycol" class="form-control" ng-model="column.datadict.keycol"
+                    ng-options="col for col in selectingColmns">
+                </select>
+            </div>
+            <div class="col-sm-3 text-center">
+                <select name="datadictvaluecol" class="form-control" ng-model="column.datadict.valuecol"
+                    ng-options="col for col in selectingColmns">
+                </select>
+            </div>
+        </div>
+        <div ng-repeat="(filterkey,filterobj) in column.datadict.filter track by filterkey">
+            <div class="form-group clearfix">
+                <label class="col-sm-2 control-label form-lable-modal">字典关系过滤</label>
+                <div class="col-sm-3 text-center">
+                    <label class="col-sm-4 control-label form-lable-modal">字段</label>
+                    <select name="datadictfiltervaluecol" class="form-control" ng-model="filterobj.col"
+                        ng-options="col for col in selectingColmns">
+                    </select>
+                </div>
+                <div class="col-sm-3 text-center">
+                    <label class="col-sm-5 control-label form-lable-modal">操作符</label>
+                    <select name="datadictfilteropera" class="form-control" ng-model="filterobj.opera">
+                        <option value="=">等于</option>
+                        <option value=">">大于</option>
+                        <option value="<">小于</option>
+                        <option value=">=">大于等于</option>
+                        <option value="<=">小于等于</option>
+                        <option value="!=">不等于</option>
+                        <option value="like">包含于</option>
+                    </select>
+                </div>
+                <div class="col-sm-3 text-center">
+                    <label class="col-sm-2 control-label form-lable-modal">值</label>
+                    <input class="form-control" type="text" ng-model="filterobj.val">
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <label class="col-sm-2 control-label form-lable-modal"></label>
+                <div class="col-sm-3 text-center">
+                    <label class="col-sm-5 control-label form-lable-modal">连接符</label>
+                    <select name="datadictfilterlink" class="form-control" ng-model="filterobj.link">
+                        <option value="and">and</option>
+                        <option value="or">or</option>
+                    </select>
+                </div>
+                <div class="col-sm-2 text-center">
+                    <label class="col-sm-10 control-label form-lable-modal">&nbsp;</label>
+                    <button type="button" ng-click="delfilter(filterkey)" class="btn btn-danger text-right col-sm-12 form-control">删除</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group clearfix">
+            <label class="col-sm-2 control-label form-lable-modal">&nbsp;</label>
+            <button type="button" ng-click="addDDtFilter()" class="btn btn-info text-right col-sm-2">新增</button>
+        </div>
+        <div class="form-group clearfix">
+            <label  class="col-sm-2 control-label form-lable-modal">映射关系</label>
+            <div class="col-sm-4 text-center">值</div>
+            <div class="col-sm-4 text-center">显示值</div>
+            <div class="col-sm-2">
+                <button type="button" class="btn btn-info text-right col-sm-12" ng-click="addDist()">新增</button>
+            </div>
+        </div>
+        <div class="form-group clearfix" ng-repeat="(distkey,distvalue) in column.distconfig track by distkey">
+            <label  class="col-sm-2 control-label form-lable-modal"></label>
+            <div class="col-sm-4 text-center">
+                <input class="form-control" type="text" ng-model="distvalue['key']">
+            </div>
+            <div class="col-sm-4 text-center">
+                <input class="form-control" type="text" ng-model="distvalue['value']">
+            </div>
+            <div class="col-sm-2">
+                <button type="button" ng-click="delRow(distkey)" class="btn btn-danger text-right col-sm-12">删除</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">完成</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>
+<style type="text/css">
+#formula_list {
+    background: white;
+    position: absolute;
+    z-index:9999;
+    border:1px solid grey;
+    font-size:13px;
+    display:none;
+    max-height: 300px;
+    overflow: auto;
+}
+#formula_list ul li:hover {
+    text-decoration:none;
+    cursor:default;
+    background-color: #e1e3e9;
+}
+</style>
+<div id="formula_list">
+    <ul>
+        <li ng-repeat="item in column_list" ng-click="set_column(item.field)">{{ item.title }}</li>
+    </ul>
+</div>
+{% endverbatim %}

@@ -1,0 +1,36 @@
+{% verbatim %}
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title">保存配置</h3>
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body open-body">
+    <form action="#" name="myForm" method="post" id="addForm" class="form-horizontal">
+        <div class="form-group clearfix">
+            <label class="col-sm-2 control-label form-lable-add">名称</label>
+            <div class="col-sm-4">
+                <input type="text" name="confname" ng-change="checkconfname()" ng-model="sceneConfigObj.confname" required id="confname" class="form-control" placeholder="请填写名称" maxlength="30">
+                <div style="position: fixed;width: 100px;">
+                    <p class="text-danger">{{ confnamemsg }}</p>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label form-lable-add">禁用</label>
+            <div class="col-sm-2">
+                <select ng-model="sceneConfigObj.status" ng-init="sceneConfigObj.status=0" class="form-control">
+                    <option value="0" ng-selected="1">否</option>
+                    <option value="1">是</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group clearfix" style="padding-top: 7px">
+            <label class="col-sm-2 control-label form-lable-add">备注</label>
+            <div class="col-sm-8">
+                <textarea type="text" name="remark" ng-model="sceneConfigObj.remark" id="remark" class="form-control" style="height: 87px" placeholder="请填写描述信息"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" ng-disabled="errorflag||checking" type="button" ng-click="ok()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>
+{% endverbatim %}

@@ -1,0 +1,30 @@
+<div class="change-loaded-dataset">
+  <div ng-if="userData.length">
+    <h3>已定义的指标</h3>
+    <ul>
+      <li ng-repeat="dataset in userData track by dataset.id"
+        ng-class="{selected: Dataset.currentDataset.id === dataset.id}">
+        <a class="dataset" ng-click="selectDataset(dataset)"
+          ng-disabled="Dataset.currentDataset.id === dataset.id">
+          <i class="fa fa-database"></i>
+          <strong>{{dataset.name}}</strong>
+        </a>
+        <span ng-if="dataset.description">{{dataset.description}}</span>
+        <strong ng-if="Dataset.currentDataset === dataset">(已选中)</strong>
+      </li>
+    </ul>
+  </div>
+  <h3>请点击选择</h3>
+  <!--<ul class="loaded-dataset-list">
+    <li ng-repeat="dataset in sampleData track by dataset.id"
+      ng-class="{selected: Dataset.currentDataset.id === dataset.id}">
+      <a class="dataset" ng-click="selectDataset(dataset)"
+        ng-disabled="Dataset.currentDataset.id === dataset.id">
+        <i class="fa fa-database"></i>
+        <strong>{{dataset.name}}</strong>
+      </a>
+      <strong ng-if="Dataset.currentDataset === dataset">(已选中)</strong>
+      <em ng-if="dataset.description">{{dataset.description}}</em>
+    </li>
+  </ul>-->
+</div>

@@ -1,0 +1,1090 @@
+{% extends 'base_lite.html' %} {% load staticfiles %} {% block title %}数据可视化{% endblock %} {% block content %}
+<!--<editor-fold desc="静态资源">-->
+<!-- #region  -->
+<link rel="stylesheet" href="{% static 'css/common.css'  %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'plugin/colorpicker/bootstrap-colorpicker.min.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/angular/gridster/angular-gridster.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-bootstrap-colorpicker/colorpicker.min.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/angular/angularjs-datepicker/angular-datepicker.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-material/angular-material.min.css' %}" />
+<link rel="stylesheet" href="{% static 'plugin/jquery/canvas/jQuery.canvas.css' %}">
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-rangeslider/angular.rangeSlider.css'  %}" />
+<link rel="stylesheet" href="{% static 'plugin/angular/angularjs-toaster/toaster.min.css'  %}" />
+<link rel="stylesheet" href="{% static 'components/datax-ui/datax-ui.css'  %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'newdashboard/newdashboard.css'  %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'newdashboard/table.css'  %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'newdashboard/toolbar-default.css'  %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'newdashboard/newdash_item.css'  %}?v={{ nowversion }}1">
+<script src="{% static 'plugin/html2canvas/html2canvas.js' %}"></script>
+<link rel="stylesheet" href="{% static 'plugin/wang-editor/wangEditor.min.css' %}">
+<script src="{% static 'plugin/wang-editor/wangEditor.min.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/mobile-home.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'plugin/barrager/css/barrager.css' %}">
+<link rel="stylesheet" href="{% static 'componets/multi-select/multi-select.css' %}">
+<script src="{% static 'componets/datax-loading/loading.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'plugin/barrager/js/jquery.barrager.js' %}"></script>
+<!-- #endregion -->
+<!--</editor-fold>-->
+<!-- 只在此页面生效的css -->
+<style type="text/css">
+    .md-select-icon {
+        color: inherit !important;
+    }
+
+    .md-slider {
+        height: 32px !important;
+    }
+</style>
+<script type="application/javascript">
+    var viewType = '{{ viewType }}';
+    var currentSceneId = '{{ pk }}';
+    var urlArgs = '{{ urlArgs }}';
+    var mbMenuType = 'lite'
+    var shareUrl = window.location.href;
+    var shareName = ''
+</script>
+{% verbatim %}
+<div class="dashboard-main-app" ng-app="dashboardApp" ng-controller="dashboardController" ng-style="containerStyle()">
+    <!--<editor-fold desc="移动端门户与菜单">-->
+    <!-- #region -->
+    <div ng-show="mbMenuType == 'full'">
+        <div class="m-header m-component" id="mbHeaderDiv">
+            <i class="fa fa-list m-menu" ng-click="showMBMenu()"></i>
+            智慧运营分析平台
+            <i class="fa fa-star-o m-collection" ng-click="collectionScene()"></i>
+        </div>
+        <div class="m-body m-component" id="mbExtraDiv">
+            <div class="full-content m-body-content">
+                <div class="m-body-menu" ng-if="footerType == 'menu'">
+                    <uib-accordion close-others="true">
+                        <div uib-accordion-group class="panel-default" is-open="row.open" ng-repeat="row in menuList">
+                            <uib-accordion-heading>
+                                {{ row.name }}
+                                <i class="pull-right glyphicon a-line"
+                                    ng-class="{'glyphicon-chevron-down': row.open, 'glyphicon-chevron-right': !row.open}"></i>
+                            </uib-accordion-heading>
+                            <ul class="list-group">
+                                <li ng-if="row.url && row.url.length > 1" ng-click="openMbPage(row, 'menu')"
+                                    class="list-group-item a-line">{{ row.name }}</li>
+                                <li ng-if="row.child.length > 0" ng-repeat="childrow in row.child"
+                                    class="list-group-item" ng-click="openMbPage(childrow, 'menu')">{{ childrow.name }}
+                                </li>
+                            </ul>
+                        </div>
+                    </uib-accordion>
+                </div>
+                <div class="m-body-collection" ng-if="footerType == 'collection'">
+                    <ul class="list-group">
+                        <li class="list-group-item a-line" ng-repeat="row in connectScene"
+                            ng-click="openMbPage(row, 'connect')">
+                            {{ row.name }}
+                        </li>
+                    </ul>
+                </div>
+                <div class="m-body-message" ng-if="footerType == 'message'">
+                    <ul class="list-group">
+                        <!-- <li class="list-group-item"><i class="fa fa-bell"></i>&nbsp;Cras justo odio</li>
+                        <li class="list-group-item"><i class="fa fa-bell"></i>&nbsp;Dapibus ac facilisis in</li>
+                        <li class="list-group-item"><i class="fa fa-bell-o"></i>&nbsp;Morbi leo risus</li>
+                        <li class="list-group-item"><i class="fa fa-bell-o"></i>&nbsp;Porta ac consectetur ac</li>
+                        <li class="list-group-item"><i class="fa fa-bell-o"></i>&nbsp;Vestibulum at eros</li> -->
+                    </ul>
+                </div>
+                <div class="m-body-setting" ng-if="footerType == 'setting'">
+                    <a class="btn btn-default">注销</a>
+                </div>
+            </div>
+        </div>
+        <div class="m-footer m-component">
+            <div class="footer-item" ng-click="switchMbBodyContent('menu')"
+                ng-class="{'footer-check':footerType=='menu'}">
+                <i class="fa fa-th-list"></i>
+                <span>菜单</span>
+            </div>
+            <div class="footer-item" ng-click="switchMbBodyContent('collection')"
+                ng-class="{'footer-check':footerType=='collection'}">
+                <i class="fa "
+                    ng-class="{'fa-star':footerType=='collection', 'fa-star-o':footerType!='collection'}"></i>
+                <span>收藏</span>
+            </div>
+            <div class="footer-item" ng-click="switchMbBodyContent('message')"
+                ng-class="{'footer-check':footerType=='message'}">
+                <i class="fa "
+                    ng-class="{'fa-commenting':footerType=='message', 'fa-commenting-o':footerType!='message'}"></i>
+                <span>消息</span>
+            </div>
+            <div class="footer-item" ng-click="switchMbBodyContent('setting')"
+                ng-class="{'footer-check':footerType=='setting'}">
+                <i class="fa fa-cog"></i>
+                <span>设置</span>
+            </div>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+    <!--<editor-fold desc="场景导出（收藏）图标">-->
+    <!-- #region -->
+    <div class="down-bar-switch"></div>
+    <div id="downBar" class="downBar">
+        <i class="fa fa-share-alt fa-hover" ng-click="downTheme('share')" title="分享"></i>
+        <i class="fa fa-file-image-o fa-hover" ng-click="downTheme('pic')" title="下载图片"></i>
+        <i class="fa fa-file-excel-o fa-hover" ng-click="downTheme('excel')" title="导出excel"></i>
+        <i class="fa fa-file-word-o fa-hover" ng-click="downTheme('word')" title="导出word"></i>
+        <i class="fa fa-file-powerpoint-o fa-hover" ng-click="downTheme('powerpoint')" title="导出ppt"></i>
+        <i class="fa fa-file-pdf-o fa-hover" ng-click="downTheme('pdf')" title="导出pdf"></i>
+        <i class="fa fa-star-o fa-hover pc-collection" ng-click="collectionScene()" title="收藏"></i>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+
+    <!--<editor-fold desc="移动端首页">-->
+    <!-- #region -->
+    <div class="lite-mb-portal" ng-style="mbLiteTheme.bg">
+        <div class="menu-items" ng-style="mbLiteTheme.list" ng-repeat="mbLiteMenu in menuList">
+            <div class="menu-item-title">
+                {{ mbLiteMenu.name }}
+            </div>
+            <div class="menu-item-childs">
+                <div class="menu-child-item" ng-repeat="childMenu in mbLiteMenu.child">
+                    <div class="menu-item-icon"><img ng-src="{{childMenu.icon}}"></img></div>
+                    <div class="click-pointer menu-item-name"
+                        ng-click="openMbPage(childMenu, 'menu');closeMbLitePortal()">{{ childMenu.name }}</div>
+                    <div class="menu-item-tags">说明: {{childMenu.desc}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+    <!-- #region 移动端轻量菜单 -->
+    <div class="lite-mb-menu" id="liteMbMenu">
+        <md-menu md-position-mode="target bottom">
+            <md-button aria-label="Open phone interactions menu" class="md-icon-button"
+                ng-click="openMenu($mdMenu, $event)">
+            </md-button>
+            <md-menu-content class="lite-mb-menu-container" width="6">
+                <md-menu-item class="lite-mb-menu-item" ng-repeat="liteMenu in liteMenuList">
+                    <md-button ng-click="openMbPage(liteMenu, 'menu')">{{ liteMenu.name }}</md-button>
+                </md-menu-item>
+            </md-menu-content>
+        </md-menu>
+    </div>
+    <!-- #endregion -->
+
+    <!-- #region 分享菜单 -->
+    <div class="m-share" ng-click="downTheme('share')">
+        <i class="fa fa-share-square-o"></i>
+    </div>
+    <!-- #endregion -->
+
+    <div class="main-app-content" id="mainDashboardController">
+
+        <div id="dashboardConfig" class="main-dash-content-block" ng-style="style()" resize>
+            <!--<editor-fold desc="组件列表">-->
+            <!-- #region  -->
+            <div class="left-block">
+                <input class="form-control charts-filter-input" placeholder="请输入过滤字符" ng-model="filterChartsVal"
+                    ng-change="filterCharts()">
+                <div class="left-card">
+                    <chart-list kinds="kinds" items="configitems">
+
+                    </chart-list>
+                </div>
+            </div>
+            <!-- #endregion -->
+            <!--</editor-fold>-->
+
+            <!--<editor-fold desc="工具栏">-->
+            <!-- #region  -->
+            <div class="dashboard-toolbar" ng-class="{'toolbar-default': sceneObj.options.toolBarStyle.default,
+            'toolbar-black': sceneObj.options.toolBarStyle.black}">
+                <div class="toolbar-edit" ng-click="showChartsList()">复用组件</div>
+                <div class="toolbar-add" ng-click="chartSet()">新增组件</div>
+                <div class="toolbar-labelbox" ng-drag="true" ng-drag-data="{sizeX:32,sizeY:2,dropType:'labelBox'}">
+                    新增文本/网页</div>
+                <div class="toolbar-text" ng-drag="true" ng-drag-data="{sizeX:32,sizeY:1,dropType:'text'}">文本查询框</div>
+                <div class="toolbar-select" ng-drag="true" ng-drag-data="{sizeX:32,sizeY:1,dropType:'select'}">下拉选择框
+                </div>
+                <div class="toolbar-date" ng-drag="true" ng-drag-data="{sizeX:32,sizeY:1,dropType:'date'}">时间段</div>
+                <div class="toolbar-config" ng-click="scenesGlobalConfig();">全局配置</div>
+                <div class="toolbar-save" ng-click="saveScene();">保存</div>
+                <div class="toolbar-undo" ng-click="returnDashList()">返回列表页</div>
+            </div>
+            <!-- #endregion -->
+            <!--</editor-fold>-->
+
+            <!--<editor-fold desc="dashboard 主面板">-->
+            <!-- #region  -->
+            <div id="scenesLayout" gridster="gridsterOpts" ng-drop="true"
+                ng-drop-success="dropComplete($index,$data,$event)" ng-drag-start="dragstart($data,$event)"
+                ng-drag-stop="dragstop($data,$event)" ng-drag-move="dragmove($data,$event)">
+                <ul>
+                    <li class="" ng-click="changeItemIndex(item)" ng-style="item.data.styleConfig" gridster-item="item"
+                        ng-repeat="item in configitems" ng-hide="item.data.itemConfigs.hideInDashboard && viewType=='show'">
+                        <grid-item modal-panel="modalPanel" olapids="olapIds" config='item' table-data="table"
+                            configitems="configitems" drop-Type="item.data.dropType" remove-action="del(item);"
+                            show-text-editor="showTextEditor(item)" open-filter-panel="openFilterPanel(item)"
+                            global-config="gridsterOpts" reloading-dashboard-status="reloadingDashboard"
+                            item-style-config="openScenesStyleConfigPanel(item)"
+                            sync-font-color="sceneObj.options.syncFontColor" open-linkage-panel="openLinkagePanel(item)"
+                            update-component="updateComponent(item)" row-height="rowHeight"
+                            open-comments-section="openCommentsSection(item)" scene-options="sceneObj"
+                            scenes-content-width="scenesContentWidth" after-data-load="afterDataLoad(ev)">
+                        </grid-item>
+                    </li>
+                </ul>
+            </div>
+            <!-- #endregion -->
+            <!--</editor-fold>-->
+        </div>
+
+
+    </div>
+    <!--<editor-fold desc="联动/跳转">-->
+    <!-- #region -->
+    <div class="linkage-config top-transition floating-layer-margin">
+        <div class="modal-header open-header custom-header">
+            <ul class="nav nav-tabs">
+                <li role="presentation" ng-class="{'active':currentLinkageObj.type == 'relation'}"
+                    ng-click="currentLinkageObj.type = 'relation'"><a>联动</a></li>
+                <li role="presentation" ng-class="{'active':currentLinkageObj.type == 'redirect'}"
+                    ng-click="currentLinkageObj.type = 'redirect'"><a>跳转</a></li>
+            </ul>
+            <button type="button" ng-click="closeLinkagePanel('close')" class="close open-close" data-dismiss="modal"
+                aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body open-body general-transition"
+            style="max-height: 500px; overflow-y: auto; position: relative;">
+            <!-- 组件联动 -->
+            <form class="form-horizontal" ng-if="currentLinkageObj.type == 'relation'">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">选择自身字段</label>
+                    <div class="col-sm-6">
+                        <select ng-model="currentLinkageObj.relationField" class="form-control"
+                            ng-options="item.field as item.field for item in linkageChartFields"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-12" ng-repeat="(key, olap) in olaps track by key">
+                        <label ng-if="key == 0" class="col-sm-3 control-label">勾选组件及关联字段</label>
+                        <label ng-if="key > 0" class="col-sm-3 control-label"></label>
+                        <div class="col-sm-4" style="line-height: 2.6; cursor: pointer;">
+                            <input ng-model="olap.chart.check" type="checkbox"
+                                ng-change="linkageChartChange(olap)">&nbsp;
+                            <span
+                                ng-click="olap.chart.check = !olap.chart.check;linkageChartChange(olap)">{{ olap.chart.name }}</span>
+                        </div>
+                        <div class="col-sm-4">
+                            <select class="form-control" ng-model="olap.olap.col.selected"
+                                ng-options="item.column as item.title for item in olap.olap.col.cols">
+                                <option value="">---选择字段---</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <!-- 点击跳转 -->
+            <form class="form-horizontal" ng-init="showChild = false" ng-if="currentLinkageObj.type == 'redirect'">
+                <div class="form-group" ng-class="{'fixed-height500': showChild}">
+                    <label class="col-sm-2 control-label">链接</label>
+                    <div class="col-sm-6" ng-mouseover="showChild = true" ng-mouseleave="showChild = false"
+                        ng-class="{'show-child': showChild}">
+                        <input class="form-control" ng-model="currentLinkageObj.linkUrl" type="text">
+                        <div class="child-panel general-transition">
+                            <div style="float:left;width:100%;">
+                                <p class="form-lable-p">选择场景</p>
+                                <select class="form-control" ng-click="showChild = false"
+                                    style="width:100%; height: 260px;" multiple="multiple"
+                                    ng-model="currentLinkageObj.redirectUrl"
+                                    ng-options="scene.id as scene.name group by scene.type_name for scene in scenes"
+                                    ng-change="changeScene();">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <ul class="nav nav-pills">
+                        <li role="presentation"
+                            ng-click="currentLinkageObj.isComponentArg = !currentLinkageObj.isComponentArg">
+                            <a><input type="checkbox" ng-model="currentLinkageObj.isComponentArg">&nbsp;组件字段</a>
+                        </li>
+                        <li role="presentation"
+                            ng-click="currentLinkageObj.isCustomArg = !currentLinkageObj.isCustomArg">
+                            <a><input type="checkbox" ng-model="currentLinkageObj.isCustomArg">&nbsp;自定义参数</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="form-group" ng-if="currentLinkageObj.isComponentArg">
+                    <label class="col-sm-2 control-label">选择字段</label>
+                    <div class="col-sm-6">
+                        <select ng-model="currentLinkageObj.componentUrlArg" class="form-control"
+                            ng-options="item.field as item.field for item in linkageChartFields"></select>
+                    </div>
+                </div>
+                <div class="form-group" ng-if="currentLinkageObj.isCustomArg">
+                    <label class="col-sm-2 control-label">输入参数</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" placeholder="a=1&b=2"
+                            ng-model="currentLinkageObj.customUrlArg">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer footer-btn">
+            <button class="btn btn-primary btn-ok" type="button" ng-click="closeLinkagePanel('save')">保存</button>
+            <button class="btn btn-warning btn-cancel" type="button" ng-click="closeLinkagePanel('close')">关闭</button>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+
+    <!--<editor-fold desc="全局配置弹窗">-->
+    <!-- #region -->
+    <div class="global-config top-transition floating-layer-margin" ng-init="globalConfigType = 'style'"
+        datax-panel-drag>
+        <div class="datax-modal-header custom-header drag-title">
+            <ul class="nav nav-tabs">
+                <li role="presentation" ng-class="{'active':globalConfigType == 'style'}"
+                    ng-click="globalConfigType = 'style'"><a>全局样式</a></li>
+                <li role="presentation" ng-class="{'active':globalConfigType == 'code'}"
+                    ng-click="globalConfigType = 'code'"><a>自定义代码段</a></li>
+                <li role="presentation" ng-class="{'active':globalConfigType == 'mbSort'}"
+                    ng-click="globalConfigType = 'mbSort'"><a>移动端显示排序</a></li>
+                <!--
+                <li role="presentation" ng-class="{'active':globalConfigType == 'autoSave'}" ng-click="globalConfigType = 'autoSave'"><a>自动保存</a></li>
+                -->
+            </ul>
+            <button type="button" ng-click="closeGlobalConfigPanel()" class="close open-close" data-dismiss="modal"
+                aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="datax-modal-body custom-modal-body" >
+            <div ng-show="globalConfigType == 'style'">
+                <div dx-row gutter="24">
+                    <div dx-col sm="24">
+                        预置样式：
+                    </div>
+                    <div dx-col class="pre-cover" sm="24">
+                        <div class="pre-cover-white pre-cover-img" ng-click="setPreStyle('white')"></div>
+                        <div class="pre-cover-black pre-cover-img" ng-click="setPreStyle('black')"></div>
+                        <div class="pre-cover-blue pre-cover-img" ng-click="setPreStyle('blue')"></div>
+                        <div class="pre-cover-theme04 pre-cover-img" ng-click="setPreStyle('theme04')"></div>
+                        <div class="pre-cover-theme05 pre-cover-img" ng-click="setPreStyle('theme05')"></div>
+                        <div class="pre-cover-theme06 pre-cover-img" ng-click="setPreStyle('theme06')"></div>
+                    </div>
+                    <div dx-col sm="6">已配置样式</div>
+                    <div dx-col sm="16">
+                        <dx-select items="configedSceneStyleObjs" dx-label="'confname'" 
+                            dx-model="customScenes.selectedConfigScene" multiple="false" dx-change="configSceneStyleApply()"></dx-select>
+                    </div>
+                    <div dx-col sm="24">
+                        全局背景配置：
+                    </div>
+                    <div dx-col sm="6">使用背景色</div>
+                    <div dx-col sm="16">
+                        <input colorpicker="rgba" colorpicker-parent="true" class="datax-input"
+                            ng-model="sceneObj.options.globalStyle.backgroundColor" type="text">
+                    </div>
+                    <div dx-col sm="6">使用背景图</div>
+                    <div dx-col sm="16">
+                        <dx-checkbox checked="tempVal.useBgImg" change="isUseBgImg()"></dx-checkbox>
+                    </div>
+                    <div ng-show="tempVal.useBgImg">
+                        <div dx-col sm="6">背景图</div>
+                        <div dx-col sm="12">
+                            <input type="text" class="datax-input" ng-model="sceneObj.options.globalStyle.backgroundImage"
+                                title="{{ sceneObj.options.globalStyle.backgroundImage }}">
+                        </div>
+                        <div dx-col sm="4">
+                            <div class="datax-btn datax-btn-default" style="position: relative;">上传图片
+                                <input style="width: 100%; position: absolute; top: 0; opacity: 0;" type="file"
+                                    id="scenesBgImg" custom-on-change="changeScenesPicture">
+                            </div>
+                        </div>
+                        <div dx-col sm="6">图片样式</div>
+                        <div dx-col sm="16">
+                            <select ng-model="sceneObj.options.globalStyle.backgroundSize">
+                                <option value="cover">按图片原长宽比拉伸并铺满背景</option>
+                                <option value="100% 100%">直接拉伸铺满背景(图片长宽比会改变)</option>
+                            </select>
+                        </div>
+                        <div dx-col sm="6">已上传</div>
+                        <div dx-col sm="16">
+                            <user-imgs imgs="imgs" refresh-method="refreshStyle()"
+                            img-model="sceneObj.options.globalStyle.backgroundImage"></user-imgs>
+                        </div>
+                    </div>
+                    <div dx-col sm="6">文字颜色</div>
+                    <div dx-col sm="10">
+                        <input colorpicker="rgba" colorpicker-parent="true" colorpicker-position="top"
+                        class="datax-input" ng-model="sceneObj.options.globalStyle.color" type="text">
+                    </div>
+                    <div dx-col sm="6">
+                        <dx-checkbox checked="sceneObj.options.syncFontColor" change="">同步到子组件</dx-checkbox>
+                    </div>
+                    <div dx-col sm="4">
+                        左右间距
+                    </div>
+                    <div dx-col sm="6">
+                        <input type="number" class="datax-input" ng-model="gridsterOpts.margins[1]">
+                    </div>
+                    <div dx-col sm="4">
+                        上下间距    
+                    </div>
+                    <div dx-col sm="6">
+                        <input type="number" class="datax-input" ng-model="gridsterOpts.margins[0]">
+                    </div>
+                    <div dx-col sm="24">
+                        全局组件背景配置：
+                    </div>
+                    <div dx-col sm="6">
+                        组件背景色    
+                    </div>
+                    <div dx-col sm="12">
+                        <input colorpicker="rgba" colorpicker-parent="true" colorpicker-position="top"
+                        class="datax-input" ng-model="sceneObj.options.chartStyle.backgroundColor" type="text">
+                    </div>
+                    <div dx-col sm="6">
+                        <dx-checkbox checked="tempVal.useChartsBgImg" change="isUseChartsBgImg()">组件使用背景图</dx-checkbox>
+                    </div>
+                    <div ng-show="tempVal.useChartsBgImg">
+                        <div dx-col sm="6">组件背景图</div>
+                        <div dx-col sm="12">
+                            <input type="text" class="datax-input" ng-model="sceneObj.options.chartStyle.backgroundImage"
+                                title="{{ sceneObj.options.chartStyle.backgroundImage }}">
+                        </div>
+                        <div dx-col sm="4">
+                            <div class="datax-btn datax-btn-default" style="position: relative;">上传图片
+                                <input style="width: 100%; position: absolute; top: 0; opacity: 0;" type="file"
+                                    id="chartsBgImg" custom-on-change="changeChartsPicture">
+                            </div>
+                        </div>    
+                        <div dx-col sm="6">图片样式</div>
+                        <div dx-col sm="16">
+                            <select ng-model="sceneObj.options.chartStyle.backgroundSize">
+                                <option value="cover">按图片原长宽比拉伸并铺满背景</option>
+                                <option value="100% 100%">直接拉伸铺满背景(图片长宽比会改变)</option>
+                            </select>
+                        </div>
+                        <div dx-col sm="6">已上传</div>
+                        <div dx-col sm="16">
+                            <user-imgs imgs="charsimgs" refresh-method="refreshStyle()"
+                                img-model="sceneObj.options.chartStyle.backgroundImage"></user-imgs>
+                        </div>
+                    </div>
+                    <div dx-col sm="24">
+                        全局过滤器背景配置：
+                    </div> 
+                    <div dx-col sm="6">过滤器背景色</div>
+                    <div dx-col sm="16">
+                        <input colorpicker="rgba" colorpicker-parent="true" colorpicker-position="top"
+                        class="datax-input" ng-model="sceneObj.options.filterStyle.backgroundColor" type="text">
+                    </div>
+                    <div dx-col sm="6">大屏适配</div>
+                    <div dx-col sm="16">
+                        <!-- <input ng-model="sceneObj.basicconfig.customConfig.fullscreen" type="checkbox"> -->
+                        <dx-checkbox checked="sceneObj.basicconfig.customConfig.fullscreen"></dx-checkbox>
+                    </div>
+                    <div dx-col sm="6">开启评论功能</div>
+                    <div dx-col sm="16">
+                        <!-- <input ng-model="sceneObj.basicconfig.customConfig.showComments" type="checkbox"
+                            ng-change="switchCommentsPanel()"> -->
+                        <dx-checkbox checked="sceneObj.basicconfig.customConfig.showComments" change="switchCommentsPanel()"></dx-checkbox>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="globalConfigType == 'code'">
+                <div dx-row gutter="24">
+                    <div dx-col sm="4">
+                        <dx-checkbox checked="sceneObj.basicconfig.customConfig.loadExJs">扩展js:</dx-checkbox>
+                    </div>
+                    <div dx-col sm="18">
+                        <input type="text" class="datax-input" ng-disabled="!sceneObj.basicconfig.customConfig.loadExJs"
+                            ng-class="{'datax-input-disabled':!sceneObj.basicconfig.customConfig.loadExJs}"
+                        ng-model="sceneObj.basicconfig.customConfig.exJs">
+                    </div>
+                    <div dx-col sm="4">
+                        <dx-checkbox checked="sceneObj.basicconfig.customConfig.loadExCss">扩展css:</dx-checkbox>
+                    </div>
+                    <div dx-col sm="18">
+                        <input type="text" class="datax-input" ng-disabled="!sceneObj.basicconfig.customConfig.loadExCss"
+                        ng-class="{'datax-input-disabled':!sceneObj.basicconfig.customConfig.loadExCss}" 
+                        ng-model="sceneObj.basicconfig.customConfig.exCs">
+                    </div>
+                    <div dx-col sm="24">
+                        <div dx-button-group>
+                            <button dx-button type="default" click="updateCustomCode('addMethod');">增加函数</button>
+                            <button dx-button type="default" click="updateCustomCode('userInfo');">获取用户信息</button>
+                            <button dx-button type="default" click="updateCustomCode('refresh');">重置</button>
+                        </div>
+                    </div>
+                    <div dx-col sm="24">
+                        <textarea  class="datax-input"
+                            ng-model="sceneObj.basicconfig.customConfig.customCode.code"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="form-horizontal" ng-show="globalConfigType == 'mbSort'"
+                style="padding: 0 10px 10px 10px; overflow: hidden;">
+                <ul style="overflow: hidden;" ui-sortable ng-model="configitems">
+                    <li style="margin-bottom: 10px; overflow: hidden;" ng-repeat="item in configitems">
+                        <a class="datax-btn datax-btn-default">{{ item|componentName }}</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="form-horizontal" ng-show="globalConfigType == 'autoSave'">
+                <div class="form-group"></div>
+                <div class="form-group">
+                    <div class="col-sm-3">
+                        <input type="checkbox" ng-model="sceneObj.basicconfig.customConfig.autoSave.active">是否开启(单位:秒)
+                    </div>
+                    <div class="col-sm-4" ng-if="sceneObj.basicconfig.customConfig.autoSave.active">
+                        <input type="number" class="form-control"
+                            ng-model="sceneObj.basicconfig.customConfig.autoSave.interval">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="datax-modal-footer footer-btn">
+            <button class="datax-btn datax-btn-primary" type="button" ng-click="exportStyle()">导出当前配置的样式</button>
+            <button class="datax-btn datax-btn-default" type="button" ng-click="closeGlobalConfigPanel()">关闭</button>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+
+    <!--<editor-fold desc="单个组件配置弹窗">-->
+    <!-- #region -->
+    <div class="scenes-item-config top-transition floating-layer-margin" datax-panel-drag>
+        <div class="modal-header open-header drag-title">
+            <h3 class="modal-title open-header-title" style="width: 90%;">组件样式配置
+            </h3>
+            <!--  弹出框的关闭按钮  -->
+            <button type="button" ng-click="closeScenesStyleConfigPanel()" class="close open-close" data-dismiss="modal"
+                aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body open-body" style="max-height: 500px; overflow-y: auto; position: relative;">
+            <form class="form-horizontal">
+                <div class="form-group" ng-if="',select,text,date'.indexOf(currentItemType) > 0">
+                    <label class="col-sm-2 control-label">文字输入占比</label>
+                    <div class="col-sm-6">
+                        <multi-select items="separationClassArr" display-field="'name'" value-field="'value'"
+                            value="scenesItemStyle.separationClass"></multi-select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">背景色</label>
+                    <div class="col-sm-6" style="position: relative;">
+                        <input colorpicker="rgba" colorpicker-parent="true" class="form-control"
+                            ng-model="scenesItemStyle.backgroundColor" type="text">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">圆角弧度</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" id="sceneBorderRadius"
+                            ng-model="scenesItemStyle.borderRadius"
+                            ng-change="fixPx('scenesItemStyle.borderRadius', scenesItemStyle.borderRadius, 'sceneBorderRadius')">
+                    </div>
+                </div>
+                <div class="form-group" ng-if="currentItemType == 'table'">
+                    <label class="col-sm-2 control-label">表格边框颜色</label>
+                    <div class="col-sm-6">
+                        <input colorpicker="rgba" colorpicker-parent="true" class="form-control"
+                            ng-model="scenesItemStyle.tableBorderColor" type="text">
+                    </div>
+                </div>
+                <div class="form-group" ng-if="currentItemType == 'table'">
+                    <label class="col-sm-2 control-label">列锁定</label>
+                    <div class="col-sm-6">
+                        <input class="form-control" ng-model="scenesItemStyle.fixedLeft" type="number">
+                    </div>
+                </div>
+                <div class="form-group" ng-if="currentItemType == 'table'">
+                    <label class="col-sm-2 control-label">列高</label>
+                    <div class="col-sm-6">
+                        <input class="form-control" ng-model="scenesItemStyle.rowHeight" type="number">
+                    </div>
+                </div>
+                <!-- <div class="form-group">
+                    <label class="col-sm-2 control-label">文字颜色</label>
+                    <div class="col-sm-6">
+                        <input colorpicker="rgba"
+                               class="form-control" ng-model="scenesItemStyle.color" type="text">
+                    </div>
+                    <div>
+                        <a class="col-sm-2 btn btn-default">重置</a>
+                    </div>
+                </div>-->
+                <div class="form-group">
+                    <div class="col-sm-4">
+                        <dx-checkbox checked="scenesItemConfigs.hideInDashboard">在显示界面隐藏</dx-checkbox>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-4">
+                        <dx-checkbox checked="scenesItemStyle.borderDisplay">是否显示边框</dx-checkbox>
+                    </div>
+                </div>
+                <!--<div class="form-group" ng-if="scenesItemStyle.borderDisplay">
+                    <label class="col-sm-2 control-label">边框显示方式</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" ng-model="scenesItemStyle.borderDisplayMethod">
+                            <option value="always">一直显示</option>
+                            <option value="hover">鼠标移上时显示</option>
+                        </select>
+                    </div>
+                </div>-->
+                <div class="form-group" ng-if="scenesItemStyle.borderDisplay">
+                    <label class="col-sm-2 control-label">边框样式</label>
+                    <div class="col-sm-4">
+                        <!-- <select ng-model="scenesItemStyle.borderStyle" class="form-control">
+                            <option value="solid">实线</option>
+                            <option value="dashed">虚线</option>
+                            <option value="dotted">点</option>
+                            <option value="double">双线</option>
+                        </select> -->
+                        <multi-select items="borderStyles" display-field="'name'" value-field="'value'"
+                            value="scenesItemStyle.borderStyle"></multi-select>
+                    </div>
+                </div>
+                <div class="form-group" ng-if="scenesItemStyle.borderDisplay">
+                    <label class="col-sm-2 control-label">边框宽度</label>
+                    <div class="col-sm-4">
+                        <input type="input" ng-model="scenesItemStyle.borderWidth" class="form-control"
+                            id="sceneBorderWidth"
+                            ng-change="fixPx('scenesItemStyle.borderWidth', scenesItemStyle.borderWidth, 'sceneBorderWidth')" />
+                    </div>
+                </div>
+                <div class="form-group" ng-if="scenesItemStyle.borderDisplay">
+                    <label class="col-sm-2 control-label">边框颜色</label>
+                    <div class="col-sm-6">
+                        <input colorpicker="rgba" colorpicker-parent="true" colorpicker-position="top"
+                            class="form-control" ng-model="scenesItemStyle.borderColor" type="text">
+                    </div>
+                </div>
+                <!-- <div class="form-group" ng-if="'table,select,text,date'.indexOf(currentItemType) > -1">
+                    <div class="col-sm-12">
+                        <input type="checkbox" ng-model="scenesItemStyle.transparent">&nbsp;表格/文本框/下拉框/时间段框透明
+                    </div>
+                </div> -->
+
+                <div class="form-group" ng-if="currentItemType == 'table'">
+                    <div class="col-sm-4">
+                        <dx-checkbox checked="scenesItemStyle.showPage">分页栏是否显示</dx-checkbox>
+                    </div>
+                </div>
+                <div class="form-group" ng-if="currentItemType == 'table'">
+                    <div class="col-sm-4">
+                        <dx-checkbox checked="scenesItemStyle.fullFix">表格宽度铺满</dx-checkbox>
+                    </div>
+                </div>
+                <div class="form-group" ng-if="currentItemType == 'table'">
+                    <div class="col-sm-4">
+                        <dx-checkbox checked="scenesItemStyle.liteBorder">精简表格边框</dx-checkbox>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-4">
+                        <input type="checkbox" ng-model="scenesItemStyle.currCharsBgPicSts"
+                            ng-change="currCharsBgPicChange()">&nbsp;是否使用背景图片
+                    </div>
+                </div>
+                <div class="form-group" ng-if="scenesItemStyle.currCharsBgPicSts">
+                    <label class="col-sm-2 control-label">组件背景图</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" ng-model="scenesItemStyle.backgroundImage"
+                            title="{{ scenesItemStyle.backgroundImage }}">
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="col-sm-6 btn btn-default" style="position: relative;">上传图片
+                            <input style="width: 100%; position: absolute; top: 0; opacity: 0;" type="file"
+                                id="currChartsBgImg" custom-on-change="changeCurrChartsPicture">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" ng-if="scenesItemStyle.currCharsBgPicSts">
+                    <label class="col-sm-2 control-label">图片样式</label>
+                    <div class="col-sm-6">
+                        <multi-select items="imgStyles" display-field="'name'" value-field="'value'"
+                            value="scenesItemStyle.backgroundSize"></multi-select>
+                    </div>
+                </div>
+                <div class="form-group" ng-if="scenesItemStyle.currCharsBgPicSts">
+                    <label class="col-sm-2 control-label">已上传</label>
+                    <div class="col-sm-8">
+                        <user-imgs imgs="charsimgs" refresh-method="refreshStyle()"
+                            img-model="scenesItemStyle.backgroundImage"></user-imgs>
+                    </div>
+                </div>
+                <div class="form-group" ng-if="currentItemType == 'table'">
+                    <div class="col-sm-6">
+                        <dx-checkbox checked="scenesItemStyle.editable">是否可编辑</dx-checkbox>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="scenesItemStyle.editable">
+                    <label class="col-sm-2 control-label">值改变后触发代码</label>
+                    <div class="col-sm-8">
+                        <textarea ng-model="scenesItemStyle.afterChangeCode"></textarea>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="currentItemType == 'table'">
+                    <div class="col-sm-6">
+                        <dx-checkbox checked="scenesItemConfigs.customUrlSwitch">自定义URL</dx-checkbox>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="scenesItemConfigs.customUrlSwitch">
+                    <label class="col-sm-2 control-label">url</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="datax-input" ng-model="scenesItemConfigs.customUrl">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer footer-btn" style="position: relative;">
+            <a class="btn btn-default synchronize-component-style-btn">同步至其他组件</a>
+            <div class="synchronize-component-style-panel">
+                <div><input type="checkbox" ng-model="tempVariables.synchronizeComponentStyle.chart"> 图表</div>
+                <div><input type="checkbox" ng-model="tempVariables.synchronizeComponentStyle.table"> 表格</div>
+                <div><input type="checkbox" ng-model="tempVariables.synchronizeComponentStyle.filter"> 过滤器</div>
+                <div><input type="checkbox" ng-model="tempVariables.synchronizeComponentStyle.text"> 文本/网页</div>
+                <div><a class="btn btn-default" ng-click="synchronizeComponentStyle()">确定</a></div>
+            </div>
+            <button class="btn btn-warning btn-cancel" type="button"
+                ng-click="closeScenesStyleConfigPanel()">关闭</button>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+
+    <!--<editor-fold desc="保存弹窗">-->
+    <!-- #region -->
+    <div class="save-panel" ng-if="showSavePanel">
+        <div class="global-filter">
+            <div class="modal-header open-header">
+                <h3 class="modal-title open-header-title" style="width: 90%;">保存场景
+                </h3>
+                <!--  弹出框的关闭按钮  -->
+                <button type="button" ng-click="closeSavePanel()" class="close open-close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body open-body">
+                <form class="form-horizontal" name="saveForm">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">名称 <span class="required-label"> * </span></label>
+                        <div class="col-sm-6">
+                            <input type="text" name="name" class="form-control" required ng-model="sceneObj.name"
+                                placeholder="请填写场景名称">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">类型 <span class="required-label"> * </span></label>
+                        <div class="col-sm-6">
+                            <select ng-options="item.code as item.name for item in enumKinds" ng-change="changeType()"
+                                name="kind" class="form-control" required ng-model="sceneObj.kind"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">标签</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="keywords" class="form-control" ng-model="sceneObj.keywords"
+                                placeholder="多标签使用逗号分隔">
+                        </div>
+                        <div uib-tooltip="将场景类型和各个组件的类型作为标签" tooltip-placement="top" class="col-sm-2 btn btn-default"
+                            ng-click="smartMatch()">
+                            智能匹配
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">描述</label>
+                        <div class="col-sm-6">
+                            <input type="textarea" name="remark" class="form-control" ng-model="sceneObj.remark">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer footer-btn">
+                <button class="btn btn-primary btn-ok" id="saveScenesBtn"
+                    ng-disabled="saveForm.name.$invalid || saveForm.kind.$invalid" type="button"
+                    ng-click="save()">保存</button>
+                <button class="btn btn-warning btn-cancel" type="button" ng-click="closeSavePanel()">关闭</button>
+            </div>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+
+    <!--<editor-fold desc="超文本编辑弹窗">-->
+    <!-- #region -->
+    <div class="text-editor-content" ng-style="openPanelStyle" style="width: 680px; height: 400px;">
+        <div class="modal-header open-header custom-header">
+            <ul class="nav nav-tabs">
+                <li role="presentation" ng-class="{'active':currentTextEditorObj.data.componentType == 'text'}"
+                    ng-click="changeTextEditor('text')"><a>插入文本</a></li>
+                <!--  <li role="presentation" ng-class="{'active':currentTextEditorObj.data.componentType == 'img'}" ng-click="changeTextEditor('img')"><a>插入图片</a></li>  -->
+                <li role="presentation" ng-class="{'active':currentTextEditorObj.data.componentType == 'webPage'}"
+                    ng-click="changeTextEditor('webPage')"><a>插入网页</a></li>
+            </ul>
+            <!--  弹出框的关闭按钮  -->
+            <button type="button" ng-click="closeTextEditor()" class="close open-close" data-dismiss="modal"
+                aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body open-body">
+            <div id="textEditorContent">
+                <p>sample text</p>
+            </div>
+            <div class="img-editor-content auto-hide">
+
+            </div>
+            <div class="webPage-editor-content auto-hide">
+                <form class="form-horizontal">
+                    <div class="form-group"
+                        ng-repeat="($index, item) in currentTextEditorObj.data.links track by $index">
+                        <!-- <label class="col-sm-1 dash-label-default">名称</label>
+                        <div class="col-sm-3"><input type="text" class="form-control" ng-model="item.name"></div> -->
+                        <label class="col-sm-2 dash-label-default">地址</label>
+                        <div class="col-sm-5"><input type="text" class="form-control" ng-model="item.url"></div>
+                        <div class="col-sm-1"><a class="btn btn-default" ng-click="showLinkPage()">确定</a></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+
+    <!--<editor-fold desc="组件过滤器弹窗">-->
+    <!-- #region -->
+    <div class="filter-panel" ng-if="showFilterPanel">
+        <div class="global-filter">
+            <div class="modal-header open-header">
+                <h3 class="modal-title open-header-title" style="width: 90%;">过滤器配置
+                </h3>
+                <!--  弹出框的关闭按钮  -->
+                <button type="button" ng-click="closeFilterPanel()" class="close open-close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+            </div>
+            <div class="modal-body open-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="title" class="col-sm-2 control-label">过滤器名称:</label>
+                        <div class="col-sm-10 form-input-add">
+                            <input type="text" ng-model="currentFilterObj.data.filterName" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="title" class="col-sm-2 control-label">默认值</label>
+                        <div class="col-sm-4">
+                            <select class="form-control" ng-model="currentFilterObj.data.defaultValName"
+                                ng-options="item.value as item.name for item in filterDefaultValues | filter: {type: currentFilterObj.data.dropType}">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4" ng-show="currentFilterObj.data.defaultValName==null">
+                            <input type="text" ng-model="currentFilterObj.data.defaultValText" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="title" class="col-sm-2 control-label">是否多选</label>
+                        <div class="col-sm-4">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="currentFilterObj.data.multipleSelect">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="title" class="col-sm-12">选择关联的图表</label>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4" ng-if="chart.data.datatype == 'chart' || chart.data.datatype == 'table'"
+                            ng-repeat="(key, chart) in configitems track by key">
+                            <div class="checkbox">
+                                <label ng-mouseover="showChartOlap(chart)" ng-mouseleave="hideChartOlap(chart)"
+                                    title="{{ chart.data.name }}" class="text-not-wrap">
+                                    <input type="checkbox" ng-model="chart.data.check">
+                                    {{ chart.data.name }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="title" class="col-sm-12">选择关联的字段</label>
+                    </div>
+                    <div class="form-group">
+                        <div ng-class="'olap-' + colObj.id" class="col-sm-6"
+                            style="padding-bottom: 5px; padding-top: 5px;"
+                            ng-repeat="(key, colObj) in filterObj.colsObjs track by key">
+                            <label for="title" title="{{ colObj.name }}"
+                                class="col-sm-4 control-label text-not-wrap">{{ colObj.name }}</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="colObj.selected"
+                                    ng-options="col.column as col.title for col in colObj.cols">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-if="currentFilterObj.data.dropType == 'text'">
+                        <label for="title" class="col-sm-3">匹配方式</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" ng-model="currentFilterObj.data.textFilterWay">
+                                <option value="equal">等于</option>
+                                <option value="like">包含</option>
+                                <option value="b">大于</option>
+                                <option value="s">小余</option>
+                                <option value="b_equal">大于等于</option>
+                                <option value="s_equal">小于等于</option>
+                                <option value="in">在结果集中(in)(多条件推荐使用下拉多选)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="currentFilterObj.data.customCode.enabled"> 自定义代码段
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="currentFilterObj.data.customCode.enabled">
+                        <label for="title" class="col-sm-3">值改变后触发代码</label>
+                        <div>
+                            <textarea ng-model="currentFilterObj.data.customCode.afterValueChangeCode"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="currentFilterObj.data.customCode.customFilterData"> 自定义过滤列表
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="currentFilterObj.data.customCode.customFilterData">
+                        <label for="title" class="col-sm-3">url</label>
+                        <div class="col-sm-6">
+                            <input type="text" ng-model="currentFilterObj.data.customCode.customFilterUrl" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer footer-btn">
+                <button class="btn btn-primary btn-ok" type="button" ng-click="saveFilterPanel()">保存</button>
+                <button class="btn btn-warning btn-cancel" type="button" ng-click="closeFilterPanel()">取消</button>
+            </div>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+
+    <!--<editor-fold desc="新增组件">-->
+    <!-- #region -->
+    <script type="text/ng-template" id="myModaltest.html">
+        <iframe id="configiframe" name="configiframe" ng-src="{{chartConfigUrl}}"
+                style="width:100%;height:calc(100vh - 120px);" frameborder="0"></iframe>
+            <div class="modal-footer footer-btn">
+                <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">确定</button>
+                <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+            </div>
+    </script>
+
+    <div class="chart-save-panel top-transition floating-layer-margin">
+        <div class="modal-body open-body" style="max-height: 500px; overflow-y: auto; position: relative;">
+            <form class="form-horizontal" name="newChartForm">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">组件名称 <span class="required-label"> * </span></label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" required name="name" ng-model="tempChartObj.name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">组件类型 <span class="required-label"> * </span></label>
+                    <div class="col-sm-6">
+                        <select ng-options="item.code as item.name for item in enumKinds" required name="kind"
+                            class="form-control" ng-model="tempChartObj.kind"></select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer footer-btn">
+            <button class="btn btn-primary" ng-disabled="newChartForm.name.$invalid || newChartForm.kind.$invalid"
+                type="button" ng-click="initNewChart('save')">保存配置(其他场景也可复用)</button>
+            <!-- <button class="btn btn-warning" ng-disabled="newChartForm.name.$invalid || newChartForm.kind.$invalid"
+                    type="button" ng-click="initNewChart('close')">保存配置仅供当前场景使用</button> -->
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+
+    <!--<editor-fold desc="最大化弹窗">-->
+    <!-- #region -->
+    <div class="full-screen-content top-transition floating-layer-margin">
+        <div class="modal-body open-body custom-header" style="height: 100%; width: 100%;">
+            <button type="button" ng-click="closefullScreenContent()" class="close open-close" data-dismiss="modal"
+                aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <div id="fullShowChart" style="width: 100%; height: 100%;"></div>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+
+</div>
+{% endverbatim %}
+<!--<editor-fold desc="静态资源2">-->
+<!-- #region  -->
+<script type="text/javascript" src="{% static 'plugin/angular/i18n/angular-locale_zh-cn.js' %}"></script>
+
+
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'js/sortable.js' %}"></script>
+<script src="{% static 'js/ngDraggable.js' %}"></script>
+<script src="{% static 'plugin/angular/gridster/angular-gridster.js' %}"></script>
+<script src="{% static 'plugin/tether/js/tether.js' %}"></script>
+<script src="{% static 'plugin/drop/js/drop.js' %}"></script>
+<script src="{% static 'plugin/datalib/datalib.min.js' %}"></script>
+<script src="{% static 'plugin/angular/angularjs-datepicker/angular-datepicker.min.js' %}"></script>
+
+<script src="{% static 'plugin/echarts/echarts.min.js' %}"></script>
+<script src="{% static 'plugin/echarts/echarts-wordcloud.min.js' %}"></script>
+<script src="{% static 'js/map/china.js' %}"></script>
+<script src="{% static 'js/map/bmap.min.js' %}"></script>
+<script src="{% static 'js/map/coordinate.js' %}"></script>
+<script src="{% static 'js/echart.tool.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-bootstrap-colorpicker/bootstrap-colorpicker-module.min.js' %}"></script>
+<script src="{% static 'plugin/html2canvas/html2canvas.min.js' %}"></script>
+<script src="{% static 'plugin/jquery/canvas/jQuery.canvas.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-rangeslider/angular.rangeSlider.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-aria/angular-aria.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-animate/angular-animate.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-messages/angular-messages.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-material/angular-material.js' %}"></script>
+
+<script src="{% static 'extra_module/dashboard.interface.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'plugin/angular/dashboard/dashboard.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'js/constant.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'components/utils/datax-utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'components/datax-ui/datax-ui.min.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/multi-select/multi-select.js' %}"></script>
+<script src="{% static 'newdashboard/default_styles.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'newdashboard/newdash-tools.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/modal-drag/datax-panel-drag.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'newdashboard/index.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'dashboard/directives/select-img.js' %}?v={{ nowversion }}1"></script>
+<!-- #endregion -->
+<!--</editor-fold>-->
+{% endblock %}

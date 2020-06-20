@@ -1,0 +1,58 @@
+{% extends 'base.html' %} {% load staticfiles %} {% block title %}调度监控{% endblock %} {% block content %}
+    <link rel="stylesheet" href="{% static 'olap/dispatch/dispatchlog.css' %}?v={{nowversion}}1" />
+    {% verbatim %}
+    <div ng-app="monitor" ng-controller="monitorController">
+        <div resize ng-style="style()">
+
+            <div class="card-content" when-scrolled="loadMore()">
+                <div class="tool-bar">
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label form-lable-add" style="padding-top: 5px;">olap名称：</label>
+                            <div class="col-sm-8 form-input-add">
+                                <input type="text" ng-model="search" ng-change="searchLogs()" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 input-group" style="padding-top: 5px;">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" ng-model="successDataStatus" ng-change="searchLogs()" ng-init="successDataStatus=true">
+                            <label class="custom-control-label" for="customCheck1">正常</label>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="checkbox" class="custom-control-input" ng-model="errorDataStatus" ng-change="searchLogs()" ng-init="errorDataStatus=true">
+                            <label class="custom-control-label" for="customCheck2">异常</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart-item" ng-repeat="(key, val) in dispatchLogs track by key" ng-style="{false:{'color':'#ff3c3c'}}[val.currstatus == '调度成功！']">
+                    <div class="left">
+                        olap名称：<br>
+                        {{ val.olapname }}<br>
+                        当前状态：<br>
+                        {{ val.currstatus }}<br>
+                        上一环节结束时间：<br>
+                        {{ val.modify_date | dateFtt}}<br>
+                    </div>
+                    <div class="right">
+                        <div>处理记录：</div>
+                        <ul class="log-list">
+                            <li ng-repeat="(key2, val2) in val.historyRecords track by key2">
+                                {{ val2 }}
+                            </li>
+                          </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endverbatim %}
+    <script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugin/angular/i18n/angular-locale_zh-cn.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugin/moment/moment.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugin/moment/locale/zh-cn.js' %}"></script>
+    <script>
+        moment.locale('zh-cn');
+    </script>
+    <script src="{% static 'olap/dispatch/dispatchlog.js' %}?v={{nowversion}}1"></script>
+    <script src="{% static 'js/utils.js' %}?v={{nowversion}}1"></script>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}任务计划设置{% endblock %}
+
+{% block content %}
+
+{% verbatim %}
+<div  ng-app="dispatchapp">
+        <div ui-view></div>
+</div>
+{% endverbatim %}
+<script type="text/javascript" src="{% static 'plugin/moment/moment.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/moment/locale/zh-cn.js' %}"></script>
+<script>
+        moment.locale('zh-cn');
+</script>
+
+<script src="{% static 'olap/dispatch/index.js' %}?v={{ nowversion }}1"></script>
+{% endblock %}

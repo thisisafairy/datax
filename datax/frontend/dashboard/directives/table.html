@@ -1,0 +1,22 @@
+<div>
+    <!--<div class="col-md-12" ng-if="option.pagin == '1'">
+        <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm" boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+    </div>-->
+
+    <table style="table-layout:fixed" class="table table-striped table-bordered ">
+            <thead>
+                <tr ng-repeat="thead in option.theads"  repeat-finish="repeatDone('thead');" repeat-id='thead'>
+                            <th ng-repeat="theadrow in thead.rows" rowspan="{{ theadrow.rowspan }}" colspan="{{ theadrow.colspan }}">{{ theadrow.title }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="datarow in tabledata"  repeat-finish="repeatDone('data');" repeat-id = 'data'>
+                    <td ng-repeat="(columnkey,columnrow) in option.columns track by columnkey"  >{{ datarow[columnrow] }}</td>
+                </tr>
+            </tbody>
+    </table>
+    <div class="table-pagenation" ng-if="option.pagin == '1'">
+        <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-md"
+            boundary-link-numbers="true" rotate="false" ng-change="pageChanged(currentPage)"></ul>
+    </div>
+</div>

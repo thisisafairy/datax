@@ -1,0 +1,30 @@
+<div>
+    <table  style="border-collapse:separate; border-spacing:30px;" align="center">
+            <tr>
+                <td>
+                    <label>微信备注名称:</label>
+                </td>
+                <td>
+                    <input type="text" ng-model="wx.name" style="width: 400px" class="cont-bodyfrom-input" placeholder="appid">
+                </td>
+            </tr>
+
+
+        <tr>
+                <td>
+                    <label>请选择消息模板</label>
+                </td>
+                <td>
+                    <select style="width: 400px;height: 33px"   ng-model="wx.wechattemplate"
+                            ng-options="template.id as template.templatename for template in templateconfs">
+                        <option value="">请选择模板</option>
+
+                    </select>
+                </td>
+            </tr>
+    </table>
+</div>
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" type="button" ng-click="ok('wx')">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>

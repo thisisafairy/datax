@@ -1,0 +1,115 @@
+
+/* 工具栏 start */
+.dashboard-toolbar {
+    display: none;
+    height:35px;
+    width: calc(100% - 20px);
+    position: absolute;
+    top: 5px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(90, 84, 84, 0.41);
+    padding-top: 5px;
+    /* z-index: 100;
+    border-radius: 5px;
+    background-color: rgba(200, 200, 200, 0.7); */
+}
+
+.dashboard-toolbar div {
+    cursor:pointer;
+    margin-left: 40px;
+    display: inline-block;
+    padding-left: 20px;
+    padding-top: 2px;
+    height: 25px;
+    background-size: 16px 16px !important;
+}
+
+.dashboard-toolbar div:first-child {
+    margin-left: 8px;
+}
+
+.toolbar-default {
+    color: #888888;
+}
+
+.toolbar-default .toolbar-add {
+    background: url('/frontend/image/newdash/default/add.png') no-repeat 0;
+}
+
+.toolbar-default .toolbar-edit {
+    background: url('/frontend/image/newdash/default/edit.png') no-repeat 0;
+}
+
+.toolbar-default .toolbar-text {
+    background: url('/frontend/image/newdash/default/text.png') no-repeat 0;
+}
+
+.toolbar-default .toolbar-select {
+    background: url('/frontend/image/newdash/default/select.png') no-repeat 0;
+}
+
+.toolbar-default .toolbar-date {
+    background: url('/frontend/image/newdash/default/date.png') no-repeat 0;
+}
+
+.toolbar-default .toolbar-labelbox {
+    background: url('/frontend/image/newdash/default/labelbox.png') no-repeat 0;
+}
+
+.toolbar-default .toolbar-config {
+    background: url('/frontend/image/newdash/default/config.png') no-repeat 0;
+}
+
+.toolbar-default .toolbar-save {
+    background: url('/frontend/image/newdash/default/save.png') no-repeat 0;
+}
+
+.toolbar-default .toolbar-undo {
+    background: url('/frontend/image/newdash/default/undo.png') no-repeat 0;
+}
+
+.toolbar-black {
+    color: #E0E0E0;
+}
+
+.toolbar-black .toolbar-add {
+    background: url('/frontend/image/newdash/black_default/add.png') no-repeat 0;
+}
+
+.toolbar-black .toolbar-edit {
+    background: url('/frontend/image/newdash/black_default/edit.png') no-repeat 0;
+}
+
+.toolbar-black .toolbar-text {
+    background: url('/frontend/image/newdash/black_default/text.png') no-repeat 0;
+}
+
+.toolbar-black .toolbar-select {
+    background: url('/frontend/image/newdash/black_default/select.png') no-repeat 0;
+}
+
+.toolbar-black .toolbar-date {
+    background: url('/frontend/image/newdash/black_default/date.png') no-repeat 0;
+}
+
+.toolbar-black .toolbar-labelbox {
+    background: url('/frontend/image/newdash/black_default/labelbox.png') no-repeat 0;
+}
+
+.toolbar-black .toolbar-config {
+    background: url('/frontend/image/newdash/black_default/config.png') no-repeat 0;
+}
+
+.toolbar-black .toolbar-save {
+    background: url('/frontend/image/newdash/black_default/save.png') no-repeat 0;
+}
+
+.toolbar-black .toolbar-undo {
+    background: url('/frontend/image/newdash/black_default/undo.png') no-repeat 0;
+}
+
+.dashboard-toolbar div {
+
+}
+
+/* 工具栏 end */

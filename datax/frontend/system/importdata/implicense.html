@@ -1,0 +1,83 @@
+ {% extends 'base.html' %} {% load staticfiles %} {% block title %}导入配置{% endblock %} {% block content %} {% verbatim %}
+<style>
+.searchboxstyle{
+    padding-left: 0px;
+}
+.importbuttonstyle{
+    float: left;
+    padding-left: 20px;
+}
+.importDtCountStyle{
+    display: inline-block;
+    min-width: 240px;
+    position: relative;
+    top: 2px;
+}
+.logshowarea{
+    height: 150px;
+    width:100%;
+    overflow-y:scroll
+}
+.tbodystyle{
+    height: 250px;
+    overflow-y:scroll;
+}
+.upWarning{
+    color:red;
+    padding-left: 20px;
+}
+.myxbtn{
+    height: 27px;
+}
+</style>
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel" style="display: inline-block">
+        license文件导入
+    </h1>
+</section>
+<div class="col-sm-12 user-list" ng-app="licenseLogs">
+    <div class="box" ng-controller="licenseLogsController">
+        <div class="box-body user-list-body" style="padding-bottom: 0px">
+            <div class="importbuttonstyle">
+                <div class="importDtCountStyle">
+                    <span style="display: inline-block">导入文件：</span>
+                    <input type="file" id="importDataFile" ng-model="importDataFile" onchange="angular.element(this).scope().validfile(this)" style="padding-top: 3px;padding-left: 3px;display: inline-block">
+                </div>
+                <button id="importDataBtn" class="btn btn-default" ng-disable="!usableBtn" ng-click="uploadPkFile()">替换</button>
+                <span class="upWarning">{{ msg }}</span>
+            </div>
+        </div>
+        <div class="box-body user-list-body" style="padding-top: 0px">
+            <div class="col-md-12 userlist-table">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th data-field="impFileName" data-align="left">替换文件名</th>
+                            <th data-field="creater" data-align="left">操作者</th>
+                            <th data-field="createDate" data-align="left">替换时间</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tbodystyle">
+                        <tr ng-repeat="impfile in impFileList">
+                            <td>{{ $index+1 }}</td>
+                            <td>{{ impfile.filename }}</td>
+                            <td>{{ impfile.username }}</td>
+                            <td>{{ impfile.createdate }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+             <div class="col-md-12">
+                <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                    boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+{% endverbatim %}
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'system/importdata/implicense.js' %}?v={{ nowversion }}1"></script> {% endblock %}

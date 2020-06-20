@@ -1,0 +1,65 @@
+{% verbatim %}
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title">{{ modeltitle }}</h3>
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body open-body">
+    <form action="#" name="myForm" method="post" id="addForm" class="form-horizontal">
+        <div class="form-group" style="display: none;">
+            <input type="hidden" name="id" id="id" ng-model="odbcolap.id">
+        </div>
+        <div class="form-group clearfix">
+            <label class="col-sm-2 control-label form-lable-add">olap名称</label>
+            <div class="col-sm-4">
+                <input type="text" name="olapname" ng-change="checkconfname()" ng-model="odbcolap.olapname" required id="olapname" class="form-control" placeholder="请填写名称" maxlength="30">
+            </div>
+            <label class="col-sm-2 control-label form-lable-add">描述</label>
+            <div class="col-sm-4">
+                <textarea name="desc" ng-model="odbcolap.desc" class="form-control" style="position: fixed;width: 166px;height: 90px;" rows="3" placeholder="请填写描述"></textarea>
+            </div>
+        </div>
+        <div class="form-group clearfix">
+            <label class="col-sm-2 control-label form-lable-add">类型</label>
+            <div class="col-sm-4">
+                <select name="dtype" class="form-control" id="dtype" ng-model="odbcolap.dtypeid"
+                    ng-options="ty.id as ty.name for ty in dtypes">
+                </select>
+            </div>
+        </div>
+        <!--新增/修改数据权限-->
+        <div class="form-group clearfix">
+            <label class="col-sm-2 control-label form-lable-add">数据标签</label>
+            <div class="col-sm-4">
+                <a class="btn btn-default" ng-click="addTag()" style="height:34px;line-height:20px;">
+                    <i class="fa fa-plus"></i> 新增数据权限
+                </a>
+            </div>
+        </div>
+        <div class="form-group" ng-repeat="(tagkey,tagrow) in odbcolap.tag_config track by tagkey">
+            <label for="desc" class="col-md-1 control-label" style="margin-top: -6px">分类</label>
+            <div class="col-md-3">
+                <select class="form-control" ng-model="tagrow.tagid">
+                    <option value="">选择权限类型</option>
+                    <option value="{{row.id}}" ng-repeat="row in usertag track by $index">{{ row.name }}</option>
+                </select>
+            </div>
+            <label for="desc" class="col-md-1 control-label" style="margin-top: -6px">字段</label>
+            <div class="col-md-5">
+                <select class="form-control" ng-model="tagrow.columns">
+                    <option value="">选择对应字段</option>
+                    <option value="{{cRow.fullname}}" ng-repeat="cRow in columns track by $index">{{ cRow.title }}</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <a class="btn btn-default" ng-click="deleteTag(tagkey)" style="height:34px;line-height:20px;">
+                    <i class="fa fa-trash-o"></i>删除
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" ng-disabled="checking" type="button" ng-click="ok()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>
+{% endverbatim %}

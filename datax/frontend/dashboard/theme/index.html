@@ -1,0 +1,183 @@
+{% extends 'base.html' %} {% load staticfiles %} {% block title %}主题管理{% endblock %} {% block content %}
+<style>
+    .vega svg,
+    .vega canvas {
+        padding: 10px;
+    }
+
+    .table-embed .row {
+        margin-left: 0;
+    }
+
+    .table-embed .table-bordered {
+        border: 1px solid #dddddd;
+    }
+</style>
+<link rel="stylesheet" href="{% static 'css/index.css'  %}">
+<link rel="stylesheet" href="{% static 'css/theme.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/datatables-bootstrap/dataTables.bootstrap.css' %}">
+<link rel="stylesheet" href="{% static 'plugin/daterangepicker/daterangepicker.css'  %}">
+<div ng-app="themeslist" ng-controller="ManageCtrl">
+    <div class="theme-left">
+        <div class="left-header">
+            <div class="col-md-6 left-themedesign">主题设计</div>
+            <div class="col-md-5 themedesign-add">
+                <div ng-click="personSet()" class="btn btn-theme">
+                    <i class="fa fa-plus icon-fa"></i>添加主题</div>
+            </div>
+        </div>
+        <div class="scenario-mobile">
+            <ul class="scenario-mobileul">
+                <li class="scenario-newname">重命名</li>
+                <li class="scenario-delete">删除</li>
+            </ul>
+        </div>
+        <div class="left-center">
+            <div ng-repeat="(rowkey, data)  in allthemes track by rowkey ">
+                <div class="theme-name" ng-click="itemclick($event,data,rowkey)">
+                    <i ng-class="{true: 'fa fa-folder-open-o fa-lg ic-fa', false: 'fa fa-folder-o fa-lg ic-fa'}[$index==0]"> {[{data.name}]}</i>
+                    <div class="scenario-add" ng-click="addSingle($event,data.id)">
+                        <i class="fa fa-plus icon-fa"></i>
+                    </div>
+                </div>
+                <div class="scenario-name" ng-style="{display:$index==0?'':'none'}">
+                    <ul sv-root sv-on-sort="reorder(data.scenesconfig,data,$item, $partFrom, $partTo, $indexFrom, $indexTo)" sv-part="data.scenesconfig">
+                        <li class="scenario-move" ng-repeat="item in data.scenesconfig" sv-element>
+                            <!--<i class="fa fa-files-o ic-fa"></i>{[{item.name}]}, {[{item.sortindex}]}</li>-->
+                            <i class="fa fa-files-o ic-fa"></i>{[{item.name}]}</li>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="theme-right">
+        <div class="right-theme-name">
+            当前主题:{[{CurrentTheme.name}]}
+        </div>
+        <div class="right-theme-operation">
+            <a href="{[{ previewtheme }]}" target="_blank" ng-if="previewtheme!=''">前往预览</a>
+        </div>
+        <div class="right-theme-operation">
+            <i class="fa fa-eye ic-fa"></i>轮播设置
+            <label>
+                <input type="checkbox" ng-change="changeInterval()" ng-model="noWrapSlides"> 禁用循环轮播
+            </label>
+            <label>
+                轮播间隔(秒):
+                <input type="number" ng-change="changeInterval()" ng-model="myInterval" style="width:60px;">
+            </label>
+        </div>
+        <div class="right-center">
+            <div class="right-center-body">
+                    <iframe style="height: 100%;width: 100%;" id="mainframe" name="mainframe" src="" frameborder="0"></iframe>
+                <!-- <div style="height: calc(100% - 60px);">
+                    <div uib-carousel active="active" interval="myInterval" no-wrap="noWrapSlides" id="maincarousel">
+                        <div uib-slide ng-repeat="slide in slides track by slide.index" index="slide.index">
+                            <div class="container-fluid" ng-bind-html="htmlSnippet(slide.htmlcleanconfig)">
+                            </div>
+                            <div class="carousel-caption">
+                                <p>{[{slide.name}]}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+    <script type="text/ng-template" id="myModalSetP.html">
+    <div class="modal-content" style="border:none;">
+    <div class="modal-header open-header">
+        <h3 class="modal-title open-header-title"  ng-show="!group.id">添加主题</h3>
+        <h3 class="modal-title open-header-title"  ng-show="group.id">修改主题</h3>
+        <!--  弹出框的关闭按钮  -->
+        <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    </div>
+    <div class="modal-body open-body">
+        <form class="form-horizontal" id="userform" name="userform">
+          <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label form-lable">主题名称</label>
+            <div class="col-sm-10 form-input">
+                <input type="text"  id="id" name="id" style="display:none;" ng-model="group.id">
+              <input type="text"  class="form-control" id="name" name="name" ng-model="group.name" >
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label form-lable">主题编号</label>
+            <div class="col-sm-10 form-input">
+              <input type="text" class="form-control" id="code" name="code" ng-model="group.code" >
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label form-lable">说明</label>
+            <div class="col-sm-10 form-input">
+                <textarea style="height:50px;" class="form-control" id="remark" name="remark" ng-model="group.remark" ></textarea>
+            </div>
+          </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label form-lable">场景</label>
+            <div class="col-sm-10 form-input">
+                <div style="float:left;width:200px;">
+                    <p class="form-lable-p">所有场景</p>
+                    <select style="width:200px;height:200px;" name="allusers" class="filtered" id="allusers"  multiple="multiple"
+                    ng-model="selusers" ng-options="user.name group by user.kind for user in allusers" ng-dblclick="add()">
+                    </select>
+                </div>
+                <div style="float:left;width:50px;padding-left: 5px;margin-top: 58px;">
+                    <br>
+                    <div><a title=">>" href="#" id="id_user_add_link" ng-click="add()"> 添加<span class="glyphicon glyphicon-arrow-right"></span></a></div><br>
+                    <div><a title="<<" href="#" id="id_user_remove_link" ng-click="remove()"> 移除<span class="glyphicon glyphicon-arrow-left"></span></a></div>
+                </div>
+                <div style="float:left;width:200px;">
+                    <p class="form-lable-p">已选场景</p>
+                    <select style="width:200px;height:200px;" id="selusers" multiple="multiple" size="0" name="selusers"
+                      ng-model="seledusers" ng-options="user.name for user in users" ng-dblclick="remove()">
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!--<div class="form-group" >
+            <div style="float:left">
+            </div>
+        </div>-->
+        </form>
+    </div>
+    <div class="modal-footer footer-btn">
+        <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+        <button class="btn btn-warning btn-cancel" type="button" ng-click="delete()" ng-show="group.id">删除</button>
+        <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">关闭</button>
+    </div>
+    </div>
+ </script>
+
+</div>
+
+<script src="{% static 'plugin/angular/angular-sanitize/angular-sanitize.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-animate/angular-animate.js' %}"></script>
+
+<script src="{% static 'plugin/angular/angular-sortable-view/angular-sortable-view.js' %}"></script>
+
+<script src="{% static 'plugin/datalib/datalib.js' %}"></script>
+
+<script src="{% static 'plugin/echarts/echarts.min.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'plugin/moment/moment.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/moment/locale/zh-cn.js' %}"></script>
+<script>
+    moment.locale('zh-cn');
+</script>
+
+<script src="{% static 'plugin/daterangepicker/daterangepicker.js' %}"></script>
+
+<script src="http://api.map.baidu.com/api?v=2.0&ak=Wuh7Oy6carflwquDvNZ3lGzY"></script>
+<!-- 主组件包 -->
+<!-- 生成地图所需其他包 -->
+<script src="{% static 'js/map/china.js' %}"></script>
+<!-- 百度地图扩展包 -->
+<script src="{% static 'js/map/bmap.min.js' %}"></script>
+<!-- 各省市的地理坐标 -->
+<script src="{% static 'js/map/coordinate.js' %}"></script>
+<script src="{% static 'js/relation.js' %}"></script>
+<script src="{% static 'js/echart.tool.js' %}"></script>
+<script src="{% static 'js/table.js' %}"></script>
+<script src="{% static 'dashboard/theme/index.js' %}?v={{ nowversion }}1"></script> {% endblock %}

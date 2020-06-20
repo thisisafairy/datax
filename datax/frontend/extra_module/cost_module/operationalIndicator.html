@@ -1,0 +1,257 @@
+ {% extends 'base_portal.html' %} {% load staticfiles %} {% block title %}营运指标管理{% endblock %}
+{% block content %}
+<link href="{% static 'css/Ext/css/ext-all.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'css/Ext/ax-all.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'css/ext/ux/css/LockingGridView.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'js/ext/ux/fileuploadfield/css/fileuploadfield.css'  %}" rel="stylesheet" type="text/css" />
+<style>
+</style>
+{% verbatim %}
+    <div id="form">
+    </div>
+    <div id="cumgrid"></div>
+{% endverbatim %}
+    <script src="{% static 'js/ext/adapter/jquery/ext-jquery-adapter.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ext-all.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ax-all.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/pgfunc-ext.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/locale/ext-lang-zh_CN.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ux/LockingGridView.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ux/fileuploadfield/fileuploadfield.js'%}" type="text/javascript"></script>
+
+    <script>
+        Ext.BLANK_IMAGE_URL = "{% static 'js/ext/s.gif' %}";
+        Ext.Ajax.defaultHeaders = {'X-CSRFToken' : getCookie('csrftoken')};
+        //后台数据URL
+        var listdataurl = '/cost/operationalIndicatorList' ; //后台返回列表数据 {total:1:rows:[{name:'name1',code:'code1'}]}
+
+
+        Ext.onReady(function(){
+
+            //定义所展示的列
+            var cols = [
+                 new Ext.grid.RowNumberer(),
+                new Ext.grid.CheckboxSelectionModel({singleSelect:true}),
+                { header: "产品尺寸",width:90,dataIndex: "productsize",editor:{xtype:'textfield'}},
+                { header: "版型",width:60,dataIndex: "tabletsize",editor:{xtype:'numberfield'}},
+                {header: "硅片成本",width:90,dataIndex: "guicost", editor:{ xtype: 'numberfield',allowBlank:true}},
+                {header: "电池转换率%",width:100,dataIndex: "convertrate", editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer },
+                {header: "电池面积系数",width:100,dataIndex: "batteryarea", editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer  },
+                {header: "电池单片W数",width:100,dataIndex: "singlew", editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer  },
+                {header: "硅片来料不良率%",width:110,dataIndex: "inbad", editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer },
+                {header: "电池入库良率%",width:100,dataIndex: "instockgood", editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer },
+                {header: "组件平均投档效率%",width:120,dataIndex: "avgrate", editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer  },
+                {header: "CTM%",width:80,dataIndex: "ctm", editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer  },
+                {header: "组件标称功率差%",width:120,dataIndex: "wrate", editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer  },
+                {header: "组件碎片率%",width:100,dataIndex: "piesrate",editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer  },
+                {header: "组件入库良率%",width:100,dataIndex: "zinstockgood",editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer  },
+                {header: "组件目标功率",width:100,dataIndex: "aimw",editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer  },
+
+           ];
+
+            function colRenderer(val) {return Ext.util.Format.number(val,'0.0000');}
+            //查询所需的store
+            var store =new Ext.data.Store({
+                autoLoad : true,  
+                idProperty: 'id',
+                url: listdataurl,  
+                reader : new Ext.data.JsonReader({totalProperty: 'total',root: 'rows'}, 
+                    [{ name : 'id'},{name : 'productsize'}, {name : 'tabletsize'}, {name:'guicost'}, {name : 'convertrate'}, {name:'singlew'},{name:'inbad'},{name:'instockgood'}, {name : 'avgrate'},
+                      {name:'ctm'}, {name : 'wrate'}, {name:'piesrate'}, {name : 'zinstockgood'}, {name:'aimw'},{name:'batteryarea'}]),  
+                sortInfo: {field: 'id', direction: 'ASC'},
+                  listeners:{
+                         beforeload:function(){
+                               Ext.getBody().mask('页面加载刷新中,请稍后......');
+                          },load:function(){
+                             Ext.getCmp("rate").setValue(store.reader.jsonData.rate);
+                             Ext.getBody().unmask();
+                         }
+                   }
+            });  
+
+           var toolbar = new Ext.Toolbar(['-', {
+                    text: '添加',
+                    handler: function(){
+                        var Record = grid.getStore().recordType;
+                        var date = new Date()
+                        var p = new Record({"productsize":"","tabletsize":"0","guicost":0,"convertrate":0,"singlew":0,"inbad":0,"instockgood":0,"avgrate":0,
+                                            "ctm":0,"wrate":0,"piesrate":0,"zinstockgood":0,"aimw":0,"batteryarea":0
+                                            });
+                        grid.stopEditing();
+                        var insRowIdx = store.data.length;
+                        store.insert(insRowIdx, p);
+                        grid.startEditing(insRowIdx, 2);
+                    }
+                }, '-', {
+                    text: '删除',
+                    handler: function(){
+                        Ext.Msg.confirm('信息', '确定要删除？', function(btn){
+                            if (btn == 'yes') {
+                               var recs = grid.getSelectionModel().getSelections();
+                                var ids='';
+                                for (var i = 0; i < recs.length; i++) {
+                                        if (recs[i] && (recs[i].get("id") == null || recs[i].get("id") == "")) {
+                                            grid.getStore().remove(recs[i]);
+                                            grid.getStore().commitChanges();
+                                        }
+                                        else if(recs[i])
+                                        {
+                                            ids+="'" + recs[i].get("id")+"',";
+                                        }
+                                    }
+                                $.ajax({
+                                    url: '/cost/delOperationalIndicator',
+                                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                                    type: 'post',
+                                    data: { 'datas':ids }
+                                }).then(function (rs) {
+                                    if (rs.code == '1') {
+                                        Ext.getBody().unmask();
+                                        Reload(true);
+                                    }
+                                    else {
+                                        alert(rs.msg);
+                                        Ext.getBody().unmask();
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }, '-',{
+                    text: '保存',
+                    handler: function(){
+                        recs = store.getModifiedRecords();
+                        var dt=[];
+                        $.each(recs, function() {
+                            dt.push(this.data);
+                        });
+                        if(dt.length===0){
+                            return;
+                        }
+                        Ext.getBody().mask("保存中...");
+                        $.ajax({
+                            url: '/cost/saveOperationalIndicator',
+                            headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                            type: 'post',
+                            data: { 'datas': JSON.stringify(dt)}
+                        }).then(function (rs) {
+                            if (rs.code == '1') {
+                                Ext.getBody().unmask();
+                            }
+                            else {
+                                alert(rs.data);
+                                Ext.getBody().unmask();
+                            }
+                            store.commitChanges();
+                            Reload()
+                        });
+
+                    }
+                },'-',{
+                    text: 'excel导出',
+                    handler: function(){
+                        ExtGridExportExcel(grid, { store: null, title: '营运指标' });
+
+                    }
+                }, '->',
+                {
+                    text: '当前税率%:',
+                    xtype:'tbtext',
+
+                },
+               {
+                   xtype:'textfield',
+                   width:50,
+                   id:'rate',
+                   //value:store,
+
+               },
+
+               {
+                   text: '保存',
+                   handler: function(){
+                       Ext.getBody().mask("保存中...");
+                       $.ajax({
+                           url: '/cost/saveTaxrate',
+                           headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                           type: 'post',
+                           data: { 'taxrate': Ext.getCmp("rate").getValue()}
+                       }).then(function (rs) {
+                           if (rs.code == '1') {
+                               Ext.getBody().unmask();
+                               Reload()
+                           }
+                           else {
+                               alert(rs.data);
+                               Ext.getBody().unmask();
+                           }
+                           store.commitChanges();
+                           Reload()
+                       });
+                   }
+               },
+
+           ]);
+
+
+
+
+
+            var schBar = new Ext.ux.AimSchPanel({
+                store: store,
+                padding: '3 0 0 0',
+                collapsed:false,
+                columns:2,
+                items: []
+            });
+           var titPanel = new Ext.ux.AimPanel({
+                    tbar: toolbar,
+                    items: [schBar]
+                });
+           var grid = new Ext.ux.grid.AimEditorGridPanel({
+               title:'营运指标',
+                lockable: true,
+                clicksToEdit: 1,
+                height:document.body.clientHeight-40,
+                renderTo: 'cumgrid',
+                enableColumnHide: false,
+                store: store,
+                columns: cols,
+                tbar: titPanel,
+                width:document.body.clientWidth-$("#silderApp").width()-190,
+                columnLines: true,
+
+            });
+           //需要锁定到最左边的列
+           grid.getColumnModel().setLocked(0,true);
+           grid.getColumnModel().setLocked(1,true);
+           grid.getColumnModel().setLocked(2,true);
+           grid.getColumnModel().setLocked(3,true);
+           //构建需要填报的周信息
+           //ReBuildCols();
+           //加载数据
+           Reload();
+           function Reload(flag) {
+               if (flag!==true&&store.getModifiedRecords().length > 0)
+               {
+                   Ext.Msg.confirm('信息', '存在未保存的记录，确定要重新加载新数据？', function(btn){
+                        if (btn == 'yes') {
+                            Reload(true);
+                        }
+                    });
+               }
+               else
+               {
+                   //传递到后台的参数
+                    store.load({
+                        params:{
+                        }
+                    });
+               }
+           }
+        });
+
+
+    </script>
+
+{% endblock %}

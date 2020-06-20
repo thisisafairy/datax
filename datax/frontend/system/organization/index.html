@@ -1,0 +1,391 @@
+ {% extends 'base_177.html' %} {% load staticfiles %} {% block title %}组织机构管理{% endblock %} {% block content %}
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-material/angular-material.min.css' %}" />
+{% verbatim %}
+<link rel="stylesheet" href="/frontend/system/organization/organize.css">
+<link rel="stylesheet" href="/frontend/system/organization/dependentfiles/jquery.treegrid.css">
+<link rel="stylesheet" href="/frontend/css/jquery.mloading.css"><!--遮罩层-->
+
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel">
+        组织机构管理
+    </h1>
+</section>
+<div class="col-sm-12 user-list" ng-app="orglist" id="orglist">
+    <div class="box" ng-controller="orgListController">
+        <div class="box-body user-list-body">
+            <div class="col-md-5 col-panel panelBorder">
+                <popup ng-if="popup.open" duration="10000" close="popup.open=false" close-action="esc outerchick click">
+                    <div class="myRightClick">
+                        <ul class="ui-contextmenu" ng-click="$close()">
+                            <li><a href="#" ng-click="addChildOrg(popup.itemId,popup.tp,'add')">新增下级部门</a></li>
+                            <li class="paddingTopPx"><a href="#" ng-click="addGroup(popup.itemId,popup.tp,popup.name)">新增组织角色</a></li>
+                            <li class="paddingTopPx"><a href="#" ng-click="addChildOrg(popup.itemId,popup.tp,'edit')">修改</a></li>
+                            <li class="paddingTopPx"><a href="#" ng-click="delOrg(popup.itemId,popup.name,popup.tp,popup.parentid)">删除</a></li>
+                        </ul>
+                    </div>
+                </popup>
+                <div class="toolbar">
+                    <div class="btnOftoolbarL"><button ng-click="expandOrgTree()" class="btn btn-primary">{{ expandBtnText }}</button></div>
+                    <div class="iconDesc">
+                        <span class="orgExpander iconDescAddition"></span>
+                        <span class="singleText">机构</span>
+                        <span class="groupExpander iconDescAddition"></span>
+                        <span class="singleText">角色</span>
+                    </div>
+                </div>
+                <div class="col-md-12 org" id="orgTree">
+                    <table class="tree tableBlock" id="myanothertree">
+                    </table>
+                </div>
+            </div>
+            <div class="tab col-md-7 col-panel" role="tabpanel">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#usersRelat" aria-controls="usersRelat" role="tab" data-toggle="tab">用户相关</a></li>
+                    <li role="presentation"><a href="#menuRelat" aria-controls="menuRelat" role="tab" data-toggle="tab">菜单相关</a></li>
+                </ul>
+                <div class="tab-content tabs">
+                    <div role="tabpanel" class="tab-pane fade in active" id="usersRelat">
+                        <div class="panelDiv">
+                            <div class="toolbar">
+                                <div class="btnOftoolbarL"><button class="btn btn-primary" ng-click="addUserToOrg()">添加/移除人员</button></div>
+                            </div>
+                            <div class="allPeople">
+                                <div class="col-md-12 userlist-table">
+                                    <table class="table table-bordered table-hover" style="margin-bottom: 5px">
+                                        <thead>
+                                            <tr>
+                                                <th data-field="username" data-align="left">姓名</th>
+                                                <th data-field="nickname" data-align="left">昵称</th>
+                                                <th data-field="email" data-align="left">邮箱</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="(key,value) in userList">
+                                                <td>{{ value.username }}</td>
+                                                <td>{{ value.nickname }}</td>
+                                                <td>{{ value.email }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-md-12">
+                                    <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                                        boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane fade" id="menuRelat">
+                        <div class="panelDiv">
+                            <div class="toolbar">
+                                <div class="btnOftoolbarL"><button class="btn btn-primary" ng-click="addMenuToOrg()">添加/移除菜单</button></div>
+                            </div>
+                            <div class="allPeople">
+                                <div class="col-md-12 userlist-table">
+                                    <table class="table table-bordered table-hover" style="margin-bottom: 5px">
+                                        <thead>
+                                            <tr>
+                                                <th data-field="menuname" data-align="left">菜单名</th>
+                                                <th data-field="menuurl" data-align="left">链接(Url)</th>
+                                                <th data-field="menucode" data-align="left">菜单代码(Key)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="(key,value) in menuList">
+                                                <td>{{ value.menuname }}</td>
+                                                <td>{{ value.menuurl }}</td>
+                                                <td>{{ value.menucode }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-md-12">
+                                    <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalMenuItems" ng-model="currentMenuPage" max-size="5" class="pagination-sm"
+                                        boundary-link-numbers="true" rotate="false" ng-change="menuPageChanged()"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--<div id="usersRelat" class="col-md-7 col-panel" style="padding-right: 0px;">
+                <div class="panelBorder">
+                    <div class="toolbar">
+                        <div class="btnOftoolbarL"><button class="btn btn-primary" ng-click="addUserToOrg()">添加/移除人员</button></div>
+                    </div>
+                    <div class="allPeople">
+                        <div class="col-md-12 userlist-table">
+                            <table class="table table-bordered table-hover" style="margin-bottom: 5px">
+                                <thead>
+                                    <tr>
+                                        <th data-field="username" data-align="left">姓名</th>
+                                        <th data-field="nickname" data-align="left">昵称</th>
+                                        <th data-field="email" data-align="left">邮箱</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="(key,value) in userList">
+                                        <td>{{ value.username }}</td>
+                                        <td>{{ value.nickname }}</td>
+                                        <td>{{ value.email }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-12">
+                            <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                                boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+            <!--<div id="menuRelat" class="col-md-7 col-panel" style="padding-right: 0px;">
+                <div class="panelBorder">
+                    <div class="toolbar">
+                        <div class="btnOftoolbarL"><button class="btn btn-primary" ng-click="addUserToOrg()">添加/移除人员</button></div>
+                    </div>
+                    <div class="allPeople">
+                        <div class="col-md-12 userlist-table">
+                            <table class="table table-bordered table-hover" style="margin-bottom: 5px">
+                                <thead>
+                                    <tr>
+                                        <th data-field="username" data-align="left">姓名</th>
+                                        <th data-field="nickname" data-align="left">昵称</th>
+                                        <th data-field="email" data-align="left">邮箱</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="(key,value) in userList">
+                                        <td>{{ value.username }}</td>
+                                        <td>{{ value.nickname }}</td>
+                                        <td>{{ value.email }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-12">
+                            <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                                boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+
+        <script type="text/ng-template" id="addOrg.html">
+            <div class="modal-header open-header">
+                <h3 class="modal-title open-header-title">{{ title }}</h3>
+                <!--  弹出框的关闭按钮  -->
+                <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body open-body">
+                <form role="form" class="form-horizontal" name="myForm" >
+                    <div class="form-group" style="display: none;">
+                        <label></label>
+                        <input type="text" name="id" ng-model='org.id'>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label form-lable-modal">名称：</label>
+                        <div class="col-sm-4 form-input-add">
+                            <input type="text" name="org_name" required ng-model='org.org_name' class="form-control" maxlength="100">
+                        </div>
+                        <!--<label class="col-sm-2 control-label form-lable-modal">父级：</label>
+                        <div class="col-sm-4 form-input-add">
+                            <select name="parentid" class="form-control" id="parentid" required ng-model="org.parentid"
+                                ng-options="p.id as p.org_name for p in allOrg">
+                            </select>
+                        </div>-->
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label form-lable-modal">缩写：</label>
+                        <div class="col-sm-4 form-input-add">
+                            <input type="text" name="org_abbreviation_name" required ng-model='org.org_abbreviation_name' class="form-control" maxlength="50">
+                        </div>
+                        <label class="col-sm-2 control-label form-lable-modal">核定人数：</label>
+                        <div class="col-sm-4 form-input-add">
+                            <input type="number" name="num_of_people" ng-model='org.num_of_people' class="form-control" maxlength="30" min="0">
+                        </div>
+                    </div>
+
+                    <!--<div class="form-group">
+                        <label class="col-sm-2 control-label form-lable-modal">排序：</label>
+                        <div class="col-sm-10 form-input-add">
+                            <input type="text" name="orderby" required ng-model='type.orderby' class="form-control" maxlength="30">
+                        </div>
+                    </div>-->
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label form-lable-modal">编号：</label>
+                        <div class="col-sm-4 form-input-add">
+                            <input type="text" name="code" ng-model='org.code' class="form-control" maxlength="50">
+                        </div>
+                        <label class="col-sm-2 control-label form-lable-modal">状态：</label>
+                        <div class="col-sm-4 form-input-add">
+                            启用：
+                            <input type="radio" name="status" required value="1" ng-model="org.status"> 不启用：
+                            <input type="radio" name="status" required value="0" ng-model="org.status">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer footer-btn">
+                <button class="btn btn-primary btn-ok" ng-disabled="!myForm.$valid" type="button" ng-click="ok()">保存</button>
+                <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+            </div>
+        </script>
+
+        <script type="text/ng-template" id="addGroup.html">
+            <div class="modal-header open-header">
+                <h3 class="modal-title open-header-title">添加角色/组</h3>
+                <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body open-body">
+                <form class="form-horizontal" id="userform" name="userform">
+                  <div class="form-group">
+                    <label for="firstname" class="col-sm-2 control-label form-lable-add">机构名</label>
+                    <div class="col-sm-10 form-input-add">
+                        <input type="text" id="orgId" name="orgId" style="display:none;" ng-model="orgObj.orgId">
+                      <input type="text" disabled class="form-control" id="orgName" name="orgName" ng-model="orgObj.orgName">
+                    </div>
+                  </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label form-lable-add">模块</label>
+                    <div class="col-sm-10 form-input-add">
+                        <div style="float:left;width:200px;">
+                            <p class="form-lable-p">所有模块</p>
+                            <select style="width:200px;height:200px;" name="allgroups" id="allgroups"  multiple="multiple"
+                            ng-model="selgroups" ng-options="group as group.groupname for group in allOptionGroups">
+                            </select>
+                        </div>
+                        <div style="float:left;width:50px;padding-left: 5px;margin-top: 58px;">
+                            <br>
+                            <div><a title=">>" href="#" id="id_group_add_link" ng-click="add()"> 添加<span class="glyphicon glyphicon-arrow-right"></span></a></div><br>
+                            <div><a title="<<" href="#" id="id_group_remove_link" ng-click="remove()"> 移除<span class="glyphicon glyphicon-arrow-left"></span></a></div>
+                        </div>
+                        <div style="float:left;width:200px;">
+                            <p class="form-lable-p">已授权模块</p>
+                            <select style="width:200px;height:200px;" id="selgroups" multiple="multiple" size="0" name="selgroups"
+                              ng-model="seledgroups" ng-options="group as group.groupname for group in allSelectedGroups">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+            <div class="modal-footer footer-btn">
+                <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+                <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+            </div>
+        </script>
+
+        <script type="text/ng-template" id="addUserToOrg.html">
+            <div class="modal-header open-header">
+                <h3 class="modal-title open-header-title">添加用户</h3>
+                <!--  弹出框的关闭按钮  -->
+                <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body open-body">
+                <form class="form-horizontal" id="userform" name="userform">
+                  <div class="form-group">
+                    <label for="firstname" class="col-sm-2 control-label form-lable-add">机构名称</label>
+                    <div class="col-sm-10 form-input-add">
+                        <input type="text"  id="id" name="id" style="display:none;" ng-model="orgObj.orgId">
+                      <input type="text" disabled class="form-control" id="orgName" name="orgName" ng-model="orgObj.orgName" >
+                    </div>
+                  </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label form-lable-add">用户</label>
+                    <div class="col-sm-10 form-input-add">
+                        <div style="float:left;width:200px;">
+                            <p class="form-lable-p">所有用户</p>
+                            <select style="width:200px;height:200px;" name="allOptionUsers" id="allOptionUsers"  multiple="multiple"
+                            ng-model="selusers" ng-options="user as user.username for user in allOptionUsers">
+                            </select>
+                        </div>
+                        <div style="float:left;width:50px;padding-left: 5px;margin-top: 58px;">
+                            <br>
+                            <div><a title=">>" href="#" id="id_user_add_link" ng-click="add()"> 添加<span class="glyphicon glyphicon-arrow-right"></span></a></div><br>
+                            <div><a title="<<" href="#" id="id_user_remove_link" ng-click="remove()"> 移除<span class="glyphicon glyphicon-arrow-left"></span></a></div>
+                        </div>
+                        <div style="float:left;width:200px;">
+                            <p class="form-lable-p">已授权模块</p>
+                            <select style="width:200px;height:200px;" id="selusers" multiple="multiple" size="0" name="selusers"
+                              ng-model="seledusers" ng-options="user as user.username for user in allSelectedUsers">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+            <div class="modal-footer footer-btn">
+                <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+                <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+            </div>
+        </script>
+
+        <script type="text/ng-template" id="addMenuToOrg.html">
+            <div class="modal-header open-header">
+                <h3 class="modal-title open-header-title">添加菜单</h3>
+                <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body open-body">
+                <form class="form-horizontal" id="userform" name="userform">
+                  <div class="form-group">
+                    <label for="firstname" class="col-sm-2 control-label form-lable-add">机构名称</label>
+                    <div class="col-sm-10 form-input-add">
+                        <input type="text"  id="id" name="id" style="display:none;" ng-model="orgObj.orgId">
+                      <input type="text" disabled class="form-control" id="orgName" name="orgName" ng-model="orgObj.orgName" >
+                    </div>
+                  </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label form-lable-add">菜单</label>
+                    <div class="col-sm-10 form-input-add">
+                        <div style="float:left;width:200px;">
+                            <p class="form-lable-p">所有菜单</p>
+                            <select style="width:200px;height:200px;" name="allOptionMenus" id="allOptionMenus"  multiple="multiple"
+                            ng-model="selmenus" ng-options="menu as menu.menuname group by menu.parentname for menu in allOptionMenus">
+                            </select>
+                        </div>
+                        <div style="float:left;width:50px;padding-left: 5px;margin-top: 58px;">
+                            <br>
+                            <div><a title=">>" href="#" id="id_menu_add_link" ng-click="add()"> 添加<span class="glyphicon glyphicon-arrow-right"></span></a></div><br>
+                            <div><a title="<<" href="#" id="id_menu_remove_link" ng-click="remove()"> 移除<span class="glyphicon glyphicon-arrow-left"></span></a></div>
+                        </div>
+                        <div style="float:left;width:200px;">
+                            <p class="form-lable-p">已授权模块</p>
+                            <select style="width:200px;height:200px;" id="selmenus" multiple="multiple" size="0" name="selmenus"
+                              ng-model="seledmenus" ng-options="menu as menu.menuname group by menu.parentname for menu in allSelectedMenus">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                </form>
+            </div>
+            <div class="modal-footer footer-btn">
+                <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+                <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+            </div>
+        </script>
+
+
+    </div>
+</div>
+{% endverbatim %}
+<script src="{% static 'plugin/angular/angular-aria/angular-aria.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-animate/angular-animate.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-messages/angular-messages.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-material/angular-material.min.js' %}"></script>
+
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'system/organization/dependentfiles/angular-popups.js' %}"></script>
+<script src="{% static 'system/organization/dependentfiles/jquery.cookie.js' %}"></script>
+<script src="{% static 'system/organization/dependentfiles/jquery.treegrid.js' %}"></script>
+<script src="{% static 'plugin/jquery/jquery.mloading.js' %}"></script><!--遮罩层-->
+
+<script src="{% static 'system/organization/index.js' %}?v={{ nowversion }}1"></script>
+    <script type="text/javascript">
+
+    </script>
+{% endblock %}

@@ -1,0 +1,307 @@
+{% extends ""|add:basepage %}
+{% load staticfiles %}
+{% block title %}组件设计{% endblock %}
+
+
+{% block content %}
+    <script>
+        showLoading();
+    </script>
+    {% if messages %}
+        <script>
+            {% for msg in messages %}
+                alert('{{ msg.message }}');
+            {% endfor %}
+        </script>
+    {% endif %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <!-- endinject -->
+    <!-- endbuild -->
+
+    <!-- build:css(src) styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="{% static 'plugin/angular/angular-rangeslider/angular.rangeSlider.css' %}"/>
+    <link rel="stylesheet" href="{% static 'plugin/colorpicker/bootstrap-colorpicker.min.css' %}">
+    <style>
+        .sss {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #e3e6eb;
+            z-index: 9;
+        }
+
+        input, select, textarea {
+            line-height: normal;
+        }
+
+        .field-drop input, select, textarea {
+            padding-left: 4px;
+        }
+
+        h2 {
+            margin: 0px !important;
+        }
+    </style>
+    {% verbatim %}
+    <div ng-app="polestar">
+        <div ng-controller="MainCtrl" class="flex-root vflex full-width full-height">
+            <div class="hflex full-width sss">
+
+            </div>
+            <div class="hflex full-width main-panel grow-1" ng-style="style()" resize>
+                <div class="pane data-pane noselect">
+                    <div class="card no-top-margin data-card abs-100">
+                        <div class="sidebar-header" ng-if="!embedded">
+                            <h2>组件设计 <a ng-show="ismodal!='t'" ng-click="backlist()"
+                                        style="padding-left:3px;cursor:pointer;color:#000" class="right"><i
+                                    class="fa fa-chevron-left"></i>查看组件列表</a>
+                                <button ng-show="ismodal!='t'" type="button" class="btn btn-default btn-xs"
+                                        ng-click="getconfig()">
+                                    <span class="glyphicon glyphicon-floppy-disk"></span>保存
+                                </button>
+                                <dataset-selector class="right"></dataset-selector>
+                            </h2>
+                            <input type="text" style="display:none;" id="ecconfigjson" ng-model="ecconfigjson">
+                            <input type="button" style="display:none;" id="refreshbutton" ng-click="refreshconfig()">
+                            <div class="current-dataset  tool-target" title="{{Dataset.currentDataset.name}}">
+                                <i class="fa fa-database" title="加载数据"></i>
+                                <span class="dataset-search" ><i class="fa fa-search" title="搜索"></i></span>
+                                <span class="dataset-name">{{Dataset.nowName}}</span>
+                                <!-- <div class="dataset-tooltip" ng-click="loadData();">
+
+                                  </div> -->
+                            </div>
+                            <div class="dataset-search-container">
+                                <div class="form-group clearfix" >
+                                <div class="col-sm-10">
+                                    <input type="text" class="full-width" placeholder="快速查找字段名" ng-keyup="SearchChange($event)">
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                        <div ng-if="Dataset.noData" ng-bind="'加载完成，未发现数据'"></div>
+                        <button class="btn btn-default full-width" ng-click="loadData();"
+                                ng-if="Dataset.data.length == 0">
+          <span ng-if="!Dataset.loading">
+            加载数据
+          </span>
+                            <img style="width: 16px;height: 16px;" ng-if="Dataset.loading"
+                                 src="/frontend/plugin/SVG-Loaders/svg-loaders/oval1.svg">
+                        </button>
+                        <schema-list ng-if="Dataset.data.length > 0" field-defs="Dataset.schema.fieldSchemas"
+                                     order-by="Dataset.fieldOrder"
+                                     show-count="true"
+                                     filter-manager="FilterManager"
+                                     show-add="true"
+                        >
+                        </schema-list>
+                    </div>
+                </div>
+                <div class="pane encoding-pane">
+                    <shelves spec="Spec.spec"
+                             support-auto-mark="true"
+                             filter-manager="FilterManager"
+                             chron="chron"
+                             ecconfig="ecconfig"
+                    ></shelves>
+                </div>
+
+                <div class="pane vis-pane">
+                    <div ng-if="isechart(Spec.spec.mark)" class="card abs-100 no-top-margin no-right-margin">
+                        <e-chart style="width: 100%;position: absolute;top: 0;left: 0;right: 0;bottom: 0;"
+                                 config="ecconfig" data="data">
+                        </e-chart>
+                    </div>
+                    <div class="abs-100 empty-vis card no-top-margin" style="background:#ffffff;"
+                         ng-show="Spec.isEmptyPlot && mixedconfig.field.y.length==0">
+                        还没有配置可视化。通过将字段拖动到左侧的属性窗格开始配置
+                    </div>
+                </div>
+            </div>
+
+            <dataset-modal></dataset-modal>
+        </div>
+
+        <script type="text/ng-template" id="myModalContent.html">
+            <div class="modal-header open-header">
+                <h3 class="modal-title open-header-title">组件保存</h3>
+                <!--弹出框的关闭按钮-->
+                <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal"
+                        aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="dataform" name="dataform">
+                    <div class="form-group">
+                        <label for="name" class="col-sm-2 control-label">组件名<font color="red"> * </font></label>
+                        <div class="col-sm-10 form-input-add">
+                            <input type="text" id="id" name="id" style="display:none;" ng-model="group.id">
+                            <input type="text" style="display:none;" id="imgpath" name="imgpath"
+                                   ng-model="group.imgpath"/>
+                            <input type="text" required class="form-control" style="width: 200px;" id="name" name="name"
+                                   ng-model="group.name" placeholder="请填写组件名称">
+                        </div>
+                    </div>
+                    <input type="text" style="display:none;" class="form-control" name="charttype"
+                           ng-model="group.charttype">
+                    <input type="text" style="display:none;" name="echartconfig" ng-model="group.echartconfig"/>
+                    <div class="form-group">
+                        <label for="createname" class="col-sm-2 control-label">类别<font color="red"> * </font></label>
+                        <div class="col-sm-4 form-input-add">
+                            <select required ng-model="group.kind" id="kind" name="kind"
+                                    ng-options="item.code as item.name for item in kinds"
+                                    class="form-control">
+                                <!-- <option ng-repeat="item in kinds" value="{{item.code}}">{{item.name}}</option> -->
+                            </select>
+                        </div>
+                        <label for="createtime" class="col-sm-3 control-label">数据刷新周期<font color="red">
+                            * </font></label>
+                        <div class="col-sm-2" style="width: 70px">
+                            <input type="text" required class="form-control" id="refreshspeed" name="refreshspeed"
+                                   ng-init="group.refreshspeed=60" ng-model="group.refreshspeed" placeholder="整数">
+                        </div>
+                        <label class="col-sm-1 control-label" style="text-align: left;">秒</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name" class="col-sm-2 control-label">关键字</label>
+                        <div class="col-sm-10 form-input-add">
+                            <input type="text" class="form-control" style="width: 200px;" id="keywords" name="keywords"
+                                   ng-model="group.keywords" placeholder="请填写组件查询关键字">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="name" class="col-sm-2 control-label">组件描述</label>
+                        <div class="col-sm-10 form-input-add">
+                        <textarea ng-model="group.remark" id="remark" name="remark" style="width:100%;height:80px;"
+                                  placeholder="请填写组件描述信息">
+                        </textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="createname" class="col-sm-2 control-label">创建人</label>
+                        <div class="col-sm-3 form-input-add">
+                            <input type="text" class="form-control" id="createname" name="createname"
+                                   ng-model="group.createname" disabled>
+                        </div>
+                        <label for="createtime" class="col-sm-2 control-label">创建时间</label>
+                        <div class="col-sm-4 form-input-add">
+                            <input type="text" class="form-control" style="width: 200px" id="createtime"
+                                   name="createtime" ng-model="group.createtime" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="jsonconfig" class="col-sm-2 control-label"
+                               ng-click="showjson=!showjson">显示高级JSON配置</label>
+                        <div class="col-sm-10 form-input-add" ng-show="showjson">
+                       <textarea ng-model="group.jsonconfig" id="jsonconfig" name="jsonconfig"
+                                 style="width:100%;height:200px;">
+                        </textarea>
+                            <textarea ng-model="group.filterstring" id="filterstring" name="filterstring"
+                                      style="display:none;">
+                        </textarea>
+                            <textarea ng-model="group.datasetstring" id="datasetstring" name="datasetstring"
+                                      style="display:none;">
+                        </textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer footer-btn">
+                <button class="btn btn-primary btn-ok" type="button" ng-click="ok()"
+                        ng-disabled="dataform.$invalid||errorflag||checking">保存
+                </button>
+                <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+            </div>
+            {% endverbatim %}
+        </script>
+    </div>
+    <script>
+        /* jshint unused: true */
+        var initialSpec = '{{ jsonconfig | safe }}' || '';
+        var initEchartConfig ={{ echartconfig | safe }} ||undefined;
+        if(window.location.href.indexOf("ismodal=t")>0)
+        {
+            if(window.parent.window.$('div[ng-controller="dashboardController"]').scope().currentChartObj&&window.parent.window.$('div[ng-controller="dashboardController"]').scope().currentChartObj.data)
+                initEchartConfig = JSON.parse(window.parent.window.$('div[ng-controller="dashboardController"]').scope().currentChartObj.data.echartconfig);
+        }
+        var initialDataset =
+        {{ dataconfig | safe }} ||
+        undefined;
+        var initialFilter =
+        {{ filterconfig | safe }} ||
+        undefined;
+        var CurrentName = '{{ name | safe }}' || '';
+        var CurrentKind = '{{ kind | safe }}' || '';
+        var remark = '{{ remark | safe }}' || '';
+        var keywords = '{{ keywords | safe }}' || '';
+        var refreshspeed = '{{ refreshspeed | safe }}' || '';
+        var createtime = '{{ createtime | safe }}' || '';
+        var createname = '{{ createname | safe }}' || '';
+        var DataSources =
+        {{ dataolap | safe }} ||
+        [];
+        var charttype = '{{ charttype | safe }}' || 'echarts';
+    </script>
+    <script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-order-object-by/ng-order-object-by.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-google-analytics/angular-google-analytics.min.js' %}"></script>
+    <script src="{% static 'js/v2/promise.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-local-storage/angular-local-storage.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-rangeslider/angular.rangeSlider.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-sanitize/angular-sanitize.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-sortable-view/angular-sortable-view.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-touch/angular-touch.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-websql/angular-websql.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/zeroclipboard/ZeroClipboard.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-zeroclipboard/angular-zeroclipboard.min.js' %}"></script>
+    <script src="{% static 'plugin/compassql/compassql.min.js' %}"></script>
+    <script src="{% static 'plugin/tether/js/tether.js' %}"></script>
+    <script src="{% static 'plugin/drop/js/drop.js' %}"></script>
+    <script src="{% static 'plugin/datalib/datalib.js' %}"></script>
+    <script src="{% static 'plugin/angular/vlui/vlui.js' %}"></script>
+    <script src="{% static 'plugin/echarts/echarts.js' %}"></script>
+    <script src="{% static 'plugin/echarts/echarts-wordcloud.min.js' %}"></script>
+    <script src="http://api.map.baidu.com/api?v=2.0&ak=Wuh7Oy6carflwquDvNZ3lGzY"></script>
+    <!-- 主组件包 -->
+    <!-- 生成地图所需其他包 -->
+    <script src="{% static 'js/map/china.js' %}"></script>
+    <!-- 百度地图扩展包 -->
+    <script src="{% static 'js/map/bmap.min.js' %}"></script>
+    <!-- 各省市的地理坐标 -->
+    <script src="{% static 'js/map/coordinate.js' %}"></script>
+    <script src="{% static 'js/angular.echart.js' %}"></script>
+    <script src="{% static 'plugin/html2canvas/html2canvas.min.js' %}"></script>
+    <script src="{% static 'plugin/colorpicker/bootstrap-colorpicker.min.js' %}"></script>
+    <script src="{% static 'js/tools.js' %}"></script>
+    <script src="{% static 'js/vecharts.js' %}"></script>
+    <script src="{% static 'polestar/app/index.js' %}"></script>
+    <script src="{% static 'polestar/app/spec/spec.service.js' %}"></script>
+    <script src="{% static 'polestar/app/main/chart.tool.js' %}?v=0.0.1"></script>
+    <script src="{% static 'polestar/app/main/main.controller.js' %}?v={{ nowversion }}1"></script>
+    <script>
+        hideLoading();
+    </script>
+    <script>
+        window.onload = function () {
+            var socket = new WebSocket("ws://" + window.location.host + "/element/");
+            socket.onmessage = function (e) {
+                alert(e.data)
+            }
+            socket.onopen = function () {
+
+            }
+            if (socket.readyState == WebSocket.OPEN) {
+                socket.onopen();
+            }
+
+        }
+    </script>
+
+{% endblock %}
+
+    

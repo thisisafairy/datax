@@ -1,0 +1,37 @@
+{% verbatim %}
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title">{{ modeltitle }}</h3>
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body open-body">
+  
+    <form action="#" name="myForm" method="post" id="addForm" class="form-horizontal">
+        <div class="form-group" style="display: none;">
+            <label></label>
+            <input type="hidden" name="id" id="id" ng-model="datatag.id">
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label form-lable-add">标签名</label>
+            <div class="col-sm-10 form-input-add">
+                <input type="text" name="tagname" ng-change="checktagname()" ng-model="datatag.tagname" required id="tagname" class="form-control" maxlength="30">
+            </div>
+        </div>
+        <div class="form-group" ng-if="myForm.tagname.$invalid">
+            <p class="col-sm-offset-2 col-sm-5 text-danger">*标签名必填</p>
+        </div>
+        <div class="form-group" ng-if="errorflag">
+                <p class="col-sm-offset-2 col-sm-5 text-danger">*{{ datatagmsg }}</p>
+            </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label form-lable-add">备注</label>
+            <div class="col-sm-10 form-input-add">
+                <input type="text" name="tagremark" ng-model="datatag.tagremark " class="form-control" maxlength="30">
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" ng-disabled="myForm.$invalid||errorflag||checking" type="button" ng-click="ok()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>
+{% endverbatim %}

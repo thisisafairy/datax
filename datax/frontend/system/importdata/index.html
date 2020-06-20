@@ -1,0 +1,93 @@
+ {% extends 'base.html' %} {% load staticfiles %} {% block title %}导入配置{% endblock %} {% block content %} {% verbatim %}
+<style>
+.searchboxstyle{
+    padding-left: 0px;
+}
+.importbuttonstyle{
+    float: left;
+    padding-left: 20px;
+}
+.importDtCountStyle{
+    display: inline-block;
+    min-width: 240px;
+    position: relative;
+    top: 2px;
+}
+.logshowarea{
+    height: 150px;
+    width:100%;
+    overflow-y:scroll
+}
+.tbodystyle{
+    height: 250px;
+    overflow-y:scroll;
+}
+.upWarning{
+    color:red;
+    padding-left: 20px;
+}
+.myxbtn{
+    height: 27px;
+}
+</style>
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel" style="display: inline-block">
+        导入配置
+    </h1>
+</section>
+<div class="col-sm-12 user-list" ng-app="importconfig">
+    <div class="box" ng-controller="importconfigController">
+        <div class="box-body user-list-body" style="padding-bottom: 0px">
+            <div class="importbuttonstyle">
+                <div class="importDtCountStyle">
+                    <span style="display: inline-block">导入文件：</span>
+                    <input type="file" id="importDataFile" ng-model="importDataFile" onchange="angular.element(this).scope().validfile(this)" style="padding-top: 3px;padding-left: 3px;display: inline-block">
+                </div>
+                <button id="importDataBtn" class="btn btn-default" ng-disable="!usableBtn" ng-click="uploadPkFile()">导入</button>
+                <span class="upWarning">{{ msg }}</span>
+            </div>
+        </div>
+        <div class="box-body user-list-body" style="padding-top: 0px">
+            <div class="col-md-12 userlist-table">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th data-field="impFileName" data-align="left">导入文件名</th>
+                            <th data-field="creater" data-align="left">创建者</th>
+                            <th data-field="createDate" data-align="left">导入时间</th>
+                            <th >操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tbodystyle">
+                        <tr ng-repeat="impfile in impFileList">
+                            <td>{{ $index+1 }}</td>
+                            <td>{{ impfile.fileName }}</td>
+                            <td>{{ impfile.creater }}</td>
+                            <td>{{ impfile.createDate }}</td>
+                            <td>
+                                <div class="buttons">
+                                    <button class="btn editable-table-button myxbtn btn-buttons" ng-click="delete(impfile)">删除</button>
+                                    <button class="btn editable-table-button myxbtn btn-buttons" ng-click="downLoadFile(impfile)">下载</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!--log show-->
+        <div class="box-body user-list-body">
+            <div style="padding-left: 15px">
+                <span style="font-size:1.1em;font-weight: 500">导入记录：</span>
+            </div>
+            <div class="col-md-12 userlist-table">
+                <textarea class="logshowarea" id="logsshow"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+{% endverbatim %}
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'system/importdata/index.js' %}?v={{ nowversion }}1"></script> {% endblock %}

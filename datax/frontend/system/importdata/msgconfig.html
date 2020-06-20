@@ -1,0 +1,417 @@
+ {% extends 'base.html' %} {% load staticfiles %} {% block title %}全局消息配置{% endblock %} {% block content %} {% verbatim %}
+<style>
+.searchboxstyle{
+    padding-left: 0px;
+}
+.importbuttonstyle{
+    float: left;
+    padding-left: 20px;
+}
+.importDtCountStyle{
+    display: inline-block;
+    min-width: 240px;
+    position: relative;
+    top: 2px;
+}
+.logshowarea{
+    height: 150px;
+    width:100%;
+    overflow-y:scroll
+}
+.tbodystyle{
+    height: 250px;
+    overflow-y:scroll;
+}
+.upWarning{
+    color:red;
+    padding-left: 20px;
+}
+.myxbtn{
+    height: 27px;
+
+}
+ #editor {overflow:scroll; max-height:300px}
+</style>
+
+    <style type="text/css">
+       .chooseBtn {
+            display: none;
+        }
+
+        .choose-label {
+            box-shadow: #ccc 0px 0px 0px 1px;
+            width: 40px;
+            height: 20px;
+            display: inline-block;
+            border-radius: 20px;
+            position: relative;
+            background-color: #DCDCDC;
+            overflow: hidden;
+        }
+
+        .choose-label:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            border-radius: 20px;
+            background-color: #fff;
+            z-index: 20;
+            -webkit-transition: all 0.5s;
+            transition: all 0.5s;
+        }
+
+        .chooseBtn:checked + label.choose-label:before {
+            left: 20px;
+        }
+
+        .chooseBtn:checked + label.choose-label {
+            background-color: #323A5B;
+        }
+
+    </style>
+
+
+    <head>
+    <link rel="stylesheet" href="" type="text/css" />
+
+    </head>
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel" style="display: inline-block">
+        全局消息配置
+    </h1>
+</section>
+<div class="col-sm-12" ng-app="msgconfig">
+    <div class="box" ng-controller="msgConfigController">
+         <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active" ng-click="loadmodel('email')"><a href="#emailConfig" role="tab" data-toggle="tab">邮件配置</a></li>
+            <li role="presentation" ng-click="loadmodel('sms')"><a href="#smsConfig" role="tab" data-toggle="tab">短信配置</a></li>
+            <li role="presentation" ng-click="loadmodel('wx')"><a href="#weixinConfig" role="tab" data-toggle="tab">微信配置</a></li>
+             <li role="presentation" ng-click="loadmodel('sys')"><a href="#sysErrorConfig" role="tab" data-toggle="tab">系统错误消息提醒配置</a></li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" id="emailConfig" class="tab-pane active">
+
+                <div align="right">
+                    <button class="btn btn-primary btn-ok" type="button" ng-click="save('email')">保存</button>
+                </div>
+                <br>
+                <div role="tabpanel" id="emailConfig" class="tab-pane active" >
+                    <table style="border-collapse:separate; border-spacing:30px;" align="center">
+                        <tr>
+                            <td>
+                                <label>邮箱地址:</label>
+                            </td>
+                            <td>
+                                <input type="text" ng-model="mail.mailaddress" style="width: 400px;" class=" cont-bodyfrom-input" placeholder="Email">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>邮箱密码:</label>
+                            </td>
+                            <td>
+                                <input type="password" ng-model="mail.mailpassword"  style="width: 400px;" class=" cont-bodyfrom-input" placeholder="使用授权码,非邮箱密码">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>smpt地址:</label>
+                            </td>
+                            <td>
+                                <select style="width: 400px;height: 33px"   ng-model="mail.smptaddress">
+                                        <option value="">请选择</option>
+                                        <option value="SMTP.gmail.com">SMTP.gmail.com</option>
+                                        <option value="SMTP.sina.com">SMTP.sina.com</option>
+                                        <option value="SMTP.163.com">SMTP.163.com</option>
+                                        <option value="SMTP.qq.com">SMTP.qq.com</option>
+                                        <option value="SMTP.sohu.com">SMTP.sohu.com</option>
+                                        <option value="SMTP.live.com">SMTP.live.com</option>
+                                        <option value="SMTP.mail.yahoo.com">SMTP.mail.yahoo.com</option>
+                                        <option value="SMTP.netease.com">SMTP.netease.com</option>
+                                        <option value="SMTP.sina.com.cn">SMTP.sina.com.cn</option>
+                                        <option value="SMTP.263.net">SMTP.263.net</option>
+                                        <option value="SMTP.126.com">SMTP.126.com</option>
+
+                                    </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>smpt端口:</label>
+                            </td>
+                            <td>
+                                <input type="text" ng-model="mail.smptport"  id="smptport" style="width: 400px;" class=" cont-bodyfrom-input" placeholder="smpt port">
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="border-collapse:separate; border-spacing: 30px">
+                        <tr>
+                            <td>
+                                <label style="float: left; margin-right: 10px">选择模板:</label>
+                                 <input style="float: left" type="checkbox"  id="male5" class="chooseBtn" ng-model="mail.emailtemplateconf"/>
+                            <label for="male5" class="choose-label"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>系统分享类消息</label>
+                            </td>
+                            <td>
+                                <label>业务规则触发类消息</label>
+                            </td>
+                        </tr>
+                        <tr  ng-if="mail.emailtemplateconf==true">
+                            <td>
+                                 <select style="width: 200px;height: 33px"   ng-model="mail.emailsharetemplate"
+                                        ng-options="template.id as template.templatename for template in templateconfs">
+                                    <option value="">请选择模板</option>
+
+                                </select>
+                            </td>
+                            <td>
+                                 <select style="width: 200px;height: 33px"   ng-model="mail.emailrulestemplate"
+                                        ng-options="template.id as template.templatename for template in templateconfs">
+                                    <option value="">请选择模板</option>
+
+                                </select>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+            <div role="tabpanel" id="smsConfig" class="tab-pane" >
+                 <div align="right">
+                    <button class="btn btn-primary btn-ok" type="button" ng-click="save('sms')">保存</button>
+                </div>
+                <div>
+                    <table  style="border-collapse:separate; border-spacing:30px;" align="center">
+                            <tr>
+                                <td>
+                                    <label>短信应用SDK AppID:</label>
+                                </td>
+                                <td>
+                                    <input type="text" ng-model="sms.sppid" style="width: 400px" class="cont-bodyfrom-input" placeholder="appid">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>短信应用SDK AppKey:</label>
+                                </td>
+                                <td>
+                                    <input type="text" ng-model="sms.appkey" style="width: 400px" class="cont-bodyfrom-input" placeholder="appkey">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>短信模板 ID:</label>
+                                </td>
+                                <td>
+                                    <input type="text" ng-model="sms.templateid" style="width: 400px" class="cont-bodyfrom-input" placeholder="template id">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>签名:</label>
+                                </td>
+                                <td>
+                                    <input type="text" ng-model="sms.template" style="width: 400px" class="cont-bodyfrom-input" placeholder="template">
+                                </td>
+                            </tr>
+                    </table>
+                    <table style="border-collapse:separate; border-spacing: 30px">
+                        <tr>
+                            <td>
+                                <label style="float: left; margin-right: 10px">选择模板:</label>
+                                 <input style="float: left" type="checkbox"  id="male6" class="chooseBtn" ng-model="sms.smstemplateconf"/>
+                            <label for="male6" class="choose-label"></label>
+                            </td>
+                        </tr>
+                        <tr ng-if="sms.smstemplateconf==true">
+                            <td>
+                                <label>系统分享类消息</label>
+                            </td>
+                            <td>
+                                <label>业务规则触发类消息</label>
+                            </td>
+                        </tr>
+                        <tr  ng-if="sms.smstemplateconf==true">
+                            <td>
+                                 <select style="width: 200px;height: 33px"   ng-model="sms.smssharetemplate"
+                                        ng-options="template.id as template.templatename for template in templateconfs">
+                                    <option value="">请选择模板</option>
+
+                                </select>
+                            </td>
+                            <td>
+                                 <select style="width: 200px;height: 33px"   ng-model="sms.smsrulestemplate"
+                                        ng-options="template.id as template.templatename for template in templateconfs">
+                                    <option value="">请选择模板</option>
+
+                                </select>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+
+            </div>
+            <div role="tabpanel" id="weixinConfig" class="tab-pane" >
+                <div align="right">
+                    <button class="btn btn-primary btn-ok" type="button" ng-click="save('wx')">保存</button>
+                </div>
+                <div>
+                    <table  style="border-collapse:separate; border-spacing:30px;" align="center">
+                            <tr>
+                                <td>
+                                    <label>微信备注名称:</label>
+                                </td>
+                                <td>
+                                    <input type="text" ng-model="wx.name" style="width: 400px" class="cont-bodyfrom-input" placeholder="appid">
+                                </td>
+                            </tr>
+                    </table>
+                    <table style="border-collapse:separate; border-spacing: 30px">
+                        <tr>
+                            <td>
+                                <label style="float: left; margin-right: 10px">选择模板:</label>
+                                 <input style="float: left" type="checkbox"  id="male7" class="chooseBtn" ng-model="wx.wxtemplateconf"/>
+                            <label for="male7" class="choose-label"></label>
+                            </td>
+                        </tr>
+                        <tr ng-if="wx.wxtemplateconf==true">
+                            <td>
+                                <label>系统分享类消息</label>
+                            </td>
+                            <td>
+                                <label>业务规则触发类消息</label>
+                            </td>
+                        </tr>
+                        <tr  ng-if="wx.wxtemplateconf==true">
+                            <td>
+                                 <select style="width: 200px;height: 33px"   ng-model="wx.wxsharetemplate"
+                                        ng-options="template.id as template.templatename for template in templateconfs">
+                                    <option value="">请选择模板</option>
+
+                                </select>
+                            </td>
+                            <td>
+                                 <select style="width: 200px;height: 33px"   ng-model="wx.wxrulestemplate"
+                                        ng-options="template.id as template.templatename for template in templateconfs">
+                                    <option value="">请选择模板</option>
+
+                                </select>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+            <div role="tabpanel" id="sysErrorConfig" class="tab-pane">
+                <div align="right">
+                    <button class="btn btn-primary btn-ok" type="button" ng-click="save('sys')">保存</button>
+                </div>
+
+                <table style="border-collapse:separate; border-spacing:30px;">
+                    <tr>
+                        <td>
+                            <label>启用系统消息报错提醒:</label>
+                        </td>
+                        <td>
+                            <input type="checkbox"  id="male1" class="chooseBtn" ng-model="sys.msg"/>
+                            <label for="male1" class="choose-label"></label>
+                        </td>
+                    </tr>
+                    <tr ng-if="sys.msg== true">
+                        <td>
+                            <label>邮件提醒:</label>
+                        </td>
+                        <td>
+                            <input type="checkbox"  id="male2" class="chooseBtn" ng-model="sys.email"/>
+                            <label for="male2" class="choose-label"></label>
+                        </td>
+                         <td>
+                            <label>短信提醒:</label>
+                        </td>
+                        <td>
+                            <input type="checkbox"  id="male3" class="chooseBtn" ng-model="sys.sms"/>
+                            <label for="male3" class="choose-label"></label>
+                        </td>
+                        <td>
+                            <label>微信提醒:</label>
+                        </td>
+                        <td>
+                            <input type="checkbox"  id="male4" class="chooseBtn" ng-model="sys.wechat" />
+                            <label for="male4" class="choose-label"></label>
+                        </td>
+                    </tr>
+                    <tr ng-if="sys.msg== true">
+                        <td >
+                            <label >请选取邮件收件人</label>
+                        </td>
+                        <td>
+                            <input type="text" ng-model="select_email_user" readonly="readonly" class="form-control" ng-click="select_user('mail_email')">
+                        </td>
+
+                        <td>
+                            <input type="text" i ng-model="select_sms_user" readonly="readonly" class="form-control" ng-click="select_user('mail_sms')">
+                        </td>
+                        <td>
+                            <label></label>
+                        </td>
+                        <td>
+                            <label ng-if="sys.wechat == true">读取微信配置</label>
+                        </td>
+
+                    </tr>
+                    <tr  ng-if="sys.msg== true">
+                        <td>
+                            <label>请选择使用的模板</label>
+                        </td>
+                        <td>
+                            <select style="width: 200px;height: 33px"   ng-model="sys.emailtemplate"
+                                    ng-options="template.id as template.templatename for template in templateconfs">
+                                <option value="">请选择模板</option>
+
+                            </select>
+                        </td>
+                        <td>
+                            <select style="width: 200px;height: 33px"   ng-model="sys.smstemplate"
+                                    ng-options="template.id as template.templatename for template in templateconfs">
+                                <option value="">请选择模板</option>
+
+                            </select>
+                        </td>
+                        <td>
+                            <label></label>
+                        </td>
+                        <td>
+                            <select style="width: 200px;height: 33px"   ng-model="sys.wechattemplate"
+                                    ng-options="template.id as template.templatename for template in templateconfs">
+                                <option value="">请选择模板</option>
+
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+
+
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endverbatim %}
+
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'system/importdata/msgconfig.js' %}?v={{ nowversion }}1"></script>
+
+{% endblock %}
+

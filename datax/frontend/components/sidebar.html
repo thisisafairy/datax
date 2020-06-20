@@ -1,0 +1,36 @@
+{% verbatim %}
+
+<div class="datax-sidebar" id="dataxSidebar" ng-controller="dataxSidebarController">
+    <div class="datax-sidebar-wrapper">
+        <ul class="datax-menu-wrapper">
+            <!--li class="header" ng-click="testClick()">菜单</li-->
+            <li class="datax-menu-item ng-scope">
+                <div class="datax-menu-full-wrapper" ng-click="ihomepage()">
+                    <div class="datax-menu-full-title text-not-wrap">
+                        <i class="fa fa-home fa-lg" ></i>
+                        <span>首页</span>
+                    </div>
+                </div>
+            </li>
+            <li class="datax-menu-item" ng-repeat="menu in menuList">
+                <div class="datax-menu-icon-wrapper" ng-mouseover="showSubMenu(menu, $event)" ng-class="{'datax-menu-menu-active':menu.is_active}">
+                    <i class="fa {{ menu.icon }}"></i>
+                </div>
+                <div class="datax-menu-full-wrapper" ng-class="{'datax-menu-active':menu.is_active}">
+                    <div class="datax-menu-full-title text-not-wrap" ng-click="expandMenu(menu, $event)">
+                        <i class="fa {{ menu.icon }}"></i>&nbsp;&nbsp;<span>{{ menu.name }}</span>
+                    </div>
+                    <div class="datax-menu-sub-wrapper">
+                        <ul>
+                            <li class="datax-menu-sub-item" ng-repeat="submenu in menu.child" 
+                                ng-class="{'datax-menu-menu-active':submenu.is_active}"
+                                ng-click="toPage(submenu)">。&nbsp;{{ submenu.name }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+{% endverbatim %}

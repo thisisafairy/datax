@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}OLAP分析{% endblock %}
+
+{% block content %}
+    <!-- <link rel="stylesheet" href="{% static 'node_modules/admin-lte/plugins/select2/select2.min.css' %}"> -->
+    <link rel="stylesheet" href="{% static 'plugin/angular/angular-bootstrap-datetimepicker/css/datetimepicker.css' %}"/>
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap-select/bootstrap-select.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/add.css'  %}">
+{% verbatim %}
+<div  ng-app="olapapp">
+        <div ui-view></div>
+</div>
+{% endverbatim %}
+<!-- <script src="{% static 'node_modules/admin-lte/plugins/select2/select2.min.js' %}"></script> -->
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/angular/i18n/angular-locale_zh-cn.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/moment/moment.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/moment/locale/zh-cn.js' %}"></script>
+<script>
+    moment.locale('zh-cn');
+</script>
+<script src="{% static 'js/sortable.js'%}"></script>
+<script src="{% static 'plugin/angular/angular-bootstrap-datetimepicker/js/datetimepicker.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-bootstrap-datetimepicker/js/datetimepicker.templates.js' %}"></script>
+<script src="{% static 'plugin/bootstrap-select/bootstrap-select.min.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-bootstrap-select/angular-bootstrap-select.min.js' %}"></script>
+<script src="{% static 'olap/index.js' %}?v={{nowversion}}1"></script>
+{% endblock %}

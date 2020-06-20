@@ -1,0 +1,97 @@
+<style>
+    .modal-dialog{  /*用于限制当前页面弹出框的宽度，这个类在本页面没有，生成弹出框的时候才加载*/
+        width: 470px;
+    }
+    input[type="file"] {
+        padding-top: 4px;
+        padding-left: 4px;
+    }
+    .batchImpDivSty{
+        display: inline;
+    }
+    .batchImpInputSty{
+        width: 20px;
+    }
+</style>
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title" ng-bind="configlist.type"></h3>
+    <!--  弹出框的关闭按钮  -->
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body open-body">
+    <div ng-if="!istest&&testsuccess" class="alert alert-success alert-dismissible">
+                <!-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button> -->
+                <h4><i class="icon fa fa-check"></i>成功</h4>
+                <p ng-bind="msg"></p>
+    </div>
+    <div ng-if="!istest&&!testsuccess" class="alert alert-danger alert-dismissible">
+                <!-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button> -->
+                <h4><i class="icon fa fa-ban"></i> 失败</h4>
+                <p ng-bind="msg"></p>
+     </div>
+    <form action="#" method="post" id="configModle" class="form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-3 control-label form-lable">类型</label>
+            <div class="col-sm-6 form-input">
+                <input type="text" name="type" ng-disabled="true" required  class="form-control"  ng-model='configlist.type'>
+            </div>
+            <!--<div ng-if="operaTionType != 'updateFileTable'">
+                <label style="padding-top: 6px">批量导入</label>
+                <div class="batchImpDivSty">
+                    <input type="checkbox" class="batchImpInputSty" ng-true-value="'t'" ng-false-value="'f'" ng-model="configlist.batchImpStatus" />
+                </div>
+            </div>-->
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label form-lable">文件上传</label>
+            <div class="col-sm-7 form-input">
+                <input type="file" id="fileupload" name="file"  required ng-model='configlist.file' onchange="angular.element(this).scope().validfile(this)"  class="form-control">
+                <!--<input type="file" id="fileupload" name="file"  required ng-model='configlist.file' class="form-control">-->
+            </div>
+        </div>
+        <div ng-if="operaTionType != 'updateFileTable'" class="form-group">
+            <label class="col-sm-3 control-label form-lable">文件别名</label>
+            <div class="col-sm-6 form-input">
+                <input type="text" name="file_show_name" ng-model='configlist.file_show_name' placeholder="默认取文件原名" class="form-control">
+            </div>
+        </div>
+        <div ng-if="operaTionType == 'updateFileTable'" class="form-group">
+            <label class="col-sm-3 control-label form-lable">覆盖/增量上传</label>
+            <div class="col-sm-6 form-input">
+                <input type="checkbox" name="upload_type" ng-model='configlist.upload_type' ng-init="configlist.upload_type=false">
+                <label ng-bind="configlist.upload_type == true ? '当前为：覆盖上传':'当前为：增量上传'"></label>
+            </div>
+        </div>
+        <div ng-if="configlist.type == 'excel'||operaTionType == 'updateFileTable'" class="form-group">
+            <label class="col-sm-3 control-label form-lable">数据空值替换符</label>
+            <div class="col-sm-6 form-input" style="width: 337px">
+                <input type="text" name="excel_nullchrepl" ng-model='configlist.excel_nullchrepl' placeholder="请输入需要替换的符号" class="form-control" style="display: inline;width: 187px;">
+                <label style="display: inline;width: 45px">(英文逗号分隔)</label>
+            </div>
+        </div>
+        <div class="form-group" ng-if="configlist.type == 'txt'" ng-init="configlist.symbol_input_type=true">
+            <label class="col-sm-3 control-label form-lable">文本分隔符</label>
+            <div class="col-sm-6 form-input" ng-init="configlist.symbol_type='tab'" ng-if="configlist.symbol_input_type">
+                <select class="form-control" required ng-model="configlist.symbol_type">
+                  <option value="tab">制表符(tab键)</option>
+                  <option value="comma">英文逗号</option>
+                  <option value="comma_c">中文逗号</option>
+                  <option value="blank1">1个空格</option>
+                  <option value="blank2">2个空格</option>
+                </select>
+            </div>
+            <div class="col-sm-6 form-input" ng-if="!configlist.symbol_input_type">
+                <input type="text" name="file_show_name" ng-model='configlist.symbol_type' class="form-control">
+            </div>
+            <button class="btn btn-primary" type="button" ng-click="symbol_type_change()">自定义分隔符</button>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer footer-btn">
+    <!--<button ng-if="operaTionType != 'updateFileTable'" ng-disabled="!permupload" class="btn btn-primary btn-ok" type="button" ng-click="upload()">上传</button>-->
+    <button ng-if="operaTionType != 'updateFileTable'" class="btn btn-primary btn-ok" style="width: 110px" type="button" ng-click="downTemp()">导入模板下载</button>
+    <button ng-if="operaTionType != 'updateFileTable'" class="btn btn-primary btn-ok" ng-disabled="uploadFileStatus" type="button" ng-click="upload()">上传</button>
+    <button ng-if="operaTionType == 'updateFileTable'" class="btn btn-primary btn-ok" type="button" ng-click="coverFile()" style="width: auto;min-width: 72px"><span ng-bind="uploadFileStatus==true?'正在上传...':'上传'"></span></button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>

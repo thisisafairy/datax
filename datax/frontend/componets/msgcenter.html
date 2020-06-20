@@ -1,0 +1,161 @@
+ {% extends 'base.html' %} {% load staticfiles %} {% block title %}消息中心{% endblock %} {% block content %} {% verbatim %}
+<div class="content-header cont-header">
+    <h1 class="cont-header-title" style="display: inline-block">
+        消息中心
+    </h1>
+</div>
+
+<div class="col-sm-16 user-list" ng-app="msgI">
+    <div class="box" ng-controller="msgInfoController">
+        <div class="box-body" style="padding-top: 0px"ng-if="msgInfos.mark==1">
+            <h3 align="center">{{ msgInfos.mail_title }}</h3>
+           <table class="table table-hover">
+               <tr>
+                   <td>发件人：</td>
+                   <td >{{ msgInfos.mail_from }}</td>
+               </tr>
+                <tr>
+                   <td>时间：</td>
+                   <td>{{ msgInfos.create_date }}</td>
+               </tr>
+           </table>
+           <hr/>
+            <table class="table table-hover">
+                   <tr>
+                       <td>预警标题:</td>
+                       <td>{{ msgInfos.tagname }}</td>
+                   </tr>
+                   <tr>
+                       <td>触发等级:</td>
+                       <td>{{ msgInfos.msg_type==0?'一般':'危险' }}</td>
+                   </tr>
+                   <!--<tr>
+                       <td>生成条件</td>
+                       <td>{{ msgInfos.show_condition_str }}</td>
+                   </tr>-->
+                   <!--<tr>
+                       <td>触发条数</td>
+                       <td>{{ msgInfos.indicate_cnt }}</td>
+                   </tr>-->
+                   <tr>
+                       <td>条件说明/建议</td>
+                       <td>{{ msgInfos.advice_content }}</td>
+                   </tr>
+                </table>
+
+            <!--<p>{{ msgInfos.mail_content }}</p>
+            <div class="box1" >
+                <div class="img-box">
+                <img  src="{{ msgInfos.img_path }}">
+            </div>-->
+            </div>
+            <p align="right">{{ msgInfos.create_date }} 来自系统邮件</p>
+        </div>
+        <div ng-repeat="( num,msgInfo) in msgInfos" >
+            <div class="box-body" style="padding-top: 0px"ng-if="msgInfo.mark==0">
+                <h3 align="center" ng-if="num==0">{{ msgInfo.mail_title }}</h3>
+                <table class="table table-hover">
+
+                   <tr ng-if="num==0">
+                       <td>发件人：</td>
+                       <td >{{ msgInfo.mail_from }}</td>
+                   </tr>
+                    <tr ng-if="num==0">
+                       <td >时间：</td>
+                       <td>{{ msgInfo.create_date }}</td>
+                   </tr>
+                </table>
+                <h4  ng-if="num==0">规则触发提醒第{{ num+1 }}条:</h4>
+                <h4  ng-if="num>0">规则触发提醒第{{ num+1 }}条:</h4>
+                <table class="table table-hover">
+                   <tr>
+                       <td>预警标题:</td>
+                       <td>{{ msgInfo.tagname }}</td>
+                   </tr>
+                   <tr>
+                       <td>触发等级:</td>
+                       <td>{{ msgInfo.msg_type==0?'一般':'危险' }}</td>
+                   </tr>
+                   <tr>
+                       <td>生成条件</td>
+                       <td>{{ msgInfo.show_condition_str }}</td>
+                   </tr>
+                   <!--<tr>
+                       <td>触发条数</td>
+                       <td>{{ msgInfo.indicate_cnt }}</td>
+                   </tr>-->
+                   <tr>
+                       <td>条件说明/建议</td>
+                       <td>{{ msgInfo.advice_content }}</td>
+                   </tr>
+                </table>
+            </div>
+        </div>
+      <div class="box-body" style="padding-top: 0px"ng-if="msgInfos.mark==2">
+            <h3 align="center">{{ msgInfos.mail_title }}</h3>
+           <table class="table table-hover">
+               <tr>
+                   <td>发件人：</td>
+                   <td >{{ msgInfos.mail_from }}</td>
+               </tr>
+                <tr>
+                   <td>时间：</td>
+                   <td>{{ msgInfos.create_date }}</td>
+               </tr>
+           </table>
+           <hr/>
+            <p>{{ msgInfos.mail_content }}</p>
+            <div class="box1" >
+                <div class="img-box">
+                <img  src="{{ msgInfos.img_path }}">
+            </div>
+            </div>
+            <p align="right">{{ msgInfos.create_date }} 来自系统邮件</p>
+        </div>
+         <div ng-if="msgInfo.mark==1" ng-repeat="( num,msgInfo) in msgInfos |limitTo:1">
+            <p align="right" >{{ msgInfo.create_date }} 来自系统邮件</p>
+         </div>
+         <hr/>
+    </div>
+</div>
+{% endverbatim %}
+    <script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+    <script src="{% static 'componets/msgcenter.js' %}"></script>
+
+
+<style>
+    .box{
+    width: 70%;
+    margin: 10px auto;
+}
+    .box1{
+    width: 100%;
+    margin: 10px auto;
+}
+.img-box{
+    width: 100%;
+    position:relative;
+    z-index:1;
+}
+.img-box img{
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    width:100%;
+    margin:auto;
+    z-index: -1;
+    *zoom:1;
+}
+.img-box:before {
+    content: "";
+    display: inline-block;
+    padding-bottom: 100%;
+    width: 0.1px;   /*必须要有数值，否则无法把高度撑起来*/
+    vertical-align: middle;
+}
+</style>
+
+{% endblock %}

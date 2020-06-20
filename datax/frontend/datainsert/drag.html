@@ -1,0 +1,8 @@
+<div class="drag-content" data-drop="true" ng-model='draged' jqyoui-droppable="{multiple:true,onDrop:'dropCallback',onOver: 'overCallback', onOut: 'outCallback'}">
+						<div class="drag-content-table" ng-repeat="(key, item) in draged track by key" >
+							<span>{[{ item }]}</span>
+							<div class="drag-option">
+								<i class="fa fa-align-justify"></i>
+							</div>
+						</div>
+					</div>

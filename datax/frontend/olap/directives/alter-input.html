@@ -1,0 +1,30 @@
+<div>
+    <style type="text/css">
+        .tipsStyle{
+            height: 50px;
+        }
+        .inputFeildStyle{
+            width: 100% !important;
+        }
+    </style>
+    <div ng-if="isDateFeild" class="input-group">
+        <input id="dirInputValue_{{ column }}" type="text" class="form-control" uib-datepicker-popup="{{ format }}"
+               ng-model="$parent.inputValue" is-open="$parent.popup1.opened" datepicker-options="$parent.dateOptions"
+               close-text="Close" alt-input-formats="$parent.altInputFormats" ng-change="$parent.showSeleData()" list="browsers_{{ column }}"/>
+        <span class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-click="$parent.open1()">
+                <i class="glyphicon glyphicon-calendar"></i>
+            </button>
+        </span>
+        <datalist id="browsers_{{ column }}">
+            <option ng-repeat="tipsData in $parent.tipsDatas" value="{{ tipsData }}">
+        </datalist>
+    </div>
+    <div ng-if="!isDateFeild">
+        <input type="{{ feildType }}" id="dirInputValue_{{ column }}" ng-model="$parent.inputValue" ng-change="$parent.showSeleData()" class="form-control inputFeildStyle" list="browsers_{{ column }}">
+        <datalist id="browsers_{{ column }}">
+            <option ng-repeat="tipsData in $parent.tipsDatas" value="{{ tipsData }}">
+        </datalist>
+    </div>
+
+</div>

@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}门户菜单配置{% endblock %}
+{% block content %}
+<!-- https://me.bdp.cn/index.html#/chart_edit/proj_491b85b64eec3dc285ebb64de0de0645/dsh_9b5cfcf69bc152be555ef6e9a0343236/ct_570921a532247dc7afe9dcb29a895bcc?page_referrer=dash_edit -->
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-bootstrap-colorpicker/colorpicker.min.css'  %}">
+<link rel="stylesheet" href="{% static 'dashboard/singleindex/singleindex.css'  %}" />
+<script>
+  showLoading();    
+</script>
+{% verbatim %}
+<div ng-app="singleIndex" ng-controller="singleIndexController">
+  <div class="data-list">
+  <div><a ng-click="backlist()" style="padding-left:3px;" class="right btn btn-default"><i class="fa fa-chevron-left"></i> 返回列表页</a></div>
+  <div>业务表:<a ng-click="save()" style="padding-left:3px;" class="right btn btn-default"><i class="fa fa-save"></i> 保存</a></div>
+  
+  <select class="form-control" ng-model="olap_id" ng-change="dataSourceChange()">
+      <option value="{{ olap_info.id }}" ng-repeat="olap_info in dataSources">{{ olap_info.name }}</option>
+  </select>
+  <ul class="list-group">
+    <li class="list-group-item" ng-repeat="column in columns" ng-click="process_data(column.table, column.col, column.title)">{{ column.title }}</li>
+  </ul>
+  </div>
+  <div class="chart-option">
+        <form action="#" method="post" class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-4 control-label">数据处理:</label>
+                <div class="col-sm-8 form-input-add">
+                    <select class="form-control" ng-change="process_data()" ng-model="select_column.column_handle_type">
+                        <option value="{{ handle_type.id }}" ng-repeat="handle_type in single_index_handle_methods.column_handle_types">{{ handle_type.name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label">展示类型:</label>
+                <div class="col-sm-8 form-input-add">
+                    <select class="form-control" ng-model="single_handle_obj.index_show_type">
+                        <option value="{{ chart_type.id }}" ng-repeat="chart_type in single_index_handle_methods.index_chart_types">{{ chart_type.name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" ng-if="single_handle_obj.index_show_type == 'thermometers' || single_handle_obj.index_show_type == 'progress-bar'">
+                <label class="col-sm-4 control-label">目标数值:</label>
+                <div class="col-sm-8 form-input-add">
+                    <input type="text" ng-model="single_handle_obj.aim_data.data" ng-change="aimDataChange()" class="form-control">
+                </div>
+            </div>
+            <div class="form-group" ng-if="single_handle_obj.aim_data.data && single_handle_obj.aim_data.data < select_column.result_data">
+                <p class="col-sm-offset-2 col-sm-10 text-danger">*目标数值应大于实际值</p>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label">标题名称:</label>
+                <div class="col-sm-8 form-input-add">
+                    <input type="text" ng-model="select_column.column_title" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label">标题大小:</label>
+                <div class="col-sm-8 form-input-add">
+                    <input type="text" ng-model="single_handle_obj.title_style['font-size']" ng-change="vailFontSizeAttr()" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label">标题颜色:</label>
+                <div class="col-sm-8 form-input-add">
+                    <input colorpicker type="text" ng-model="single_handle_obj.title_style['color']" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label">标题位置:</label>
+                <div class="col-sm-8 form-input-add">
+                    <select class="form-control" ng-model="single_handle_obj.title_position">
+                        <option value="{{ title_position.id }}" ng-repeat="title_position in single_index_handle_methods.title_positions">{{ title_position.name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label">添加单位:</label>
+                <div class="col-sm-8 form-input-add">
+                    <input type="text" ng-model="single_handle_obj.unit" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label">单位转换:</label>
+                <div class="col-sm-4 form-input-add">
+                    <select class="form-control" ng-model="single_handle_obj.unit_trans.symbol">
+                        <option value="{{ trans_symbol.id }}" ng-repeat="trans_symbol in single_index_handle_methods.unit_trans.symbol">{{ trans_symbol.name }}</option>
+                    </select>
+                </div>
+                <div class="col-sm-4 form-input-add">
+                    <input type="text" ng-model="single_handle_obj.unit_trans.num" class="form-control">
+                </div>
+            </div>
+            <div class="form-group" ng-if="single_handle_obj.index_show_type == 'text'">
+                <label class="col-sm-4 control-label">展示方式:</label>
+                <div class="col-sm-8 form-input-add">
+                    <select class="form-control" ng-model="single_handle_obj.data_show_method">
+                        <option value="{{ show_method.id }}" ng-repeat="show_method in single_index_handle_methods.data_show_methods">{{ show_method.name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label">货币符号:</label>
+                <div class="col-sm-8 form-input-add">
+                    <select class="form-control" ng-model="single_handle_obj.currency_symbol">
+                        <option value="{{ currency_symbol.id }}" ng-repeat="currency_symbol in single_index_handle_methods.currency_symbols">{{ currency_symbol.name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" ng-if="single_handle_obj.index_show_type == 'text'">
+                <label class="col-sm-4 control-label">小数位数:</label>
+                <div class="col-sm-8 form-input-add">
+                    <select class="form-control" ng-model="single_handle_obj.point_num">
+                        <option value="{{ point_num.id }}" ng-repeat="point_num in single_index_handle_methods.point_nums">{{ point_num.name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" ng-if="single_handle_obj.index_show_type == 'text'">
+                <label class="col-sm-4 control-label">文本大小:</label>
+                <div class="col-sm-8 form-input-add">
+                    <input type="text" ng-model="single_handle_obj.text.style['font-size']" ng-change="vailFontSizeAttr()" class="form-control">
+                </div>
+            </div>
+            <div class="form-group" ng-if="single_handle_obj.index_show_type == 'text'">
+                <label class="col-sm-4 control-label">文本颜色:</label>
+                <div class="col-sm-8 form-input-add">
+                    <input colorpicker type="text" ng-model="single_handle_obj.text.style['color']" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label"><a ng-click="openMonitorEdit()" class="btn btn-default">新增业务规则</a></label>
+            </div>
+        </form>
+  </div>
+  <div class="chart-content">
+    <div ng-if="single_handle_obj.title_position=='top'" ng-style="single_handle_obj.title_style">{{ select_column.column_title | title_handle_type:single_handle_obj }}</div>
+    <div ng-style="single_handle_obj.text.style" ng-if="single_handle_obj.index_show_type=='text'">
+        {{ select_column.result_data | handle_type:single_handle_obj }}
+    </div>
+   <div ng-if="single_handle_obj.index_show_type=='progress-bar'">
+        <section width="100%" class="bar-container"><div class="progress" ng-style="single_handle_obj.progress_bar.container_style">
+        <span style="width: {{single_handle_obj.progress_bar.data}} ;"><span>{{single_handle_obj.progress_bar.data}}</span></span></div></section>
+    <div style="text-align:right">{{single_handle_obj.aim_data.data}}</div></div>
+    <div ng-if="single_handle_obj.title_position=='bottom'" ng-style="single_handle_obj.title_style">{{ select_column.column_title | title_handle_type:single_handle_obj }}</div>
+  </div>
+</div>
+
+{% endverbatim %}
+
+  <script>
+    /* jshint unused: true */
+    var initialSpec = {{ jsonconfig | safe }} || undefined;
+    var initEchartConfig = {{ echartconfig | safe }} || undefined;
+    var initialDataset = {{ dataconfig | safe }} || undefined;
+    var initialFilter = {{ filterconfig | safe }} || undefined;
+    var CurrentName = '{{ name | safe }}' || '';
+    var CurrentKind = '{{ kind | safe }}' || '';
+    var remark = '{{ remark | safe }}' || '';
+    var keywords = '{{ keywords | safe }}' || '';
+    var refreshspeed = '{{ refreshspeed | safe }}' || '';
+    var createtime = '{{ createtime | safe }}' || '';
+    var createname = '{{ createname | safe }}' || '';
+    var DataSources = {{ dataolap | safe }} || [];
+    var charttype = '{{ charttype | safe }}' || 'vega';
+    </script>
+    <script src="{% static 'plugin/angular/angular-bootstrap-colorpicker/bootstrap-colorpicker-module.min.js' %}"></script>
+    <script src="{% static 'dashboard/singleindex/singleindex_utils.js' %}"></script>
+    <script src="{% static 'dashboard/singleindex/singleindex.js' %}"></script>
+    <script >
+      hideLoading();
+    </script>
+
+{% endblock %}
+
+    

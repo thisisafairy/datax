@@ -1,0 +1,62 @@
+{% extends 'base_portal.html' %} {% load staticfiles %}
+{% block title %}
+场景访问记录
+{% endblock %}
+{% block content %}
+{% verbatim %}
+
+<div id="scenesLog" ng-app="scenesLogApp" ng-controller="scenesLogController">
+    <style type="text/css">
+    .datax-datepicker-wrapper {
+        float: left;
+    }
+
+    .datax-datepicker-range-symbol {
+        float: left;
+        display: block;
+        padding: 0 6px;
+    }
+    </style>
+    <div class="datax-content-box">
+        <div class="datax-table-toolbar">
+            <div dx-row gutter="24">
+                <div dx-col sm="3" lg="3" xl="2">
+                    用户名
+                </div>
+                <div dx-col sm="7" lg="5" xl="6">
+                    <input type="text" class="datax-input" ng-model="tableInfo.searchField.first_name">
+                </div>
+                <div dx-col sm="3" lg="2" xl="2">
+                    场景名
+                </div>
+                <div dx-col sm="9" lg="6" xl="6">
+                    <input type="text" class="datax-input" ng-model="tableInfo.searchField.scenes_name">
+                </div>
+                <div dx-col sm="3" lg="2" xl="2">
+                    标签
+                </div>
+                <div dx-col sm="7" lg="6" xl="6">
+                    <input type="text" class="datax-input" ng-model="tableInfo.searchField.keywords">
+                </div>
+                <div dx-col sm="12" md="13" lg="0" empty="true"></div>
+                <div dx-col sm="7" lg="4" xl="3">
+                    最后访问日期
+                </div>
+                <div dx-col sm="16" lg="13" xl="10">
+                    <dx-date-picker dx-placeholder="'选择开始日期'" dx-model="tableInfo.searchField.modifytimestart"></dx-date-picker>
+                    <div class="datax-datepicker-range-symbol">-</div>
+                    <dx-date-picker dx-placeholder="'选择结束日期'" dx-model="tableInfo.searchField.modifytimeend"></dx-date-picker>
+                </div>
+                <div dx-col sm="5" lg="7" xl="11">
+                    <button style="float: right;" dx-button type="primary" click="getScenesLogs();">开始查询</button>
+                </div>
+            </div>
+        </div>
+        <dx-table columns="tableInfo.tableColumn" data="tableData" height="tableHeight"
+            table-style="tableInfo.tableStyle" full-fix="fullFix"></dx-table>
+    </div>
+</div>
+
+{% endverbatim %}
+<script src="{% static 'system/uservisitlog/sceneslog.js' %}?v={{ nowversion }}1"></script>
+{% endblock %}

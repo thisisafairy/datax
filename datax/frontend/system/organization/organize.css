@@ -1,0 +1,182 @@
+/*调节面板样式，覆盖父类*/
+.cont-header {
+    padding-left: 10px;
+    padding-top: 7px;
+}
+.col-panel{
+    padding-left: 5px;
+    height: 550px;
+}
+.user-list-body{
+    padding-top: 5px;
+}
+.user-list {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.user-list-titel {
+    padding-bottom: 7px;
+}
+.pagination{
+    margin: 0px;
+}
+.toolbar{
+    margin-top: 0px;
+    margin-left: 15px;
+}
+.panelBorder{
+    border: 1px solid #8888;
+    padding-top: 10px;
+    padding-left: 0px;
+    min-height: 550px;
+    margin-bottom: 0px;
+    padding-right: 5px;
+}
+.menuHead{
+    padding-top: 10px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.org{
+    padding-right: 0px;
+}
+
+#myanothertree tr td{
+    border: 1px solid #e5e5e5;
+}
+#myanothertree tbody tr td:nth-child(1){
+    width: 100%;
+}
+#myanothertree tbody tr td:nth-child(2){
+    width: 70px;
+}
+#myanothertree tbody tr td:nth-child(3){
+    width: 70px;
+}
+.treegrid-expander{
+    top:3px;
+}
+/*设置thead*/
+#myanothertree{
+    padding-top: 5px;
+}
+#myanothertree thead{
+    width: 100%;
+    display: block;
+}
+#myanothertree thead tr{
+    width: 100%;
+    display: block;
+}
+#myanothertree thead tr th:nth-child(1){
+    /*width: calc(100% - 140px);*/
+    width: 73%;
+}
+#myanothertree thead tr th:nth-child(2){
+    width: 70px;
+}
+#myanothertree thead tr th:nth-child(2) div{
+    width: 70px;
+}
+#myanothertree thead tr th:nth-child(3){
+    width: 70px;
+    padding-right: 18px;
+}
+#myanothertree thead tr th:nth-child(3) div{
+    width: 70px;
+}
+
+.tableBlock{
+    display: block;
+    height: 470px;
+    width: 100%;
+}
+#myanothertree tbody{
+    overflow: auto;
+}
+.hideLongCh{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    width: 70px;
+}
+
+/*右键菜单*/
+.myRightClick{
+    background: white;
+    box-sizing: border-box;
+    border: 1px solid #bababa;
+    box-shadow: 1px 2px 2px #8f8f8f;
+    padding: 10px 10px 15px 10px;
+    cursor: default;
+}
+.paddingTopPx{
+    padding-top: 5px;
+}
+.ui-contextmenu li:hover{
+    background: rgba(0, 214, 246, 0.25);
+}
+.myRightClick ul li a{
+    color:black;
+}
+.selectTr{
+    background-color: #a2f3ca;
+}
+/*调节tab分页的内容的样式*/
+#usersRelat .toolbar{
+    margin: 10px;
+}
+#usersRelat .userlist-table{
+    padding-top: 0px;
+}
+#usersRelat .col-md-12{
+    padding-left: 10px;
+}
+.panelDiv{
+    border: 1px solid #8888;
+    min-height: 508px;
+    border-top-color: white;
+}
+#menuRelat .toolbar{
+    margin: 10px;
+}
+#menuRelat .userlist-table{
+    padding-top: 0px;
+}
+#menuRelat .col-md-12{
+    padding-left: 10px;
+}
+/*icon style*/
+.groupExpander{
+    background-image: url(dependentfiles/role.svg);
+    background-size: 13px 13px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.orgExpander{
+    background-image: url(dependentfiles/department.svg);
+    background-size: 13px 13px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+/*toolbar*/
+.iconDesc{
+    display: inline;
+    float: right;
+    padding-top: 13px;
+}
+.btnOftoolbarL{
+    display: inline;
+}
+.iconDescAddition{
+    display: inline-block;
+    height: 13px;
+    width: 13px;
+    position: relative;
+    top: 2px;
+}
+.singleText{
+    display: inline-block;
+    padding-right: 10px;
+}

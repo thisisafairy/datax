@@ -1,0 +1,62 @@
+{% extends 'base_portal.html' %} {% load staticfiles %} {% block title %}场景列表{% endblock %} {% block content %}
+<!-- Bootstrap Color Picker -->
+<link rel="stylesheet" href="{% static 'newdashboard/list.css'  %}?v={{ nowversion }}1">
+<style type="text/css">
+
+</style>
+    {% verbatim %}
+<div ng-app="dashboard" ng-controller="dashboardController">
+    <div resize ng-style="style()">
+        <div class="card-content" when-scrolled="loadMore()">
+            <div class="tool-bar">
+                <div dx-row gutter="24">
+                    <div dx-col sm="3">
+                        <label class="control-label">场景名称:</label>
+                    </div>
+                    <div dx-col sm="5">
+                        <input type="text" ng-model="filterConfig.name" ng-change="changeName()" class="datax-input">
+                    </div>
+                    <div dx-col sm="3">
+                        <label class="control-label">标签:</label>
+                    </div>
+                    <div dx-col sm="5">
+                        <dx-select items="tags" dx-label="'tag'" dx-value="'tag'" 
+                            dx-model="selected.tags" multiple="true" dx-change="tagsChange()"></dx-select>
+                    </div>
+                    <div dx-col sm="2" offset="3">
+                        <a href="newboarddesign" class="datax-btn">新增</a>
+                    </div>
+                </div>
+            </div>
+            <div ng-style="itemStyle" class="cart-item" ng-repeat="val in scenes">
+                <div class="scenes-pic">
+                    <div class="img-mask">
+                        <div class="img-mask-content">
+                            <div class="preview-edit-btn">
+                                <span ng-click="previewScene(val)"><i class="fa fa-search-plus"></i> 预览</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <span ng-click="updateScenes(val)"><i class="fa fa-edit"></i> 编辑</span>
+                            </div>
+                        </div>
+                    </div>
+                    <img ng-src="{{ val.imgUrl }}">
+                    <i dx-icon ng-click="removeRow(val)" class="close open-close" type="delete"></i>
+                </div>
+                <div ng-click="updateScenes(val)" class="scenes-title">
+                    {{ val.name }}
+                </div>
+                <div class="scenes-time">
+                    {{ val.modifytime | dateFtt }}
+                </div>
+                <div class="scenes-tags">
+                    <span class="label label-default" ng-repeat="tag in val.tags">
+                        {{ tag }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endverbatim %}
+<script src="{% static 'newdashboard/list.js' %}?v={{ nowversion }}1"></script>
+{% endblock %}

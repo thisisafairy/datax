@@ -1,0 +1,115 @@
+{% verbatim %}
+<section class="content-header cont-header">
+        <h1 class="cont-header-title user-list-titel">
+            任务计划设置
+        </h1>
+    </section>
+<div class="col-md-6 form-panel form-panel-dispatch" >
+	<form role="form" class="form-horizontal olapdispatch-add" name="myForm" >
+		  <input type="hidden" ng-model="dispatch.id" />
+		  <div class="form-group form-group-first">
+		    <label  class="col-sm-2 control-label">名称</label>
+		    <div class="col-sm-9">
+		      <input type="text" name="name" class="form-control" required  ng-model="dispatch.name"  placeholder="名称">
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label class="col-sm-2 control-label">描述</label>
+		    <div class="col-sm-9">
+		      <textarea class="form-control" ng-model="dispatch.desc"  rows="3"></textarea>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label  class="col-sm-2 control-label">频率</label>
+		    <div class="col-sm-9">
+		      <select class="form-control" required ng-model="dispatch.quency">
+		      	<option value="once">单次执行</option>
+		      	<option value="loop">循环执行</option>
+		      </select>
+		    </div>
+		  </div>
+		  <div class="form-group" ng-if="dispatch.quency == 'once'">
+		    <label  class="col-sm-2 control-label">日期</label>
+		    <div class="col-sm-9">
+		    	 <p class="input-group">
+			          <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dispatch.once.date" is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" />
+			          <span class="input-group-btn">
+			            <button type="button" class="btn btn-default" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
+			          </span>
+			        </p>
+		    </div>
+		  </div>
+		  <div class="form-group" ng-if="dispatch.quency == 'loop'">
+		  	<label  class="col-sm-2 control-label">执行频率</label>
+		  	<div class="col-sm-9">
+			  	<select class="form-control" ng-model="dispatch.loop.frequency">
+							<option value="intervals">每隔多久</option>
+			      	<option value="day">每天</option>
+			      	<option value="week">每星期</option>
+			      	<option value="month">每月</option>
+			      	<option value="year">每年</option>
+			    </select>
+		    </div>
+			</div>
+			<div class="form-group" ng-if="dispatch.quency == 'loop'&&dispatch.loop.frequency == 'intervals'">
+					<label  class="col-sm-2 control-label">每</label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control" ng-model="dispatch.loop.intervalsdetail">
+					</div>
+			</div>
+			<div class="form-group" ng-if="dispatch.quency == 'loop'&&dispatch.loop.frequency == 'intervals'">
+					<label  class="col-sm-2 control-label">周期</label>
+					<div class="col-sm-9">
+						<select ng-model="dispatch.loop.intervals" class="form-control">
+							<option value="days">天</option>
+							<option value="hours">小时</option>
+							<option value="minutes">分钟</option>
+							<option value="seconds">秒</option>
+						</select>
+					</div>
+			</div>
+		  <div class="form-group" ng-if="dispatch.quency == 'loop'&& dispatch.loop.frequency == 'week'">
+		  	<label  class="col-sm-2 control-label">选择星期</label>
+		  	<div class="col-sm-9">
+			  	<select  multiple  class="form-control" ng-model="dispatch.loop.date" >
+			 			<option value="0">周日</option>
+			 			<option value="1">周一</option>
+			 			<option value="2">周二</option>
+			 			<option value="3">周三</option>
+			 			<option value="4">周四</option>
+			 			<option value="5">周五</option>
+			 			<option value="6">周六</option>
+			 	</select>
+		 	</div>
+		  </div>
+		  <div class="form-group" ng-if="dispatch.quency == 'loop'&& dispatch.loop.frequency == 'month'">
+		  	<label  class="col-sm-2 control-label">选择日期</label>
+		  	<div class="col-sm-9">
+		  		<input type="text" ng-model="dispatch.loop.date" placeholder="1">号
+		  	</div>
+		  </div>
+		  <div class="form-group" ng-if="dispatch.quency == 'loop'&& dispatch.loop.frequency == 'year'">
+		  	<label  class="col-sm-2 control-label">填写日期</label>
+		  	<div class="col-sm-4">
+		    	<input type="text" ng-model="dispatch.loop.month" class="form-control" placeholder="月（02）" name=""> 
+		    </div>
+		    <div class="col-sm-3">
+		    	<input type="text" ng-model="dispatch.loop.day" class="form-control" placeholder="日（04）" name="">
+		    </div>
+		  </div>
+		  <div class="form-group" ng-if="!(dispatch.quency == 'loop'&&dispatch.loop.frequency == 'intervals')">
+		  	<label  class="col-sm-2 control-label">时间</label>
+		  	<div class="col-sm-9">
+		  		 <div uib-timepicker ng-model="dispatch.time" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+		  	</div>
+		  </div>
+		  <div class="form-group" >
+		  <label  class="col-sm-7 control-label"></label>
+		  	<div class="col-sm-4 dispatch-addbtn">
+		  		<button  type="button" ng-click="back();" class="btn btn-warning btn-cancel">返回</button>
+		  		<button type="button" ng-disabled="!myForm.$valid" class="btn btn-primary btn-ok" ng-click="save();">保存</button>
+		  	</div>
+		  </div>
+	</form>
+</div>
+{% endverbatim %}

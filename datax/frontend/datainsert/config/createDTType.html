@@ -1,0 +1,60 @@
+<style>
+    .modal-content{
+        width: 500px;
+    }
+    .radiosStyle{
+        top:6px;
+    }
+</style>
+{% verbatim %}
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title">新增数据类型</h3>
+    <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body open-body">
+    <form role="form" method="post" id="editType" name="editType" class="form-horizontal">
+        <div class="form-group" style="display: none;">
+            <label></label>
+            <input type="text" name="id" ng-model='type.id'>
+            <input type="text" name="parent_id" ng-model="type.parent_id">
+            <input type="text" name="level" ng-model="type.level">
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label form-lable-modal">上级名称：</label>
+            <div class="col-sm-6 form-input-add">
+                <select class="form-control" ng-model='type.parent_name'>
+                    <option value="0">根节点</option>
+                    <option value="{{ item.id }}" ng-repeat="item in parentNames">{{ item.name }}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label form-lable-modal">类型名称：</label>
+            <div class="col-sm-8 form-input-add">
+                <input type="text" name="type_name" required ng-model='type.type_name' class="form-control" maxlength="30">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label form-lable-modal">排序：</label>
+            <div class="col-sm-3 form-input-add">
+                <input type="text" name="orderby" required ng-model='type.orderby' class="form-control" maxlength="30">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label form-lable-modal">状态：</label>
+            <div class="col-sm-6 form-input-add radiosStyle">
+                <label>启用：</label>
+                <input type="radio" name="status" value="1" ng-model="type.status">
+                <label style="margin-left: 20px">不启用：</label>
+                <input type="radio" name="status" value="0" ng-model="type.status">
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-ok" ng-disabled="!editType.$valid" type="button" ng-click="ok()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>
+{% endverbatim %}

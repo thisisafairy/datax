@@ -1,0 +1,169 @@
+{% extends 'base.html' %} {% load staticfiles %} {% block title %}首页配置{% endblock %} {% block content %}
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-ui-grid/ui-grid.css' %}">
+<link rel="stylesheet" href="{% static 'plugin/sup.treebox/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'system/indexconfig/index.config.css' %}"> {% verbatim %}
+<style type="text/css">
+</style>
+<div ng-app="indexconfig" ng-controller="indexconfigController">
+    <div class="controll-panel">
+        <!-- 新增模块按钮 -->
+        <button class="btn btn-default" ng-click="editModule('', -1, -1)">
+            <span class="glyphicon glyphicon-plus"></span> 新增模块链接
+        </button>
+        <!-- 保存按钮 -->
+        <button class="btn btn-default" ng-click="saveIndexConfig()">保存</button>
+    </div>
+    <div class="main-panel">
+        <div class="title-panel">
+            <!-- 标题 -->
+            <!-- 标题编辑框 -->
+            <input style="width:450px;" id="titleEdit" class="page-title" type="text" ng-model="title" />
+        </div>
+        <div class="cols-content clearfix" resize>
+            <!-- 列 -->
+            <div class="col " ng-mouseover="colHover(key, true)" ng-mouseleave="colHover(key, false)" ng-repeat="(key, col) in cols track by key">
+                <div class="col-panel " ng-mouseover="colHover(key, true)" ng-mouseleave="colHover(key, false)">
+                    <div class="col-title full-width" ng-style="colTitleStyles[key]">{{ col.title }}</div>
+                    <!-- 模块列表 -->
+                    <div class="col-datas full-width">
+                        <div class="module-data" ng-repeat="(moduleKey, module) in col.modules track by moduleKey">
+                            <!-- 模块ICON -->
+                            <div class="module-icon">
+                                <img ng-if="module.moduleIcon" ng-src="{{ module.moduleIcon }}">
+                                <img ng-if="!module.moduleIcon" ng-src="{{ defaultIcon }}">
+                            </div>
+                            <!-- 模块标题 -->
+                            <div class="module-title">{{ module.moduleName }}</div>
+                            <!-- 模块说明 -->
+                            <div class="module-desc">{{ module.moduleDesc }}</div>
+                            <!-- 模块说明图片 -->
+                            <div class="module-pic-desc" ng-if="module.modulePicDesc.length > 2">
+                                <img ng-if="module.modulePicDesc" ng-src="{{ module.modulePicDesc }}">
+                            </div>
+                            <!-- 模块操作按钮 -->
+                            <div class="module-operation">
+                                <!-- 编辑 -->
+                                <i class="fa fa-edit" ng-click="editModule(module, key, moduleKey)"></i>
+                                <br>
+                                <!-- 删除 -->
+                                <i class="fa fa-trash-o" ng-click="removeModule(key, moduleKey)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 列标题 -->
+
+                <div class="col-arrow ">
+                    <!-- 安全管控图片 -->
+                    <img src="/frontend/image/ico/safe_control.png" class="safety" ng-if="key == 3">
+                    <img src="/frontend/image/ico/index_arrow.png" class="arraw">
+                </div>
+            </div>
+            <!-- phone,pad,pc,tv图片 -->
+            <div class="last-step" >
+                <img ng-src="{{ device }}" ng-repeat="device in showDevices">
+            </div>
+        </div>
+        <!-- 箭头 -->
+        <!-- <div class="arrow-content" ng-style="positionColStyle">
+            <div class="col-arrow" ng-repeat="(key, col) in cols track by key">
+                <img src="/frontend/image/ico/index_arrow.png">
+            </div>
+        </div> -->
+    </div>
+
+
+    <script type="text/ng-template" id="editModule.html">
+        <div class="modal-header open-header">
+            <h3 class="modal-title open-header-title">编辑模块</h3>
+            <!--  弹出框的关闭按钮  -->
+            <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body open-body">
+            <form class="form-horizontal" id="moduleForm" name="moduleForm">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label form-lable-add">增加到</label>
+                    <div class="col-sm-10 form-input-add">
+                        <select class="form-control" ng-change="changeCol()" name="colIndex" required id="colIndex" ng-model="moduleConfig.colIndex" >
+                            <option ng-repeat="item in colSize" value="{{ item }}">第{{ item }}列</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label form-label-add">模块名称</label>
+                    <div class="col-sm-10 form-input-add">
+                        <sup-tree-box data="menus" name="'moduleKey'" value="moduleKey"></sup-tree-box>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label form-label-add">说明</label>
+                    <div class="col-sm-10 form-input-add">
+                        <input type="text" name="moduleDesc" ng-model="moduleConfig.moduleDesc" id="moduleDesc" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label form-label-add">图标</label>
+                    <div class="col-sm-4 form-input-add">
+                        <input type="text" name="moduleIcon" ng-model="moduleConfig.moduleIcon" id="moduleIcon" class="form-control">
+                    </div>
+                    <div class="col-sm-4 form-input-add">
+                        <input type="file" class="form-control" id="uploadModuleIcon" name="moduleIconUpload">
+                    </div>
+                    <div class="col-sm-2 form-input-add">
+                        <button class="btn btn-default" ng-click="uploadModuleIcon('moduleIconUpload')">
+                            <span class="glyphicon glyphicon-plus"></span>上传
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label form-label-add">图片说明</label>
+                    <div class="col-sm-4 form-input-add">
+                        <input type="text" name="modulePicDesc" ng-model="moduleConfig.modulePicDesc" id="modulePicDesc" class="form-control">
+                    </div>
+                    <div class="col-sm-4 form-input-add">
+                        <input type="file" class="form-control" id="modulePicDescUpload" name="modulePicDescUpload">
+                    </div>
+                    <div class="col-sm-2 form-input-add">
+                        <button class="btn btn-default" ng-click="uploadModuleIcon('modulePicDescUpload')">
+                            <span class="glyphicon glyphicon-plus"></span>上传
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label form-label-add">排序</label>
+                    <div class="col-sm-10 form-input-add">
+                        <input type="number" name="moduleSort" ng-model="moduleConfig.moduleSort" required ng-pattern="/^[0-9]/" id="moduleSort" class="form-control">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer footer-btn">
+            <button class="btn btn-primary btn-ok" type="button" ng-click="ok()" ng-disabled="moduleForm.moduleSort.$invalid">保存</button>
+            <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+        </div>
+    </script>
+
+    <!--
+        <div class="containers">
+            <div class="drag-content">
+          <div class="btn btn-droppable" ng-repeat="item in controls" data-drop="true" ng-model='controls' jqyoui-droppable="{index: {{$index}}}">
+            <div class="btn btn-info btn-draggable" data-drag="true" data-jqyoui-options="{revert: 'invalid'}"
+                 ng-model="controls" jqyoui-draggable="{index: {{$index}},placeholder:true,animate:true, onStart:'startCallback(item, $index)',
+                            onStop: 'stopCallback', onDrag: 'dragCallback'}">
+                {{item.name}}
+            </div>
+          </div>
+            </div>
+        </div>
+        <div class="content" data-drop="true" >
+
+        </div>
+        -->
+</div>
+{% endverbatim %}
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-ui-grid/ui-grid.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'plugin/sup.treebox/dist/sup.treebox.js' %}"></script>
+<script src="{% static 'system/indexconfig/index.config.js' %}"></script>
+<script src="{% static 'system/indexconfig/index.js' %}?v={{ nowversion }}1"></script> {% endblock %}

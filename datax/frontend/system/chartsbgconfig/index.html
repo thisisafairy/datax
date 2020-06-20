@@ -1,0 +1,89 @@
+ {% extends 'base.html' %} {% load staticfiles %} {% block title %}图表背景配置{% endblock %} {% block content %} {% verbatim %}
+<style>
+.inputConfigFileStyle {
+    position: absolute;
+    font-size: 22px;
+    opacity: 0;
+    top: 0px;
+    width:72px;
+}
+</style>
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel">
+        图表背景配置
+    </h1>
+</section>
+<div class="col-sm-12 user-list" ng-app="chartsbgconfiglist">
+    <div class="box" ng-controller="chartsbgconfigController">
+        <div class="box-body user-list-body">
+            <div class="col-md-1">
+                <a class="btn btn-default btn-usermanage" ng-click="addconfig('0')">
+                    <i class="fa fa-plus"></i> 新增
+                </a>
+            </div>
+            <div class="col-md-1">
+                <a class="btn btn-default btn-usermanage">
+                    <i class="fa fa-plus"></i> 导入
+                </a>
+                <input type="file" id="uploadConfigFileID" accept=".zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed" class="inputConfigFileStyle" onchange="angular.element(this).scope().uploadConfigFile()">
+            </div>
+            <div class="col-md-offset-6 col-md-3">
+                <div class="form-group">
+                    <div class="col-sm-6 cont-body-tabinput">
+                        <input type="text" ng-model="searchkey" ng-change="search()" class="form-control cont-bodyfrom-input" placeholder="搜索名称">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 userlist-table">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th data-field="confname" data-align="left">名称</th>
+                            <th data-field="remark" data-align="left">备注</th>
+                            <th data-field="status" data-align="left">状态</th>
+                            <th data-field="creater" data-align="left">创建者</th>
+                            <th data-field="createtime" data-align="left">创建时间</th>
+                            <th data-field="modifytime" data-align="left">修改时间</th>
+                            <th style="min-width: 126px">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(key,chartsbgconfig) in lists">
+                            <td>{{ chartsbgconfig.confname }}</td>
+                            <td>{{ chartsbgconfig.remark }}</td>
+                            <td>{{ chartsbgconfig.status==0?'可用':'禁用' }}</td>
+                            <td>{{ chartsbgconfig.creater }}</td>
+                            <td>{{ chartsbgconfig.createtime }}</td>
+                            <td>{{ chartsbgconfig.modifytime }}</td>
+                            <td>
+                                <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="addconfig(chartsbgconfig.id)">编辑</button>
+                        <!--    <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="open(chartsbgconfig.id)">编辑</button>  -->
+                        <!--    <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="test(chartsbgconfig.id)">编辑</button>  -->
+                                <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="forbidden(chartsbgconfig.id)">{{ chartsbgconfig.status==1?'可用':'禁用' }}</button>
+                                <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="exportBGConfig(chartsbgconfig.id)">导出</button>
+                                <button class="btn  editable-table-button  btn-xs btn-buttons" ng-click="delete(chartsbgconfig)">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-12">
+                <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                    boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endverbatim %}
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'plugin/echarts/echarts.min.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-bootstrap-colorpicker/bootstrap-colorpicker-module.min.js' %}"></script>
+<script src="{% static 'newdashboard/default_styles.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/modal-drag/datax-panel-drag.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'system/chartsbgconfig/index.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'system/chartsbgconfig/sampledata.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'dashboard/directives/select-img.js' %}?v={{ nowversion }}1"></script>
+{% endblock %}

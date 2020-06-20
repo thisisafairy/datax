@@ -1,0 +1,56 @@
+ {% extends 'base.html' %} {% load staticfiles %} {% block title %}用户访问场景日志管理{% endblock %} {% block content %} {% verbatim %}
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel">
+        用户访问场景日志管理
+    </h1>
+</section>
+<div class="col-sm-12 visitlog-list" ng-app="visitloglist">
+    <div class="box" ng-controller="visitLogListController">
+        <div class="box-body user-list-body">
+            <div class="col-md-3">
+            </div>
+            <div class="col-md-offset-6 col-md-3">
+                <div class="form-group">
+                    <div class="col-sm-6 cont-body-tabinput">
+                        <input type="text" ng-model="searchkey" ng-change="search()" class="form-control cont-bodyfrom-input" placeholder="搜索场景名称">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 visitlog-table">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th data-field="username" data-align="left">用户名(登录账户名)</th>
+                            <th data-field="targetname" data-align="left">访问目标的名称</th>
+                            <th data-field="targettype" data-align="left">访问目标的类型</th>
+                            <th data-field="visitcount" data-align="left">访问次数</th>
+                            <th data-field="modifytime" data-align="left">最后一次访问时间</th>
+                            <th style="min-width: 100px">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(key,value) in lists">
+                            <td>{{ value.username }}</td>
+                            <td>{{ value.targetname }}</td>
+                            <td>{{ value.targettype }}</td>
+                            <td>{{ value.visitcount }}</td>
+                            <td>{{ value.modifytime }}</td>
+                            <td>
+                                <button class="btn  editable-table-button  btn-xs btn-buttons" ng-click="delete(value)">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-12">
+                <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm"
+                    boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endverbatim %}
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'system/uservisitlog/listApp.js' %}?v={{ nowversion }}1"></script> {% endblock %}

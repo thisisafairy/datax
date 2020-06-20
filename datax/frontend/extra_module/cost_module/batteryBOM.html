@@ -1,0 +1,377 @@
+ {% extends 'base_portal.html' %} {% load staticfiles %} {% block title %}电池BOM管理{% endblock %}
+{% block content %}
+<link href="{% static 'css/Ext/css/ext-all.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'css/Ext/ax-all.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'css/ext/ux/css/LockingGridView.css'  %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'js/ext/ux/fileuploadfield/css/fileuploadfield.css'  %}" rel="stylesheet" type="text/css" />
+<style>
+</style>
+{% verbatim %}
+    <div id="form">
+    </div>
+    <div id="cumgrid"></div>
+{% endverbatim %}
+    <script src="{% static 'js/ext/adapter/jquery/ext-jquery-adapter.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ext-all.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ax-all.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/pgfunc-ext.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/locale/ext-lang-zh_CN.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ux/LockingGridView.js'%}" type="text/javascript"></script>
+    <script src="{% static 'js/ext/ux/fileuploadfield/fileuploadfield.js'%}" type="text/javascript"></script>
+
+    <script>
+        Ext.BLANK_IMAGE_URL = "{% static 'js/ext/s.gif' %}";
+        Ext.Ajax.defaultHeaders = {'X-CSRFToken' : getCookie('csrftoken')};
+        //后台数据URL
+        var listdataurl = '/cost/batteryBOMList' ; //后台返回列表数据 {total:1:rows:[{name:'name1',code:'code1'}]}
+        var productSizeurl = '/cost/getProductSize';
+
+        Ext.onReady(function(){
+            //获取 产品尺寸
+             var productSizeStore = new Ext.data.JsonStore({
+                autoLoad: true,
+                id: 'code',root: 'rows',
+                fields: [{ name: 'code',name:'name' }],
+                url: productSizeurl,
+                baseParams: { code: 'productSize' },
+
+            });
+            var producttypeCombo = {
+                xtype : 'combo',displayField : 'name',valueField : 'name',store : productSizeStore,mode : 'remote', triggerAction : 'all',
+                editable:true,minChars : 1,allowBlank : true,forceSelection : true,
+            };
+
+            //获取 版型
+             var modelStore = new Ext.data.JsonStore({
+                autoLoad: true,
+                id: 'code',root: 'rows',
+                fields: [{ name: 'code',name:'name' }],
+                url: productSizeurl,
+                baseParams: { code: 'model' },
+
+            });
+            var modelCombo = {
+                xtype : 'combo',displayField : 'name',valueField : 'name',store : modelStore,mode : 'remote', triggerAction : 'all',
+                editable:true,minChars : 1,allowBlank : true,forceSelection : true,
+            };
+
+            //定义所展示的列
+            var cols = [
+                 new Ext.grid.RowNumberer(),
+                new Ext.grid.CheckboxSelectionModel({singleSelect:false}),
+                { header: "产品尺寸",width:100,dataIndex: "productsize",editor:{xtype:'textfield'}},
+                { header: "数据类型",width:60,dataIndex: "datatype",editor:{xtype:'textfield'}},
+                { header: "分类",width:90,dataIndex: "materialtype",editor:{xtype:'textfield'}},
+                {header: "物料编码",width:100,dataIndex: "code", editor:{ xtype: 'textfield',allowBlank:true}},
+                {header: "物料名称",width:170,dataIndex: "name", editor:{ xtype: 'textfield',allowBlank:true}},
+                {header: "规格型号",width:150,dataIndex: "spec", editor:{ xtype: 'textfield',allowBlank:true} },
+                {header: "单位",width:70,dataIndex: "unit", editor:{ xtype: 'textfield',allowBlank:true} },
+                {header: "BOM",width:100,dataIndex: "bom", editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer },
+                {header: "损耗",width:60,dataIndex: "badcost", editor:{ xtype: 'numberfield',decimalPrecision:8}},
+                {header: "含损耗用量",width:100,dataIndex: "badbom", editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer},
+                {header: "含税价格",width:90,dataIndex: "rateprice", editor:{ xtype: 'numberfield',decimalPrecision:8},renderer:colRenderer },
+                {header: "供货比例",width:80,dataIndex: "percent", editor:{ xtype: 'numberfield',decimalPrecision:8} },
+                { header: "预估金额",width:100,dataIndex: "estimatedamount",renderer:colRenderer},
+           ];
+
+
+            //查询所需的store
+            var store =new Ext.data.Store({
+                autoLoad : true,  
+                idProperty: 'id',
+                url: listdataurl,  
+                reader : new Ext.data.JsonReader({totalProperty: 'total',root: 'rows'}, 
+                    [{ name : 'id'},{name : 'datatype'}, {name:'productsize'},{name : 'materialtype'}, {name:'name'},{name:'code'}, {name : 'spec'}, {name:'unit'}, {name : 'bom'},
+                      {name:'badcost'}, {name : 'badbom'},{name:'rateprice'},{name:'percent'},{name:"estimatedamount"}]),  
+                sortInfo: {field: 'id', direction: 'ASC'},
+                listeners:{
+                    beforeload:function(){
+                        Ext.getBody().mask('页面加载刷新中,请稍后......');
+                    },load:function(){
+                        Ext.getCmp("sumestimatedamount").setValue(store.reader.jsonData.sumestimatedamount);
+                        Ext.getBody().unmask();
+                    }
+                }
+
+                        });  
+            function colRenderer(val) {
+                if(isNaN(val)){
+                    return Ext.util.Format.number(val,'0.0000');
+                };
+                //处理不需要转换的数字
+                var str = ''+val;
+                if(!/e/i.test(str)){return val;};
+                return (val).toFixed(18).replace(/\.?0+$/, "");
+            }
+
+           var toolbar = new Ext.Toolbar(['-', {
+                    text: '添加',
+                    handler: function(){
+                        var Record = grid.getStore().recordType;
+                        var date = new Date()
+                        var p = new Record({"productsize":"","datatype":"","materialtype":"","name":"","code":"","spec":"","unit":"","bom":0,
+                                            "badcost":0,"badbom":0,"rateprice":0,"percent":0,"estimatedamount":0
+                                            });
+                        grid.stopEditing();
+                        var insRowIdx = store.data.length;
+                        store.insert(insRowIdx, p);
+                        grid.startEditing(insRowIdx, 2);
+                    }
+                }, '-', {
+                    text: '删除',
+                    handler: function(){
+                        Ext.Msg.confirm('信息', '确定要删除？', function(btn){
+                            if (btn == 'yes') {
+                               var recs = grid.getSelectionModel().getSelections();
+                                var ids='';
+                                for (var i = 0; i < recs.length; i++) {
+                                        if (recs[i] && (recs[i].get("id") == null || recs[i].get("id") == "")) {
+                                            grid.getStore().remove(recs[i]);
+                                            grid.getStore().commitChanges();
+                                        }
+                                        else if(recs[i])
+                                        {
+                                            ids+="'" + recs[i].get("id")+"',";
+                                        }
+                                    }
+                                $.ajax({
+                                    url: '/cost/deleteBatteryBOM',
+                                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                                    type: 'post',
+                                    data: { 'datas':ids }
+                                }).then(function (rs) {
+                                    if (rs.code == '1') {
+                                        Ext.getBody().unmask();
+                                        Reload(true);
+                                    }
+                                    else {
+                                        alert(rs.msg);
+                                        Ext.getBody().unmask();
+                                    }
+                                    store.commitChanges();
+                                    Reload();
+                                });
+                            }
+                        });
+                    }
+                }, '-',{
+                    text: '保存',
+                    handler: function(){
+                        recs = store.getModifiedRecords();
+                        var dt=[];
+                        $.each(recs, function() {
+                            dt.push(this.data);
+                        });
+                        if(dt.length===0){
+                            return;
+                        }
+                        Ext.getBody().mask("保存中...");
+                        $.ajax({
+                            url: '/cost/saveBatteryBOM',
+                            headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                            type: 'post',
+                            data: { 'datas': JSON.stringify(dt)}
+                        }).then(function (rs) {
+                            if (rs.code == '1') {
+                                Ext.getBody().unmask();
+                            }
+                            else {
+                                alert(rs.msg);
+                                Ext.getBody().unmask();
+                            }
+                            store.commitChanges();
+                            Reload();
+                        });
+
+                    }
+                },'-', {
+               text: 'excel导入', handler: function () {
+                   fileWindow();
+               }
+               },'-',{
+                    text: 'excel导出',
+                    handler: function(){
+                        let data = {
+                            "export" : 'export',
+                            "productsize" : Ext.getCmp("productsize").getValue()
+                        }
+                        $.ajax({
+                            url:'/cost/batteryBOMList',
+                            headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                            type:'POST',
+                            data:data
+                        }).then(function (res) {
+                            if(res.code == 1){
+                                window.location.href=res.url;
+                                // ExtGridExportExcel(grid, { store: null, title: '组件BOM' });
+                            }else {
+                                alert('导出失败,刷新后尝试')
+                            }
+                        })
+
+                    }
+
+
+                }
+           ]);
+
+           var schBar = new Ext.ux.AimSchPanel({
+                store: store,
+                padding: '3 0 0 0',
+                collapsed:false,
+                columns:2,
+               items: [{ fieldLabel: '产品尺寸',id:'productsize',style: { marginTop: '2px' },labelWidth:60,store:productSizeStore,
+                   xtype: 'combo',name:'name',triggerAction : "all",
+                   displayField : 'name',valueField: "name",schopts: { qryopts: "{ mode: 'Like', field: 'hg' }"},
+                   listeners: {'select': function(){ Reload(); }}},
+                   { fieldLabel: "",width:600},
+                   { fieldLabel: 'sum预估金额',id:'sumestimatedamount',style: { marginTop: '2px' },labelWidth:80,
+                       schopts: { qryopts: "{ mode: 'Like', field: 'hg' }"},
+                      },
+
+               ]
+
+            });
+
+           var titPanel = new Ext.ux.AimPanel({
+                    tbar: toolbar,
+                   items: [schBar]
+                });
+           var grid = new Ext.ux.grid.AimEditorGridPanel({
+               title:'电池BOM',
+                lockable: true,
+                clicksToEdit: 1,
+                height:document.body.clientHeight-40,
+                renderTo: 'cumgrid',
+                enableColumnHide: false,
+                store: store,
+                columns: cols,
+                tbar: titPanel,
+                width:document.body.clientWidth-$("#silderApp").width()-190,
+                columnLines: true,
+
+            });
+           //需要锁定到最左边的列
+           grid.getColumnModel().setLocked(0,true);
+           grid.getColumnModel().setLocked(1,true);
+           grid.getColumnModel().setLocked(2,true);
+           grid.getColumnModel().setLocked(3,true);
+           //构建需要填报的周信息
+           //ReBuildCols();
+           //加载数据
+           Reload();
+           //加载后台数据
+           function Reload(flag) {
+               if (flag!==true&&store.getModifiedRecords().length > 0)
+               {
+                   Ext.Msg.confirm('信息', '存在未保存的记录，确定要重新加载新数据？', function(btn){
+                        if (btn == 'yes') {
+                            Reload(true);
+                        }
+                    });
+               }
+               else
+               {
+                   //传递到后台的参数
+                   store.load({
+                       params:{
+                           productsize : Ext.getCmp("productsize").getValue(),
+                           //module : Ext.getCmp("module").getValue(),
+                       }
+                   });
+               }
+
+           }
+        });
+
+    var addwin = null;
+        function fileWindow(){
+            if(addwin)addwin.show();
+            else
+            {
+                var uploadForm=new Ext.FormPanel({
+                    id:'uploadForm',
+                    width:520,
+                    frame:true,
+                    fileUpload: true,
+                    autoHeight:true,
+                    bodyStyle:'10px 10px 0px 10px',
+                    labelWidth:50,
+                    enctype: 'multipart/form-data',
+                    defaults:{
+                        anchor: '95%',
+                        allowBlank: false
+                    },
+                    items:[
+                        {
+                            xtype:'fileuploadfield',
+                            emptyText: '请选择上传文件...',
+                            fieldLabel: '文件：',
+                            id:'uploadFile',
+                            name: 'upload',
+                            allowBlank: false,
+                            blankText: '文件名称不能为空.',
+                             buttonCfg: {
+                                        text: '选择...'// 上传文件时的本地查找按钮
+                              }
+                        }
+                    ],
+                    buttons: [{
+                                    text: '上传',
+                                    handler: function(){
+                                        if(uploadForm.getForm().isValid()){
+                                            var targetFile = document.getElementById('uploadFile-file')
+                                            var formChartsData = new FormData();
+                                            var productsize = Ext.getCmp("productsize").getValue();
+                                            formChartsData.append("filename", targetFile.files[0]);
+                                            formChartsData.append("productsize",productsize)
+                                            $.ajax({
+                                                url: '/cost/uploadbatteryBOM',
+                                                headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                                                type: 'post',
+                                                processData: false,
+                                                contentType: false,
+                                                data: formChartsData
+                                            }).then(function (rs) {
+                                                if (rs.status == "success") {
+                                                    alert('上传成功')
+                                                    addwin.hide();
+                                                    window.location.reload();
+                                                } else {
+                                                    alert('上传失败');
+                                                }
+                                            });
+                                        }
+                                    }
+                                },{
+                                    text: '重置',
+                                    handler: function(){
+                                        uploadForm.getForm().reset();
+                                    }
+                                }]
+
+                });
+                addwin =new Ext.Window({
+                   title : '上传新文档',
+                    closable : true,
+                    width : 520,
+                    autoHeight: true,
+                    border : false,
+                    plain : true,
+                    modal : true,
+                    layout : 'fit',
+                    bodyStyle : 'padding:5px;',
+                    maximizable : false,// 禁止最大化
+                    closeAction : 'hide',
+                    closable : true,// 是否有关闭
+                    collapsible : true,// 可折叠
+                    iconCls : 'bind',
+                    items: [uploadForm]
+                }).show();
+
+            }
+        }
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,192 @@
+{% load staticfiles %}
+{% verbatim %}
+<header class="main-header" id="headapp" ng-controller="headController">
+    <!-- Logo -->
+    <a href="/dashboard/index" class="logo">
+      <!-- mini logo for sidebar mini 50x50 pixels -->
+      <span class="logo-mini">
+        <img src="/frontend/image/logo/mainlogo.png" alt="">
+      </span>
+      <!-- logo for regular state and mobile devices -->
+      <span class="logo-lg">数据眼</span>
+    </a>
+    <!-- Header Navbar: style can be found in header.less -->
+    <nav class="navbar navbar-static-top">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" ng-click="navstyle()" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+
+      <div class="navbar-custom-menu">
+
+        <ul class="nav navbar-nav">
+
+          <li class="dropdown user user-menu">
+
+            <a href="#" id="user-dropdown" class="dropdown-toggle" data-toggle="dropdown">
+              <img  ng-src="{{ picture }}" class="user-image userimg" alt="User Image">
+              <span class="hidden-xs" ng-bind="nickname"></span>
+            </a>
+            <ul class="dropdown-menu" ng-click="stop()">
+              <!-- User image -->
+              <li class="user-header">
+                <img ng-src="{{ picture }}" class="img-circle userimg" alt="User Image">
+                <p>
+                  DataX - 数据可视化
+                  <small>欢迎使用</small>
+                </p>
+
+                  <div ng-if="data.current == 1" class="pull-left">
+                     <br><br>
+
+                  <!--<ul ng-repeat="obj in objs">
+                      <li>
+                          <a href="/dashboard/msgcenter?id={{ obj.id }}" ng-cloak>{{ obj.mail_title }}</a>
+                      </li>
+                      <br>
+                  </ul>-->
+                  </div>
+
+
+              </li>
+              <li class="user-footer">
+                <div class="pull-left">
+                </div>
+                <div class="pull-right">
+                  <a href="/account/logout" class="btn btn-default btn-flat">退出</a>
+                </div>
+
+              </li>
+            </ul>
+          </li>
+            <!-- 刷新缓存 -->
+            <li class="dropdown user user-menu ">
+                <a href="/dashboard/clearcache" class="glyphicon glyphicon-refresh" title="刷新缓存"></a>
+            </li>
+
+            <li class="dropdown user user-menu ">
+
+            <!--href="/dashboard/msgcenters"-->
+            <a href="/dashboard/msgcenters"  class="nav-link glyphicon glyphicon-bell" >
+
+                <div id="sh" class="popconfirm" >
+
+                    <div ng-if="num>=1" id="num" class="nav-counter nav-counter-blue">{{ num }}</div>
+                </div>
+            </a>
+
+          </li>
+          <li>
+            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+          </li>
+        </ul>
+      </div>
+
+    </nav>
+  </header>
+
+
+
+<script type="text/javascript">
+			$(document).ready(function() {
+
+				$(".popconfirm").popConfirm();
+
+
+			});
+		</script>
+<script>
+var num='';
+function getNum(){
+ $.ajax({
+    url: '/api/account/echo1',
+    type: 'POST',
+    data: {},
+    success:function(data){
+        num = data.num
+        if(num ==1){
+            //处理第一次发送消息div加载不到
+            $("#sh").append("<div id='num' class='nav-counter nav-counter-blue'>"+"1"+"</div>")
+        }else if(num==0){
+            //处理消息数为0后div消不掉
+            $("#sh").append("")
+        }
+        $('#num').html(num);
+    }
+  });
+}
+
+
+window.onload=function(){
+    var socket = new WebSocket("ws://" + window.location.host + "/chat/");
+                            socket.onmessage = function() {
+                                getNum()
+                                //$('#newMessageDIV').html('<audio autoplay="autoplay"><source src="/frontend/image/audio/9478.wav"'
+		                        //+ 'type="audio/wav"/><source src="/frontend/image/audio/9478.wav" type="audio/mpeg"/></audio>');
+                            }
+                            socket.onopen = function() {
+                                getNum()
+                                //socket.send('');
+                        }
+                        if (socket.readyState == WebSocket.OPEN){
+                                socket.onopen();
+                        }
+
+}
+</script>
+
+<script src="http://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="../frontend/componets/jquery.popconfirm.js"></script>
+<script src="../frontend/componets/msgcenter.js"></script>
+
+<style type="text/css">
+	.nav-link {
+  position: relative;
+  padding: 14 14px;
+  line-height: 30px;
+  font-size: 8px;
+  font-weight: bold;
+  color: #555;
+  text-decoration: none;
+}
+.nav-link:hover {
+  color: #333;
+  text-decoration: underline;
+}
+
+.nav-counter {
+  position: absolute;
+  top: 8px;
+  right: 1px;
+  min-width: 12px;
+  height: 18px;
+  line-height: 20px;
+  width: 18px;
+  margin-top: -9px;
+  padding: 4 4px;
+  font-weight: normal;
+  color: white;
+  text-align: center;
+  line-height:15px;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.2);
+  background: #e23442;
+  border: 1px solid #911f28;
+  border-radius: 11px;
+  background-image: -webkit-linear-gradient(top, #e8616c, #dd202f);
+  background-image: -moz-linear-gradient(top, #e8616c, #dd202f);
+  background-image: -o-linear-gradient(top, #e8616c, #dd202f);
+  background-image: linear-gradient(to bottom, #e8616c, #dd202f);
+  -webkit-box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.1), 0 1px rgba(0, 0, 0, 0.12);
+  box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.1), 0 2px rgba(0, 0, 0, 0.12);
+}
+
+.nav-counter-blue {
+  background: #FF0000;
+  border: 1px solid #FF0000;
+  background-image: -webkit-linear-gradient(top, #FF0000, #FF0000);
+  background-image: -moz-linear-gradient(top, #FF0000, #FF0000);
+  background-image: -o-linear-gradient(top, #FF0000, #FF0000);
+  background-image: linear-gradient(to bottom, #FF0000, #FF0000);
+}
+</style>
+{% endverbatim %}

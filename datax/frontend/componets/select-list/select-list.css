@@ -1,0 +1,68 @@
+
+.select-list-full-content {
+    width: 250px;
+    height: 300px;
+    position: relative;
+    user-select: none;
+    list-style: none;
+    color: rgba(0, 0, 0, .65);
+    background: rgba(255, 255, 255, 1);
+}
+
+.select-list-header {
+    padding: 6px 12px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(204, 204, 204, 1);
+    width: 100%;
+    height: 34px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.select-list-body {
+    height: 100%;
+    font-size: 14px;
+    position: relative;
+}
+
+.select-list-item-list {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.select-list-item-list .select-list-item {
+    position: relative;
+    display: block;
+    padding: 5px 12px 5px 20px;
+    line-height: 22px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background .3s ease;
+}
+
+.select-list-item-list .select-list-item:hover {
+    background-color: rgba(237, 238, 240, 1);
+}
+
+.select-list-item-list .row-checked {
+    background-color: rgba(225, 225, 225, 1);
+}
+
+/* region 仿bootstrap主题方案 */
+.select-list-bootstrap {
+    border: 1px solid rgba(204, 204, 204, 1);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.select-list-bootstrap .select-list-header {
+    border-bottom: 1px solid rgba(204, 204, 204, 1);
+}
+
+.select-list-bootstrap .select-list-filter-input {
+    border-radius: 4px;
+}
+
+/* endregion */

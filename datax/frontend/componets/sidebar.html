@@ -1,0 +1,123 @@
+{% verbatim %}
+<style>
+    .imgPreview{
+        padding-top: 7px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+  .imgPreview img{
+    width: 100%;
+    height: 100%;
+  }
+  .passwordchange{
+    padding: 10px;
+  }
+  .user-homemanage li{
+    cursor: pointer;
+  }
+    .inputFileStyle{
+        padding-top: 5px;
+        padding-bottom: 5px;
+        position: absolute;
+        font-size: 22px;
+        opacity: 0;
+        top: 0px;
+        width: 55px;
+    }
+    .showFileNameSpanStyle{
+        /*display: inline-block;*/
+        width: 107px;
+        vertical-align: middle;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+<div id="sidebarapp"   ng-controller="sidebarController" >
+<aside id="control-left" class="control-sidebar  control-sidebar-dark">
+  <div class="user-collect">
+    <ul>
+      <li><i class="fa fa-circle "></i>场景管理 </li>
+      <li><i class="fa fa-circle "></i>元数据管理</li>
+      <li><i class="fa fa-circle "></i>模块管理</li>
+    </ul>
+  </div>
+  <div class="control-sidebar-center"></div>
+  <div class="user-manage">
+    <div class="">
+      <h5 id="user-homemanage">账号管理</h5>
+        <ul class="user-homemanage">
+          <li ng-click="changepassword()">  密码修改</li>
+          <li  ng-click="changepicture()">头像修改</li>
+        </ul>
+    </div>
+    <div class="theme-choice">
+      <div class="form-group">
+        <label for="firstname" class="col-sm-4 control-label cont-body-labelid">主题选择</label>
+        <div class="col-sm-6 cont-body-idinput">
+          <select id="theme-select" class="form-control pull-right" ng-model="theme" ng-change="themechange()">
+            <option value="theme1">时尚</option>
+            <option value="clean">简约</option>
+            <option value="glass">玻璃</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ueser-logout">
+    <a href="/account/logout"> <i class="fa fa-circle "></i>退出登录</a>
+  </div>
+</aside>
+<div class="control-sidebar-bg">
+  <aside id="control-right" class="col-md-offset-6 col-md-6" >
+        <div class="passwordchange" ng-if="passstart">
+            <form name="passwordform" class="form-horizontal">
+                <div class="form-group">
+                  <input id="oldpass" type="{{ inputtpye }}" class="form-control" ng-model="passform.oldpass" required placeholder="原密码"/>
+                </div>
+                <div class="form-group">
+                  <input id="newpass" type="{{ inputtpye }}" class="form-control" ng-model="passform.newpass" required placeholder="新密码"/>
+                </div>
+                <div class="form-group">
+                  <input id="confirmpass" type="{{ inputtpye }}" class="form-control" ng-model="passform.confirmpass" required placeholder="确认密码"/>
+                </div>
+                <div class="form-group text-center">
+                  <button class="btn btn-primary" ng-if="showpass" ng-click="inputtype('text')">显示密码</button>
+                  <button class="btn btn-primary" ng-if="!showpass" ng-click="inputtype('password')">隐藏密码</button>
+                  <button class="btn btn-primary" ng-click="savepass()" ng-disabled="passwordform.$invalid">保存</button>
+                </div>
+            </form>
+            <div class="col-md-12 text-center">
+                {{ msg }}
+            </div>
+        </div>
+        <div class="picuterchange" ng-if="picstart">
+            <div style="padding-top: 5px;padding-bottom: 5px;">
+                <button class="btn btn-success fileinput-button" type="button">浏览</button>
+                <input type="file" class="inputFileStyle" onchange="showFileNameInSpan()" id="picture"/>
+                <span id="showFileNameSpan" class="showFileNameSpanStyle">未上传文件</span>
+            </div>
+
+            <button id="uploadfile" ng-click="upload()" class="btn btn-primary">上传</button>
+            <button ng-click="updatepicture()" ng-disabled="savebutdisable" class="btn btn-primary"> 保存</button>
+            <div class="imgPreview col-md-12" ng-if="getimg">
+                <div>预览结果:</div>
+                <img ng-src="{{ imgpath }}" alt="" >
+            </div>
+        </div>
+  </aside>
+</div>
+</div>
+<script>
+    function showFileNameInSpan() {
+        var myfile = document.getElementById('picture');
+        if(myfile.files[0] != undefined){
+            $('#showFileNameSpan').text(myfile.files[0].name);
+            $('#showFileNameSpan').attr('title',myfile.files[0].name);
+        }else{
+            $('#showFileNameSpan').text('未上传文件');
+            $('#showFileNameSpan').attr('title','未上传文件');
+        }
+    }
+</script>
+{% endverbatim %}

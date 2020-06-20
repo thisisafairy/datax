@@ -1,0 +1,357 @@
+﻿
+/*---------------------- 整体页面样式开始 ------------------*/
+
+body
+{
+    padding:2px;
+    background-color:#F2F2F2;
+}
+
+/*页面标题头样式*/
+#header {
+    background: url(/images/NPortal/m.jpg) repeat-x center;
+}
+
+#header h1 {
+    font-size: 14px;
+    color: #fff;
+    font-weight: normal;
+    padding: 5px 10px;
+}
+
+/*---------------------- 整体页面样式结束 ------------------*/
+
+
+/*---------------------- 表单编辑样式开始 ------------------*/
+
+.aim-ui-td-caption
+{
+    text-align:left;
+    width:15%;
+    background-color:#DEE5E8;
+}
+
+.aim-ui-td-data
+{
+}
+
+.aim-ui-table-edit
+{
+    font-size:12px;
+    border:solid 1px #808080;
+    border-collapse:collapse;
+    margin:0px;
+    width:100%;
+}
+
+.aim-ui-table-edit td
+{
+    padding: 3px;
+    padding-left: 10px;
+    padding-right:10px;
+    /*border:solid 1px width;*/
+}
+
+.aim-ui-table-edit input, .aim-ui-table-edit textarea
+{
+    border:solid 1px #808080;
+}
+
+.aim-ui-button-panel
+{
+    font-size:12px;
+    border-top:1px solid #808080;
+    text-align:center;
+    padding:10px;
+}
+
+.aim-ui-button
+{
+    padding:2px;
+    padding-left:10px;
+    padding-right:10px;
+    cursor:hand;
+    color:White;
+    /*background-color:#A69E9C;*/
+    background-color:#808080;
+	border-style: outset;
+	border-width: thin;
+}
+
+.aim-ui-required
+{
+    background-color:#FEFFBB;
+}
+
+/*---------------------- 表单编辑样式结束 ------------------*/
+
+/*---------------------- 文件控件开始 ------------------*/
+
+.aim-ctrl-file
+{
+	background-color: #F7F7F7;
+	display: block;
+	margin:0px;
+	padding:2px 2px 2px 0px;
+	border:solid 1px #808080;
+	float:left;
+}
+
+.aim-ctrl-file-button
+{
+    margin:3px;
+    padding:2px;
+    padding-left:5px;
+    padding-right:5px;
+    cursor:hand;
+    color:White;
+    /*background-color:#A69E9C;*/
+    background-color:#808080;
+	border-style: outset;
+	border-width: thin;
+}
+
+.aim-ctrl-file a
+{
+	margin:0px 0px 0px 5px;
+}
+
+/*---------------------- 文件控件结束 ------------------*/
+
+/* formular */
+
+div.formular
+{
+	font-family: tahoma, verdana, "sans-serif";
+	font-size: 12px;
+	padding: 20px;
+	border: 1px solid #A5A8B8;
+	width: 100%;
+}
+
+.formular fieldset
+{
+	margin-top: 20px;
+	padding: 15px;
+	border: 1px solid #B5B8C8;
+}
+
+.formular legend
+{
+	font-size: 12px;
+	color: #15428B;
+	font-weight: 900;
+}
+
+.formular fieldset label
+{
+	float: none;
+	text-align: inherit;
+	width: auto;
+}
+
+.formular label span
+{
+	color: #000;
+}
+
+.formular .text-input
+{
+	width: 250px;
+	color: #555;
+	padding: 4px;
+	border: 1px solid #B5B8C8;
+	font-size: 14px;
+	margin-top: 4px;
+	background: #FFF url('/img/form/text-bg.gif') repeat-x;
+}
+
+.formular textarea
+{
+	width: 250px;
+	height: 70px;
+	color: #555;
+	padding: 4px;
+	border: 1px solid #B5B8C8;
+	font-size: 14px;
+	margin-top: 4px;
+	background: #FFF url('/img/form/text-bg.gif') repeat-x;
+}
+
+.formular .infos
+{
+	background: #FFF;
+	color: #333;
+	font-size: 12px;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.formular .submit
+{
+	background: url('/img/form/button-bg.png') repeat-x;
+	border: 1px solid #AAA;
+	padding: 4px;
+	margin-top: 20px;
+	float: right;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.formular hr
+{
+	clear: both;
+	visibility: hidden;
+}
+
+.formular .fc-error
+{
+	width: 350px;
+	color: 555;
+	padding: 4px;
+	border: 1px solid #B5B8C8;
+	font-size: 12px;
+	margin-bottom: 15px;
+	background: #FFEAEA;
+}
+
+/* validate */
+
+.formError
+{
+	position: absolute;
+	top: 300px;
+	left: 300px;
+	width: 150px;
+	padding-bottom: 15px;
+	display: block;
+	z-index: 5000;
+}
+
+.formError .formErrorContent
+{
+    font-size:12px;
+	width: 100%;
+	background: #808080;
+	color: yellow;
+	box-shadow: 1px 1px 6px #000;
+	-moz-box-shadow: 1px 1px 6px #000;
+	-webkit-box-shadow: 1px 1px 6px #000;
+	padding: 4px 10px 4px 10px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+}
+
+.formError .formErrorArrow
+{
+	position: absolute;
+	bottom: 0;
+	left: 20px;
+	width: 15px;
+	height: 15px;
+}
+
+.formError .formErrorArrow div
+{
+	box-shadow: 1px 4px 5px #808080;
+	-moz-box-shadow: 1px 4px 5px #808080;
+	-webkit-box-shadow: 1px 1px 5px #808080;
+	font-size: 0px;
+}
+
+.formError .formErrorArrow .line10
+{
+	width: 15px;
+	height: 1px;
+	background:#808080;
+	margin: 0 auto;
+	font-size: 0px;
+	display: block;
+}
+
+.formError .formErrorArrow .line9
+{
+	width: 13px;
+	height: 1px;
+	background: #808080;
+	margin: 0 auto;
+	display: block;
+}
+
+.formError .formErrorArrow .line8
+{
+	width: 11px;
+	height: 1px;
+	background: #808080;
+	margin: 0 auto;
+	display: block;
+}
+
+.formError .formErrorArrow .line7
+{
+	width: 9px;
+	height: 1px;
+	background: #808080;
+	margin: 0 auto;
+	display: block;
+}
+
+.formError .formErrorArrow .line6
+{
+	width: 7px;
+	height: 1px;
+	background: #808080;
+	margin: 0 auto;
+	display: block;
+}
+
+.formError .formErrorArrow .line5
+{
+	width: 5px;
+	height: 1px;
+	background: #808080;
+	margin: 0 auto;
+	display: block;
+}
+.formError .formErrorArrow .line4
+{
+	width: 3px;
+	height: 1px;
+	background: #808080;
+	margin: 0 auto;
+	display: block;
+}
+
+.formError .formErrorArrow .line3
+{
+	width: 1px;
+	height: 1px;
+	background: #808080;
+	margin: 0 auto;
+	display: block;
+}
+
+.x-tab-tabmenu-right {
+    background: transparent url(/images/shared/tog_show.gif) no-repeat 0 0;
+    border-bottom: 1px solid #8db2e3;
+    width:18px;
+    position:absolute;
+    right:0;
+    top:7;
+    z-index:10;
+    cursor:pointer;
+}
+
+.x-tab-tabmenu-over {
+    filter:alpha(opacity=50);
+}
+
+.x-tab-tabmenu-disabled {
+    background-position: 0 0;
+    opacity:.5;
+    -moz-opacity:.5;
+    filter:alpha(opacity=50);
+    cursor:default;
+}
+

@@ -1,0 +1,118 @@
+{% verbatim %}
+<link rel="stylesheet" href="{% static '/plugin/bootstrap/css/bootstrap.css'%}">
+<style>
+    .modal-dialog{  /*用于限制当前页面弹出框的宽度，这个类在本页面没有，生成弹出框的时候才加载*/
+        width: 500px;
+    }
+    .modal-body{
+        padding-top: 10px;
+    }
+    .modal-body .form-input-add{
+        padding-right: 5px;
+    }
+    .iconSelfDesignStyle{
+        text-align: center;
+        padding-right: 0px;
+    }
+    .buildRelations{
+        height: 100px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-left: 20px;
+    }
+    .joinIconStyle-true{
+        background: skyblue;
+    }
+    .currTableNameShow{
+        text-align: center;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    .myIconStyle{
+        font-size: 24px;
+        padding-top: 3px;
+    }
+    .backgroudShadow{
+        width: 80px;
+        height: 45px;
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+        cursor: pointer;
+    }
+</style>
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title" style="width:92%">联接</h3>
+    <!--  弹出框的关闭按钮  -->
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close" style="width:10%"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body open-body">
+    <form action="#" class="form-horizontal clearfix" method="post" id="relationModle">
+        <div class="col-sm-12 form-group clearfix" style="left: 3%;">
+            <!--<label for="inputEmail3" class="col-sm-2 control-label form-lable-modal">关联关系</label>
+            <div class="col-sm-4 form-input-add">
+               <select class="form-control" ng-model="relationObj.relation.relationtype">
+                        <option value="left join">左关联</option>
+                        <option value="join">普通关联</option>
+                        <option value="right join">右关联</option>
+                        <option value="inner join">内部关联</option>
+                        <option value="full join">全关联</option>
+                </select>
+            </div>-->
+            <div class="col-sm-3 form-input-add iconSelfDesignStyle" style="padding-left: 20px" ng-repeat="(k,v) in allJoinIcon" ng-click="changeJoin($event,k)">
+                <div class="backgroudShadow joinIconStyle-{{ relationObj.relation.relationtype == k }}">
+                    <img src="{{ v }}" height="30" width="42" title="{{ joinChText[k] }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group clearfix" style="padding-left: 20px">
+            <div class="col-sm-4 form-input-add" style="text-align: center">数据源</div>
+            <div class="col-sm-3 form-input-add"></div>
+            <div class="col-sm-4 form-input-add currTableNameShow" title="{{ currTableName }}">{{ currTableName }}</div>
+            <div class="col-sm-1 form-input-add "></div>
+        </div>
+        <div class="buildRelations">
+            <div ng-repeat="(key,relationvalue) in relationObj.relation.relationdetail track by key">
+                <div class="form-group clearfix">
+                    <div class="col-sm-4 form-input-add">
+                        <select class="form-control" ng-model="targetColumnObj[key]" ng-options="value as value.field group by value.table for value in allcolumnlist track by value.identity">
+                            <option value="">选择一个字段</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3 form-input-add">
+                        <select class="form-control" ng-model="relationObj.relation.relationdetail[key].relationfunction">
+                            <option value="">选择一个运算符</option>
+                            <option value="=">等于</option>
+                            <option value=">">大于</option>
+                            <option value="<">小于</option>
+                            <option value=">=">大于等于</option>
+                            <option value="<=">小于等于</option>
+                            <option value="!=">不等于</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4 form-input-add">
+                        <select class="form-control" ng-model="relationObj.relation.relationdetail[key].mycolumn">
+                            <option value="">选择一个目标字段</option>
+                            <option ng-repeat="(idx,itemObj) in currTbCols track by idx" value="{{ itemObj.Field }}">
+                                {{ itemObj.Field }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-sm-1 form-input-add" ng-click="deleteRelationDetail(key)">
+                        <span class="glyphicon glyphicon-remove myIconStyle"></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-test" type="button" ng-click="addRelation()">新增关联字段</button>
+    <button class="btn btn-primary btn-ok" type="button" ng-click="ok()" ng-disabled="!legalSave">确定</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>
+{% endverbatim %}

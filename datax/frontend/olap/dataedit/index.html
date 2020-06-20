@@ -1,0 +1,265 @@
+{% extends 'base.html' %} 
+{% load staticfiles %}
+{% block title %}数据管理{% endblock %} 
+{% block content %}
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-ui-grid/ui-grid.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-bootstrap-datetimepicker/css/datetimepicker.css' %}"/>
+<style type="text/css">
+    .olap-list {
+        width: 350px;
+        float: left;
+        padding-left: 5px;
+        padding-top: 5px;
+    }
+
+    .list-group {
+        height: calc(100% - 55px);
+        overflow-y: scroll;
+    }
+
+    .olap-info {
+        float: left;
+        width: 100%;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .edit-control {
+        float: left;
+        width: 50%;
+    }
+    input[type='number']{/*设置分页页码显示框宽度*/
+        width: 65px;
+    }
+    .hiddenMoreCharacter {
+        overflow: hidden;
+        width: 133px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    .list-group-item{/*重写padding边距*/
+        padding: 10px 10px;
+        display: inline;
+    }
+    .columnconfig{
+        overflow-y: scroll;
+        overflow-x: scroll;
+        height: 400px;
+        width: 100%;
+    }
+    .configDialogAlertStyle{
+        padding-bottom: 10px;
+        color: red;
+    }
+    .selectTagStyle{
+        width: 200px;
+        display: inline;
+    }
+
+</style>
+{% verbatim %}
+<div ng-app="dataEdit" ng-controller="dataEditController" ng-style="style()" resize>
+    <div class="olap-list">
+        <p style="display: inline">请选择数据：</p>
+        <select class="form-control selectTagStyle" ng-model="olapDataSet" ng-options="val as val.name group by val.olaptype for val in olaplist" ng-change="showTable()" title="{{ val.name }}">
+        </select>
+        <!--<div class="selectDivStyle">
+            <a href="#" class="hiddenMoreCharacter list-group-item" ng-repeat="(key, val) in olaplist track by key" ng-click="showTable(val, key)" title="{{ val.name }}">{{ val.name }}</a>
+        </div>-->
+    </div>
+    <div class="olap-info" ng-if="tableName">
+        <div class="grid-tool-bar">
+            <p style="color: red;font-size: 16px;margin-left: 0px;margin-top: 10px;">
+                注意:只有额外导入数据为是(即通过本页面新增或导入)的数据才可编辑和删除（时间填写格式：1970-01-01 00:00:00）
+            </p>
+            <p>当前选中：{{ currentTable }}</p>
+            <a class="btn btn-default" href="#" ng-click="dataEdit('add')">
+                <i class="fa fa-plus"></i> 新增
+            </a>
+            <a class="btn btn-default" href="#" ng-click="dataEdit('update')">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+            <a class="btn btn-default" href="#" ng-click="dataEdit('delete')">
+                <i class="fa fa-trash-o"></i> 删除
+            </a>
+            <a class="btn btn-default" href="#" ng-click="excelExport()">
+                <i class="fa fa-download"></i> excel导出
+            </a>
+            <a class="btn btn-default" href="#" ng-click="olapTableExcelTemplateExport()">
+                <i class="fa fa-download"></i> excel导入模板下载
+            </a>
+            <a class="btn btn-default" href="#" ng-click="excelImport()">
+                <i class="fa fa-upload"></i> excel导入
+            </a><a class="btn btn-default" href="#" ng-click="olapTableExcelTemplateExport()">
+                <i class="fa fa-fax"></i> 数据模拟
+            </a>
+            <a class="btn btn-default" href="#" ng-click="excelImport()">
+                <i class="fa fa-backward"></i> 数据还原
+            </a>
+            <a class="btn btn-default" href="#" ng-click="configSourceImport()">
+                <i class="fa fa-cogs"></i> 配置导入源
+            </a>
+        </div>
+        <div ui-grid="gridOptions" style="width: 100%; min-height: 380px; text-align: center;" ui-grid-pagination ui-grid-selection ui-grid-resize-columns
+            ui-grid-auto-resize>
+        </div>
+    </div>
+
+    <!-- excel导入 -->
+    <script type="text/ng-template" id="excelImport.html">
+        <div class="modal-header open-header">
+            <h3 class="modal-title open-header-title" style="width: 90%;">excel上传
+                <font style="color: red; font-size: 14px; text-align: center;">
+                    注:请使用本模块导出的excel或提供的模板进行修改和上传
+                </font>
+            </h3>
+            <!--  弹出框的关闭按钮  -->
+            <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+
+        </div>
+        <div class="modal-body open-body">
+            <form class="form-horizontal" id="moduleForm" name="moduleForm">
+                <div class="form-group">
+                    <div class="col-sm-6 form-input-add">
+                        <input type="file" class="form-control" id="fileupload" name="fileupload">
+                    </div>
+                    <div class="col-sm-3 form-input-add">
+                        <div class="checkbox">
+                            <label>
+                                <input ng-model="coverUpload" type="checkbox">覆盖上次导入
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 form-input-add">
+                        <button class="btn btn-default" ng-click="uploadExcel('append')">
+                            <i class="fa fa-upload"></i> 导入
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer footer-btn">
+            <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+            <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+        </div>
+    </script>
+
+    <!-- 导入源配置 -->
+    <script type="text/ng-template" id="configSourceImport.html">
+        <div class="modal-header open-header">
+            <h3 class="modal-title open-header-title" style="width: 90%;">新增/编辑字段值源配置
+            </h3>
+            <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+
+        </div>
+        <div class="modal-body open-body">
+            <form class="form-horizontal columnconfig" id="configSourceImportForm" name="configSourceImportForm">
+                <div class="col-sm-12">
+                    <label class="col-sm-12 configDialogAlertStyle">注意：复选框选择是否使用olap作为源！</label>
+                </div>
+                <div class="col-sm-12">
+                    <label class="col-sm-2" style="text-align: right;">原始字段名</label>
+                    <label class="col-sm-3" style="text-align: right;padding-right: 15px;">使用olap/输入值</label>
+                    <label class="col-sm-2">数据库</label>
+                    <label class="col-sm-2">表</label>
+                    <label class="col-sm-2">字段</label>
+                    <label class="col-sm-1">维护方式</label>
+                </div>
+                <div>
+                    <div ng-repeat="(key, val) in columns track by key">
+                        <div class="col-sm-12 form-group">
+                            <label for="title" class="col-sm-2 control-label">{{ val.title }}</label>
+                            <div class="col-sm-1">
+                            </div>
+                            <div class="col-sm-2" style="text-align: center">
+                                <input type="checkbox" ng-model="$parent.columnConfig[val.fullname].useOlap" ng-change="switchOlapOrDb(val.fullname)" ng-true-value="1" ng-false-value="0">
+                                &nbsp;&nbsp;
+                                <input type="checkbox" ng-model="$parent.columnConfig[val.fullname].useConstantValue" ng-change="switchConstantValueOrDb(val.fullname)" ng-true-value="1" ng-false-value="0">
+                            </div>
+                            <div ng-if="$parent.columnConfig[val.fullname].useConstantValue == 0">
+                                <div class="col-sm-2">
+                                    <select class="form-control" ng-model="$parent.columnConfig[val.fullname].dbid" ng-change="toSeleTable(val.fullname)" ng-disabled="$parent.columnConfig[val.fullname].useOlap" title="{{ $parent.columnConfig[val.fullname].dbid }}">
+                                        <option ng-repeat="dbobj in allDBInfo" value="{{ dbobj.dbid }}" title="{{ dbobj.dbname }}">{{ dbobj.dbname }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <select class="form-control" ng-model="$parent.columnConfig[val.fullname].tableid" ng-change="toSelColumn(val.fullname)" title="{{ $parent.columnConfig[val.fullname].tableid }}">
+                                        <option ng-repeat="tableobj in allTableInfo[val.fullname]" value="{{ tableobj.tableid }}" title="{{ tableobj.tablename }}">{{ tableobj.tablenickname }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <select class="form-control" ng-model="$parent.columnConfig[val.fullname].colid" title="{{ $parent.columnConfig[val.fullname].colid }}">
+                                        <option ng-repeat="colobj in allColumnInfo[val.fullname]" value="{{ colobj.colid }}" title="{{ colobj.columnickname }}">{{ colobj.columnickname }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div ng-if="$parent.columnConfig[val.fullname].useConstantValue == 1">
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" ng-model="$parent.columnConfig[val.fullname].constantValue">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="col-sm-1">
+                                    <select class="form-control" ng-model="$parent.columnConfig[val.fullname].maintenMethod" ng-init="$parent.columnConfig[val.fullname].maintenMethod = 0" title="{{ $parent.columnConfig[val.fullname].maintenMethod }}">
+                                        <option ng-repeat="colobj in maintenMethod" value="{{ colobj.value }}" title="{{ colobj.name }}">{{ colobj.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer footer-btn">
+            <button class="btn btn-primary btn-ok" type="button" ng-click="addSource()">新增源</button>
+            <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+            <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+        </div>
+    </script>
+
+    <!-- 新增/编辑 -->
+    <script type="text/ng-template" id="dataEdit.html">
+        <div class="modal-header open-header">
+            <h3 class="modal-title open-header-title" style="width: 90%;">{{ operationType=='update'?'编辑':'新增' }}数据
+            </h3>
+            <!--  弹出框的关闭按钮  -->
+            <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+
+        </div>
+        <div class="modal-body open-body">
+            <form class="form-horizontal" id="moduleForm" name="moduleForm">
+                <div class="edit-control" ng-repeat="(key, val) in columns track by key">
+                    <div class="form-group">
+                        <label for="title" class="col-sm-4 control-label">{{ val.title }}</label>
+                        <div class="col-sm-8 form-input-add">
+                            <!--<input type="text" name="{{ val.fullname }}" ng-model="$parent.dataObj[val.fullname]" class="form-control">-->
+                            <alter-input column="val.fullname" coltype="columnTyps[val.fullname]" olapid="olapId" refrence="columnConfig[val.fullname]" input-value="$parent.dataObj[val.fullname]" addstatus="addstatus"></alter-input>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer footer-btn">
+            <button class="btn btn-primary btn-ok" type="button" ng-click="saveData()">保存</button>
+            <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+        </div>
+    </script>
+
+</div>
+
+{% endverbatim %}
+<script src="{% static 'plugin/angular/angular-ui-grid/ui-grid.min.js' %}"></script>
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-bootstrap-datetimepicker/js/datetimepicker.js' %}"></script>
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'olap/dataedit/index.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'js/resize.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'olap/directives/alter-imput.js' %}?v={{ nowversion }}1"></script>
+{% endblock %}

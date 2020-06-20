@@ -1,0 +1,45 @@
+{% verbatim %}
+<style>
+    .footer-btn {
+        padding-top: 0px;
+    }
+    .modal-body{
+        padding: 5px;
+    }
+
+    /*自定义样式*/
+    .selfDeignTableStyle{
+        height: 400px;
+        width: 800px;
+        overflow: auto;
+    }
+    .tableHead{
+        overflow-x: auto;
+    }
+    .tableBody{
+        overflow-y: auto;
+    }
+
+</style>
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title">预览数据</h3>
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body open-body selfDeignTableStyle">
+    <table class="table table-striped table-bordered">
+        <thead class="tableHead">
+            <tr>
+                <th ng-repeat="(colKey,colName) in columnName track by colKey"><span style="{{lastTitleLen[colKey]}};display: inline-block;">{{ colName }}</span></th>
+            </tr>
+        </thead>
+        <tbody class="tableBody">
+            <tr ng-repeat="(dataskey,datarow) in data track by dataskey">
+               <th ng-repeat="(columnkey,columnrow) in columnName track by columnkey" title="{{ datarow[columnrow] }}">{{ datarow[columnrow] }}</th>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer footer-btn">
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>
+{% endverbatim %}

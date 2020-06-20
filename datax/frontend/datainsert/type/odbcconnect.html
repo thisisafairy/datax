@@ -1,0 +1,74 @@
+<style>
+    .modal-dialog{  /*用于限制当前页面弹出框的宽度，这个类在本页面没有，生成弹出框的时候才加载*/
+        width: 470px;
+    }
+</style>
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title" ng-bind="configlist.type"></h3>
+    {#  弹出框的关闭按钮  #}
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body open-body">
+    <div ng-if="!istest&&testsuccess" class="alert alert-success alert-dismissible">
+                <!-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button> -->
+                <h4><i class="icon fa fa-check"></i>成功</h4>
+                <p ng-bind="msg"></p>
+    </div>
+    <div ng-if="!istest&&!testsuccess" class="alert alert-danger alert-dismissible">
+                <!-- <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button> -->
+                <h4><i class="icon fa fa-ban"></i> 失败</h4>
+                <p ng-bind="msg"></p>
+     </div>
+    <form action="#" method="post" id="configModle" class="form-horizontal">
+        <div class="form-group" style="display: none;">
+            <label></label>
+            <input type="text" name="id"  ng-model='configlist.id'>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label form-lable">数据库类型</label>
+            <div class="col-sm-6 form-input">
+                <input type="text" name="type" ng-change="getDatabase()" ng-disabled="true" required  class="form-control"  ng-model='configlist.type'>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label form-lable">ip</label>
+            <div class="col-sm-6 form-input">
+                <input type="text" name="ip" ng-change="getDatabase()" required ng-model='configlist.ip'  class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label form-lable">端口</label>
+            <div class="col-sm-3 form-input">
+                <input type="text" name="port" ng-change="getDatabase()" required ng-model='configlist.port'  class="form-control" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label form-lable">用户名</label>
+            <div class="col-sm-6 form-input">
+                <input type="text" name="user_name" ng-change="getDatabase()" required ng-model='configlist.user_name' class="form-control" maxlength="30">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label form-lable">密码</label>
+            <div class="col-sm-6 form-input">
+                <input type="password" name="password" ng-change="getDatabase()" required  ng-model='configlist.password' class="form-control" maxlength="30">
+            </div>
+        </div>
+         <div class="form-group">
+            <label class="col-sm-3 control-label form-lable">数据库名</label>
+            <div class="col-sm-6 form-input">
+                <select ng-if="configlist.type != 'oracle'" ng-model='configlist.database' class="form-control" ng-options="list for list in lists">
+                    <!-- <option ng-repeat="(key, list) in lists" ng-value="list" ng-bind="list"></option> -->
+                </select>
+                <input type="text" class="form-control"  ng-model="configlist.database" ng-if="configlist.type == 'oracle'">
+            </div>
+            <!-- <input type="text" name="database"  required ng-model='configlist.database'  class="form-control" > -->
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer footer-btn">
+    <button class="btn btn-primary btn-test" type="button" ng-click="test()">测试连接</button>
+    <button class="btn btn-primary btn-ok" ng-disabled="istest||!testsuccess" type="button" ng-click="ok()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>

@@ -1,0 +1,83 @@
+ {% verbatim %}
+ <style type="text/css">
+     .conversion-window .modal {
+        width: 96% !important;
+        height: 80% !important;
+        top: 10% !important;
+        left: 2% !important;
+        margin-left: 0px !important;
+    }
+
+    .conversion-window .modal .modal-lg {
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0px !important;
+    }
+
+     .modal-lg .modal-content {
+         height: 100%;
+     }
+     .operatFeildMinWidth{
+         min-width: 185px;
+     }
+ </style>
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel">
+        元数据管理
+    </h1>
+</section>
+<div class="col-md-12">
+    <div class="box ">
+        <div class="box-body">
+            <div class="col-md-3">
+                <a class="btn btn-default" href="#add/">
+                    <i class="fa fa-plus"></i> 新增
+                </a>
+            </div>
+            <!--<div class="col-md-offset-6 col-md-3">
+        <input type="text" class="form-control" placeholder="搜索">
+    </div>-->
+            <div class="col-md-offset-6 col-md-3">
+                <div class="form-group">
+                    <div class="col-sm-6 cont-body-tabinput">
+                        <input type="text" ng-model="searchkey" ng-change="search()" class="form-control cont-bodyfrom-input" placeholder="搜索名称">
+                    </div>
+                    <!-- <button class="btn btn-search" type="button" ><i class="fa fa-search icon-fa"></i>查询</button> -->
+                </div>
+            </div>
+            <div class="col-md-12 olaplist">
+                <table class="table table-bordered table-hover" id="source-table">
+                    <thead>
+                        <tr>
+                            <th data-field="title" width="15%">数据源名称</th>
+                            <th data-field="desc" width="15%">数据源描述</th>
+                            <th data-field="createuser" width="10%">创建人</th>
+                            <th data-field="createtime" width="10%">创建时间</th>
+                            <th data-field="datatypename" width="10%">数据源类型</th>
+                            <th data-field="dispatch" width="15%">数据源操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(key,value) in sourcelists track by key">
+                            <td>{{ value.title }}</td>
+                            <td>{{ value.desc }}</td>
+                            <td>{{ value.createuser }}</td>
+                            <td>{{ value.createtime |date:'yyyy-MM-dd' }}</td>
+                            <td>{{ value.datatypename }}</td>
+                            <td class="operatFeildMinWidth">
+                                <a href="#/add/{{ value['id'] }}" class="btn btn-primary editable-table-button btn-xs btn-edit">编辑</a>
+                                <a href="#" ng-click="delete_source(value)" class="btn btn-primary editable-table-button btn-xs btn-edit">删除</a>
+                                <a href="#" ng-click="rowAndColConversion(value['id'])" class="btn btn-primary editable-table-button btn-xs btn-edit">行列转换</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-12">
+                <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm" boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endverbatim %}

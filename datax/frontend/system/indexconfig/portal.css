@@ -1,0 +1,397 @@
+* {
+    user-select: none;
+    box-sizing: border-box;
+    font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -moz-user-select: none;
+}
+
+/* .main-app-content {
+
+}
+ */
+.main-content {
+    overflow-x: hidden;
+}
+
+.portal-banner {
+    position: relative;
+}
+
+.title-tool {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    width: 400px;
+    height: 100%;
+}
+
+.title-tool .datax-group-select {
+    width: 240px;
+    margin-top: 8px;
+    background-color: rgba(255, 255, 255, 0);
+    border:1px solid rgba(222, 222, 222, 0.3);
+    display: inline-block;
+}
+
+.title-tool .fa-sign-out {
+    color:rgba(222, 222, 222, 0.5);
+    font-size: 27px;
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    right: 80px;
+    cursor: pointer;
+}
+
+.glass .group-select-panel {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.glass .group-select-panel .item-group-title{
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.glass .group-select-panel .item-group-list-item:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.portal-banner .title-text{
+    width: 100%;
+    height: 50px;
+    display: block;
+}
+
+.switch-page-btn {
+    position: absolute;
+    top: 40%;
+    z-index: 900000;
+    line-height: 10px;
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    font-size: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.switch-page-btn:hover {
+    background: rgba(255, 255, 255, 0.47);
+    color: rgba(255, 255, 255, 0.51);
+    border: 2px solid rgba(255, 255, 255, 0.51);
+}
+
+.switch-menu {
+    right: 10px;
+    padding: 0 0 0 16px;
+}
+
+.switch-content {
+    left: 10px;
+    display: none;
+    padding: 0 0 0 12px;
+}
+
+.portal-content {
+    min-width: 1166px;
+    width: 100%;
+    height: calc(100% - 50px);
+    position: fixed;
+    overflow: hidden;
+    top: 50px;
+    left: 0;
+    z-index: 200;
+}
+
+.portal-menu {
+    width: 60px;
+    height: 100px;
+    float: left;
+    margin-top: 10px;
+    padding: 27px 0 27px 0;
+    text-align: center;
+    position: relative;
+}
+
+.portal-menu > .fa-list-ul {
+    font-size: 23px;
+    cursor: pointer;
+}
+
+.portal-menu > .menu-main-title {
+    position: absolute;
+    margin: auto;
+    display: block;
+    top: 60px;
+    left: 18px;
+    cursor: pointer;
+}
+
+.portal-menu .menu-container {
+    position: absolute;
+    top: 0;
+    z-index: 100;
+    left: -200px;
+    width: 200px;
+    min-height: 200px;
+    max-height: 700px;
+    background-color: rgba(0, 0, 0, 0);
+    overflow-x: hidden;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    overflow: -moz-scrollbars-none;
+}
+
+.menu-container::-webkit-scrollbar { width: 0 !important }
+.menu-sub-list-container::-webkit-scrollbar { width: 0 !important }
+
+.portal-menu .menu-container .menu-list {
+    position: relative;
+    width: 200px;
+}
+
+.menu-item {
+    overflow: hidden;
+    display: block;
+    height: 36px;
+    width: 100%;
+    border: none;
+    padding: 0 0 0 20px;
+    line-height: 36px;
+    position: relative;
+}
+
+.menu-item-glass:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu-item:first-child {
+    height: 40px;
+    line-height: 40px;
+}
+
+.portal-menu .menu-container .menu-list .menu-item > .fa-angle-right {
+    position: absolute;
+    right: 14px;
+    z-index: 50;
+    top: 11px;
+}
+
+.menu-sub-list-container {
+    position: absolute;
+    top: 0;
+    left: 200px;
+    width: 200px;
+    z-index: 100;
+    min-height: 40px;
+    max-height: 500px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    overflow: -moz-scrollbars-none;
+}
+
+.menu-item:hover > .menu-sub-list-container {
+    opacity:1;
+    display: block;
+}
+
+.quick-access {
+    width: calc(100% - 122px);
+    margin: 10px 50px 0 12px;
+    height: 160px;
+    float: left;
+}
+
+.quick-access .quick-access-bar {
+    width: 100%;
+    height: 45px;
+    line-height: 45px;
+    padding: 0 0 0 20px;
+}
+
+.quick-access .quick-access-content {
+    width: 100%;
+    height: 115px;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.quick-access .quick-access-content .quick-access-content-item {
+    width: 120px;
+    height: 75px;
+    float: left;
+    margin-left: 10px;
+}
+
+.quick-access .quick-access-content .quick-access-content-item .quick-access-content-item-icon {
+    margin: 0 12px 12px 35px;
+    height: 50px;
+    width: 50px;
+    background-color: rgba(88, 190, 167, 1);
+    border-radius: 50px;
+}
+
+.quick-access .quick-access-content .quick-access-content-item .quick-access-content-item-text {
+    text-align: center;
+}
+
+.portal-list {
+    margin: 10px 0 0 72px;
+    width: calc(100% - 552px);
+    height: 420px;
+    float: left;
+}
+
+.more-link {
+    position: absolute;
+    top: 15px;
+    right: 27px;
+    cursor: pointer;
+}
+
+.portal-list .portal-list-title {
+    height: 45px;
+    width: 100%;
+    position: relative;
+    padding: 11px 0 0 20px;
+}
+
+.portal-list .portal-list-content {
+    width: 100%;
+    height: 375px;
+    padding: 0 20px 0 20px;
+}
+
+.portal-list .portal-list-content .portal-list-content-item {
+    width: 100%;
+    height: 70px;
+    padding: 20px 0 20px 0;
+}
+
+.portal-expansion {
+    margin: 10px 0 0 10px;
+    width: 420px;
+    height: 500px;
+    float: left;
+}
+
+.portal-expansion .portal-weather {
+    width: 100%;
+    height: 140px;
+    display: block;
+    background: url("/frontend/image/homepage/bg_weather.jpg") no-repeat;
+    background-size: cover;
+}
+
+.portal-expansion .portal-calender {
+    width: 100%;
+    height: 360px;
+    display: block;
+}
+
+.fc-toolbar.fc-header-toolbar {
+    margin: 10px 0 10px 0;
+    padding: 0 10px 0 10px;
+}
+
+.fc-toolbar.fc-header-toolbar .fc-left h2{
+    font-size: 20px;
+}
+
+.fc-unthemed td.fc-today {
+    border-radius: 48px;
+    background-color: rgba(255, 196, 0, 1);
+}
+
+.fc-basic-view .fc-body .fc-row {
+    min-height: 3em;
+}
+
+.fc-unthemed .fc-content, .fc-unthemed .fc-divider, .fc-unthemed .fc-list-heading td, .fc-unthemed .fc-list-view, .fc-unthemed .fc-popover, .fc-unthemed .fc-row, .fc-unthemed tbody, .fc-unthemed td, .fc-unthemed th, .fc-unthemed thead {
+    border-color: rgba(0, 0, 0, 0);
+}
+
+.fc-ltr .fc-basic-view .fc-day-top .fc-day-number {
+    float: none;
+}
+
+td.fc-day-top {
+    line-height: 45px;
+}
+
+.fc-view-container {
+    text-align: center;
+}
+
+.portal-expansion-glass .fc-prev-button, .portal-expansion-glass .fc-next-button {
+    background-image: none;
+    background-color: rgba(255, 255, 255, 0.6);
+    margin-left: 5px;
+    padding: 0;
+    border-radius: 4px;
+}
+
+.menu-content {
+    width: 100%;
+    height: calc(100% - 50px);
+    position: fixed;
+    overflow: hidden;
+    top: 50px;
+    left: 100%;
+    z-index: 100;
+    display: none;
+    padding-top: 10px;
+}
+
+.menu-content .menu-col {
+    float: left;
+}
+
+.menu-content .menu-col:first-child {
+    margin-left: 20px;
+}
+
+.menu-content .menu-items {
+    min-width: 260px;
+    max-width: calc(100% - 20px);
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 30px;
+}
+
+.menu-content .menu-item-title {
+    height: 40px;
+    line-height: 40px;
+    padding-left: 20px;
+}
+
+.menu-content .menu-item-childs {
+    min-height: 60px;
+    max-height: 320px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0 20px 0 20px;
+}
+
+.menu-content .menu-child-item {
+    height: 30px;
+    padding: 5px 0 5px 0;
+    margin-bottom: 2px;
+}
+
+.thumbnail-tag{
+    position: fixed;
+    float: left;
+    height: 200px;
+    width: 400px;
+    margin-top: -30px;
+    margin-left: 45px;
+    z-index: 9;
+}
+
+.thumbnail-picture{
+
+}

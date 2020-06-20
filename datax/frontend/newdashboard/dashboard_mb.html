@@ -1,0 +1,260 @@
+{% extends 'base_mb.html' %} {% load staticfiles %} {% block title %}数据可视化{% endblock %} {% block content %}
+<!--<editor-fold desc="静态资源">-->
+<!-- #region  -->
+
+<link rel="stylesheet" href="{% static 'css/common.min.css'  %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'css/mb-statics.css' %}" />
+<link rel="stylesheet" href="{% static 'newdashboard/newdashboard.css'  %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'components/datax-ui/datax-ui.min.css'  %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'css/mobile-home.css' %}?v={{ nowversion }}1">
+
+<!-- #endregion -->
+<!--</editor-fold>-->
+<!-- 只在此页面生效的css -->
+<style type="text/css">
+    .md-select-icon {
+        color: inherit !important;
+    }
+
+    .md-slider {
+        height: 32px !important;
+    }
+</style>
+<script type="application/javascript">
+    var viewType = '{{ viewType }}';
+    var currentSceneId = '{{ pk }}';
+    var urlArgs = '{{ urlArgs }}';
+    var mbMenuType = 'lite'
+    var shareUrl = window.location.href;
+    var shareName = '';
+    
+</script>
+
+{% verbatim %}
+<div class="dashboard-main-app" id="mbDashBoardApp" ng-style="containerStyle()">
+    <!--<editor-fold desc="移动端门户与菜单">-->
+    <!-- #region -->
+    <div ng-show="mbMenuType == 'full'">
+        <div class="m-header m-component" id="mbHeaderDiv">
+            <i class="fa fa-list m-menu" ng-click="showMBMenu()"></i>
+            智慧运营分析平台
+            <i class="fa fa-star-o m-collection" ng-click="collectionScene()"></i>
+        </div>
+        <div class="m-body m-component" id="mbExtraDiv">
+            <div class="full-content m-body-content">
+                <div class="m-body-menu" ng-if="footerType == 'menu'">
+                    <uib-accordion close-others="true">
+                        <div uib-accordion-group class="panel-default" is-open="row.open" ng-repeat="row in menuList">
+                            <uib-accordion-heading>
+                                {{ row.name }}
+                                <i class="pull-right glyphicon a-line"
+                                    ng-class="{'glyphicon-chevron-down': row.open, 'glyphicon-chevron-right': !row.open}"></i>
+                            </uib-accordion-heading>
+                            <ul class="list-group">
+                                <li ng-if="row.url && row.url.length > 1" ng-click="openMbPage(row, 'menu')"
+                                    class="list-group-item a-line">{{ row.name }}</li>
+                                <li ng-if="row.child.length > 0" ng-repeat="childrow in row.child"
+                                    class="list-group-item" ng-click="openMbPage(childrow, 'menu')">{{ childrow.name }}
+                                </li>
+                            </ul>
+                        </div>
+                    </uib-accordion>
+                </div>
+                <div class="m-body-collection" ng-if="footerType == 'collection'">
+                    <ul class="list-group">
+                        <li class="list-group-item a-line" ng-repeat="row in connectScene"
+                            ng-click="openMbPage(row, 'connect')">
+                            {{ row.name }}
+                        </li>
+                    </ul>
+                </div>
+                <div class="m-body-message" ng-if="footerType == 'message'">
+                    <ul class="list-group">
+                        <!-- <li class="list-group-item"><i class="fa fa-bell"></i>&nbsp;Cras justo odio</li>
+                        <li class="list-group-item"><i class="fa fa-bell"></i>&nbsp;Dapibus ac facilisis in</li>
+                        <li class="list-group-item"><i class="fa fa-bell-o"></i>&nbsp;Morbi leo risus</li>
+                        <li class="list-group-item"><i class="fa fa-bell-o"></i>&nbsp;Porta ac consectetur ac</li>
+                        <li class="list-group-item"><i class="fa fa-bell-o"></i>&nbsp;Vestibulum at eros</li> -->
+                    </ul>
+                </div>
+                <div class="m-body-setting" ng-if="footerType == 'setting'">
+                    <a class="btn btn-default">注销</a>
+                </div>
+            </div>
+        </div>
+        <div class="m-footer m-component">
+            <div class="footer-item" ng-click="switchMbBodyContent('menu')"
+                ng-class="{'footer-check':footerType=='menu'}">
+                <i class="fa fa-th-list"></i>
+                <span>菜单</span>
+            </div>
+            <div class="footer-item" ng-click="switchMbBodyContent('collection')"
+                ng-class="{'footer-check':footerType=='collection'}">
+                <i class="fa "
+                    ng-class="{'fa-star':footerType=='collection', 'fa-star-o':footerType!='collection'}"></i>
+                <span>收藏</span>
+            </div>
+            <div class="footer-item" ng-click="switchMbBodyContent('message')"
+                ng-class="{'footer-check':footerType=='message'}">
+                <i class="fa "
+                    ng-class="{'fa-commenting':footerType=='message', 'fa-commenting-o':footerType!='message'}"></i>
+                <span>消息</span>
+            </div>
+            <div class="footer-item" ng-click="switchMbBodyContent('setting')"
+                ng-class="{'footer-check':footerType=='setting'}">
+                <i class="fa fa-cog"></i>
+                <span>设置</span>
+            </div>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+    <!--<editor-fold desc="场景导出（收藏）图标">-->
+    <!-- #region -->
+    <div class="down-bar-switch"></div>
+    <div id="downBar" class="downBar">
+        <i class="fa fa-share-alt fa-hover" ng-click="downTheme('share')" title="分享"></i>
+        <i class="fa fa-file-image-o fa-hover" ng-click="downTheme('pic')" title="下载图片"></i>
+        <i class="fa fa-file-excel-o fa-hover" ng-click="downTheme('excel')" title="导出excel"></i>
+        <i class="fa fa-file-word-o fa-hover" ng-click="downTheme('word')" title="导出word"></i>
+        <i class="fa fa-file-powerpoint-o fa-hover" ng-click="downTheme('powerpoint')" title="导出ppt"></i>
+        <i class="fa fa-file-pdf-o fa-hover" ng-click="downTheme('pdf')" title="导出pdf"></i>
+        <i class="fa fa-star-o fa-hover pc-collection" ng-click="collectionScene()" title="收藏"></i>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+
+    <div class="lite-mb-portal" ng-style="mbLiteTheme.bg">
+        <div class="menu-items" ng-style="mbLiteTheme.list" ng-repeat="mbLiteMenu in menuList">
+            <div class="menu-item-title">
+                {{ mbLiteMenu.name }}
+            </div>
+            <div class="menu-item-childs">
+                <div class="menu-child-item" ng-repeat="childMenu in mbLiteMenu.child" ng-click="openMbPage(childMenu, 'menu');closeMbLitePortal()">
+                    <div class="menu-item-icon" ng-class="childMenu.iconClass"></div>
+                    <div class="click-pointer menu-item-name">{{ childMenu.name }}</div>
+                    <div class="menu-item-tags">说明: {{childMenu.desc}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="lite-mb-menu" id="liteMbMenu">
+        <button class="lite-mb-button" ng-click="openMenu($mdMenu, $event)"></button>
+        <!-- <md-menu md-position-mode="target bottom">
+            <md-button aria-label="Open phone interactions menu" class="md-icon-button"
+                ng-click="openMenu($mdMenu, $event)">
+            </md-button>
+            <md-menu-content class="lite-mb-menu-container" width="6">
+                <md-menu-item class="lite-mb-menu-item" ng-repeat="liteMenu in liteMenuList">
+                    <md-button ng-click="openMbPage(liteMenu, 'menu')">{{ liteMenu.name }}</md-button>
+                </md-menu-item>
+            </md-menu-content>
+        </md-menu> -->
+    </div>
+
+    <div class="m-share" ng-click="downTheme('share')">
+        <i class="fa fa-share-square-o"></i>
+    </div>
+
+    <div class="main-app-content" id="mainDashboardController">
+
+        <div id="dashboardConfig" class="main-dash-content-block" ng-style="style()" resize>
+
+            <!--<editor-fold desc="dashboard 主面板">-->
+            <!-- #region  -->
+            <div id="scenesLayout" gridster="gridsterOpts" ng-drop="true"
+                ng-drop-success="dropComplete($index,$data,$event)" ng-drag-start="dragstart($data,$event)"
+                ng-drag-stop="dragstop($data,$event)" ng-drag-move="dragmove($data,$event)">
+                <ul>
+                    <li class="" ng-click="changeItemIndex(item)" ng-style="item.data.styleConfig" gridster-item="item"
+                        ng-repeat="item in configitems" ng-show="!item.data.itemConfigs.hideInDashboard">
+                        <grid-item modal-panel="modalPanel" olapids="olapIds" config='item' table-data="table"
+                            configitems="configitems" drop-Type="item.data.dropType" remove-action="del(item);"
+                            show-text-editor="showTextEditor(item)" open-filter-panel="openFilterPanel(item)"
+                            global-config="gridsterOpts" reloading-dashboard-status="reloadingDashboard"
+                            item-style-config="openScenesStyleConfigPanel(item)"
+                            sync-font-color="sceneObj.options.syncFontColor" open-linkage-panel="openLinkagePanel(item)"
+                            update-component="updateComponent(item)" row-height="rowHeight"
+                            open-comments-section="openCommentsSection(item)" scene-options="sceneObj"
+                            scenes-content-width="scenesContentWidth" after-data-load="afterDataLoad(ev)">
+                        </grid-item>
+                    </li>
+                </ul>
+            </div>
+            <!-- #endregion -->
+            <!--</editor-fold>-->
+        </div>
+
+
+    </div>
+
+    <!--<editor-fold desc="最大化弹窗">-->
+    <!-- #region -->
+    <div class="full-screen-content top-transition floating-layer-margin">
+        <div class="modal-body open-body custom-header" style="height: 100%; width: 100%;">
+            <button type="button" ng-click="closefullScreenContent()" class="close open-close" data-dismiss="modal"
+                aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <div id="fullShowChart" style="width: 100%; height: 100%;"></div>
+        </div>
+    </div>
+    <!-- #endregion -->
+    <!--</editor-fold>-->
+
+
+
+</div>
+{% endverbatim %}
+
+
+<script type="text/javascript">
+
+var scriptArr = [
+    "//g.alicdn.com/dingding/dingtalk-jsapi/2.0.57/dingtalk.open.js",
+    "{% static 'plugin/angular/angularjs-new/angular-plugin.js'%}",
+    "{% static 'plugin/lodash/lodash.min.js' %}",
+    "{% static 'plugin/datalib/datalib.min.js' %}",
+    "{% static 'plugin/echarts/echarts.min.js' %}",
+    "{% static 'js/echart.tool.js' %}?v={{ nowversion }}1",
+    "{% static 'extra_module/dashboard.interface.js' %}?v={{ nowversion }}1",
+    "{% static 'plugin/angular/dashboard/dashboard.min.js' %}?v={{ nowversion }}1",
+    "{% static 'js/utils.js' %}?v={{ nowversion }}1",
+    "{% static 'newdashboard/newdash-tools.js' %}?v={{ nowversion }}1",
+    "{% static 'components/utils/datax-utils.js' %}?v={{ nowversion }}1",
+    "{% static 'components/datax-ui/datax-ui.min.js' %}?v={{ nowversion }}1",
+    "{% static 'newdashboard/dashboard_mb.js' %}?v={{ nowversion }}1", 
+]
+function loadJS(url, success) {
+    if (url) {
+        var domScript = document.createElement('script');
+        domScript.src = url;
+        document.body.appendChild(domScript);
+        domScript.onload = function () {
+        success();
+      }
+    //         domScript.onload = domScript.onreadystatechange = function () {
+    //     if (!this.readyState || 'loaded' === this.readyState || 'complete' === this.readyState) {
+    //       success();
+    //       this.onload = this.onreadystatechange = null;
+    //     //   this.parentNode.removeChild(this);
+    //     }
+    //   }
+    } else {
+        success();
+    }
+      
+
+      
+}
+var count=-1
+function loadAllJs() {
+    if (count < scriptArr.length) {
+        count+=1
+        loadJS(scriptArr[count], loadAllJs);
+    }
+}
+setTimeout(function(){ loadAllJs() }, 10)
+</script>
+{% endblock %}

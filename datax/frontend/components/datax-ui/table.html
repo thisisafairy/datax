@@ -1,0 +1,63 @@
+<div class="datax-table-full-content">
+    <div class="datax-table-fixed-header">
+        <div class="datax-table-content" ng-style="tableStyle.wrapper">
+            <div class="datax-table-scroll">
+                <div class="datax-table-header datax-table-scroll-header" ng-style="tableStyle.scroll.header">
+                    <table class="datax-table-fixed" ng-style="tableStyle.scroll.header.table">
+                        <thead class="datax-table-thead">
+                            <tr class="datax-table-row" ng-style="tableStyle.scroll.header.row" ng-repeat="(rowNum, row) in heads track by rowNum">
+                                <th class="datax-table-cell" ng-if="num >= fixedLeft" ng-class="{'datax-table-fixed-columns-in-body': num < fixedLeft}" 
+                                    ng-repeat="(num, col) in row.rows track by num" colspan="{{col.colspan}}">
+                                    <div ng-style="col" class="datax-table-cell datax-table-cell-text text-not-wrap">{{ col.title }}</div>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="datax-table-body" ng-style="tableStyle.scroll.body">
+                    <table class="datax-table-fixed" ng-style="tableStyle.scroll.body.table">
+                        <tbody class="datax-table-tbody">
+                            <tr class="datax-table-row" ng-style="tableStyle.scroll.body.row" ng-repeat="(rowNum, row) in data track by rowNum">
+                                <td class="datax-table-cell" ng-if="colNum >= fixedLeft" ng-class="{'datax-table-fixed-columns-in-body': colNum < fixedLeft}" 
+                                    ng-repeat="(colNum, col) in rowInfo track by colNum">
+                                    <dx-cell-edit table-data="data" row-index="rowNum" col-index="colNum"
+                                            col-name="col.field" dx-style="col" editable="editable"></dx-cell-edit>
+                                    <!-- <div dx-tooltip tooltip-text="row[col.field]" tooltip-trigger="'click'"
+                                     ng-style="col" class="datax-table-cell datax-table-cell-text text-not-wrap">{{ row[col.field] | formatText:col['format'] }}</div> -->
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 列锁定的固定层 -->
+            <div class="datax-table-fixed-left" ng-show="fixedLeft">
+                <div class="datax-table-header">
+                    <table class="datax-table-fixed" ng-style="tableStyle.fixedLeft.header.table">
+                        <thead class="datax-table-thead">
+                            <tr class="datax-table-row" ng-style="tableStyle.fixedLeft.header.row" ng-repeat="(rowNum, row) in heads track by rowNum">
+                                <th class="datax-table-cell" ng-if="num < fixedLeft" ng-repeat="(num, col) in row.rows track by num" colspan="{{col.colspan}}">
+                                    <div ng-style="col" class="datax-table-cell datax-table-cell-text text-not-wrap">{{ col.title }}</div>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="datax-table-body-outer" ng-style="tableStyle.fixedLeft.bodyOuter">
+                    <div class="datax-table-body-inner" ng-style="tableStyle.fixedLeft.bodyInner">
+                        <table class="datax-table-fixed" ng-style="tableStyle.fixedLeft.bodyInner.table">
+                            <tbody class="datax-table-tbody">
+                                <tr class="datax-table-row" ng-style="tableStyle.fixedLeft.bodyInner.row" ng-repeat="(rowNum, row) in data track by rowNum">
+                                    <td class="datax-table-cell" ng-if="colNum < fixedLeft" ng-repeat="(colNum, col) in rowInfo track by colNum" >
+                                        <dx-cell-edit table-data="data" row-index="rowNum" col-index="colNum"
+                                            col-name="col.field" dx-style="col" editable="editable" after-value-change="afterCellEdit()"></dx-cell-edit>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

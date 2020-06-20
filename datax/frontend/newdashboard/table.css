@@ -1,0 +1,191 @@
+/* #region  表格 */
+/*
+    通用样式
+*/
+
+.scenes-table {
+    width: 100%;
+    height: 640px;
+    overflow-y: hidden;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 2.5;
+    position: relative;
+    margin-top: 5px;
+    border-color: rgba(229, 229, 229, 0.95);
+}
+
+.scenes-table .table-ele {
+    border-color: inherit !important;
+}
+
+.scenes-table div {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    /* Firefox */
+    -webkit-box-sizing: border-box;
+    /* Safari */
+}
+
+.scenes-table-row {
+    width: 100%;
+    height: 35px;
+}
+
+.scenes-table-cell {
+    height: 35px !important;
+    display: inline-block;
+    min-width: 5px !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+    color: inherit;
+}
+
+td .scenes-table-cell {
+    display: block;
+}
+
+/*
+    表格头
+*/
+.scenes-table .scenes-table-header {
+    height: 35px;
+}
+
+.table-header:first-child .scenes-table-row:first-child .scenes-table-cell {
+    border-top: 1px solid;
+}
+
+.scenes-table .scenes-table-header .scenes-table-row {
+    width: 100%;
+}
+
+.scenes-table .scenes-table-header .scenes-table-cell {
+    position: relative;
+}
+
+.scenes-table .scenes-table-header .header-default .scenes-table-cell {
+    overflow: visible;
+
+}
+
+.scenes-table .th-line {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 5px;
+    background: transparent;
+    cursor: e-resize;
+}
+
+.scenes-table .th-range-slider {
+    position: absolute;
+    right: -75px;
+    top: 30px;
+    height: 28px;
+    width: 150px;
+    margin: 0;
+    display: none;
+    z-index: 100;
+}
+
+.scenes-table .scenes-table-body .scenes-table-row .scenes-table-cell {
+    text-align: left;
+    padding-left: 5px;
+}
+
+/*
+    表格体
+*/
+.scenes-table .scenes-table-body {
+    height: calc(100% - 85px);
+    overflow-x: hidden;
+    position: relative;
+}
+
+/*
+    翻页
+*/
+.scenes-table-footer {
+    width: 100%;
+    height: 25px;
+    text-align: center;
+    padding-top: 5px;
+    position: relative;
+    font-size: 14px;
+}
+
+.scenes-table-footer .fa-chevron-left,
+.fa-chevron-right {
+    cursor: pointer;
+}
+
+.scenes-table-footer .fa {
+    font-size: 1.2em;
+}
+
+.scenes-table-inside {
+    border-left: 1px solid;
+    border-color: inherit;
+}
+
+.lite-border .scenes-table-inside {
+    border-left: none;
+}
+
+.lite-border .scenes-table-cell {
+    text-align: left;
+    border-right: none;
+    padding-left: 10px;
+}
+
+.lite-border .scenes-table-row {
+    border-left: none;
+}
+
+.lite-border .table-header:first-child .scenes-table-row:first-child .scenes-table-cell {
+    border-top: none;
+}
+
+.header-text .scenes-table-cell {
+    font-weight: bold;
+    font-size: 16px;
+    width: 100%;
+    text-align: center;
+    border-bottom: none;
+}
+
+.lite-border .header-text .scenes-table-cell {
+    text-align: left;
+    padding-left: 20px;
+}
+
+.col-lock-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10000;
+}
+
+.header-text .scenes-table-row,
+.header-text .scenes-table-cell {
+    border: none;
+}
+
+.header-custom .scenes-table-row:first-child .scenes-table-cell:first-child {
+    border-top: 1px solid;
+    border-color: inherit;
+}
+
+.lite-border .header-custom .scenes-table-row:first-child .scenes-table-cell:first-child {
+    border-top: none;
+}
+
+/* #endregion */

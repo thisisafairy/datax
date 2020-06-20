@@ -1,0 +1,47 @@
+{% verbatim %}
+<style>
+    .hideLongText{
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    .selectAllStyle{
+        position: absolute;
+        left: 0px;
+        padding-left: 15px;
+    }
+</style>
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title">
+		修改
+	</h3>
+    <span ng-hide="true" ng-bind="type"></span>
+
+    <!--  弹出框的关闭按钮  -->
+    <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body" style="height: 500px;overflow-y: auto;">
+	<form action="#" class="form-horizontal clearfix" method="post">
+		<div class="form-group clearfix ">
+				<label  class="col-sm-1 checkbox-row"></label>
+				<label 	class="col-sm-6 ">列名</label>
+				<label  class="col-sm-5 ">显示名称</label>
+		</div>
+		<div class="form-group clearfix" ng-repeat="(key3, value3) in columns track by key3">
+			<div class="col-sm-1 checkbox-row">
+				<input type="checkbox" ng-model="value3.checked" ng-click="fn(key3,value3.checked,'checkBoxClick')">
+			</div>
+			<label for="title" class="col-sm-6 hideLongText" ng-click="fn(key3)" title="{{value3.field}}">{{value3.field}}</label>
+			<div class="col-sm-5">
+				<input type="text" ng-model="value3.title">
+			</div>
+		</div>
+    </form>
+</div>
+ 
+<div class="modal-footer footer-btn">
+    <div class="selectAllStyle"><input type="checkbox" ng-model="selectAll" ng-change="doSelectAll()">全选</div>
+    <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+</div>
+{% endverbatim %}

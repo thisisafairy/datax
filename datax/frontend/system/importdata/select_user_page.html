@@ -1,0 +1,40 @@
+
+<div class="modal-header open-header">
+        <h3 class="modal-title open-header-title">选择用户</h3>
+        <!--  弹出框的关闭按钮  -->
+        <button type="button" ng-click="cancel()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    </div>
+    <div class="modal-body open-body">
+        <form class="form-horizontal" id="userform" name="userform">
+        <div class="form-group">
+          <label class="col-sm-2 control-label form-lable-add">用户</label>
+            <div class="col-sm-10 form-input-add">
+                <div style="float:left;width:200px;">
+                    <p class="form-lable-p">所有用户</p>
+                    <select style="width:200px;height:200px;" name="allusers" class="filtered" id="allusers"  multiple="multiple"
+                    ng-model="selusers" ng-options="user.username for user in allusers">
+                    </select>
+                </div>
+                <div style="float:left;width:50px;padding-left: 5px;margin-top: 58px;">
+                    <br>
+                    <div><a title=">>" href="javascript:void(0)" id="id_user_add_link" ng-click="add()"> 添加<span class="glyphicon glyphicon-arrow-right"></span></a></div><br>
+                    <div><a title="<<" href="javascript:void(0)" id="id_user_remove_link" ng-click="remove()"> 移除<span class="glyphicon glyphicon-arrow-left"></span></a></div>
+                </div>
+                <div style="float:left;width:200px;">
+                    <p class="form-lable-p">已选用户</p>
+                    <select style="width:200px;height:200px;" id="selusers" multiple="multiple" size="0" name="selusers"
+                      ng-model="seledusers" ng-options="user.username for user in users">
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!--<div class="form-group" >
+            <div style="float:left">
+            </div>
+        </div>-->
+        </form>
+    </div>
+    <div class="modal-footer footer-btn">
+        <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+        <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+    </div>

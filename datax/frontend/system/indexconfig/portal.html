@@ -1,0 +1,135 @@
+{% extends 'base_lite.html' %} {% load staticfiles %}
+{% block title %}
+    {{ portalTitle }}
+{% endblock %} {% block content %}
+<!--<editor-fold desc="静态资源">-->
+<!-- #region -->    
+<link rel="stylesheet" href="{% static 'plugin/angular/angularjs-datepicker/angular-datepicker.css'  %}">
+<link rel="stylesheet" href="{% static 'plugin/fullcalendar/fullcalendar.min.css'  %}">
+<link rel="stylesheet" href="{% static 'css/common.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'componets/groupselect/group-select.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'componets/multi-select/multi-select.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'system/indexconfig/portal.css' %}?v={{ nowversion }}1">
+<!-- #endregion -->
+<!--</editor-fold>-->
+
+{% verbatim %}
+
+<div class="main-app-content" ng-app="portalApp" ng-controller="portalController" ng-style="style()" resize >
+    <div class="main-content full-content" ng-style="theme.bg">
+        <div class="switch-page-btn switch-menu quick-transition" ng-click="switchPageContent('menu')"><i class="fa fa-angle-right"></i></div>
+        <div class="switch-page-btn switch-content quick-transition" ng-click="switchPageContent('content')"><i class="fa fa-angle-left"></i></div>
+        <div class="portal-banner width-full" ng-style="theme.banner">
+            <span class="title-text" ng-style="theme.banner.text">智慧运营分析平台</span>
+            <div class="title-tool">
+                <div class="full-content" style="position: relative;">
+                    <group-select items="searchArr" display-field="'name'" value-field="'url'" group-field="'group'"
+                     ng-class="theme.banner.searchBox.theme" value="selectSceneUrl" filter="true" value-change="openUrl()"></group-select>
+                     <a href="/account/homepage/logout"><i class="fa fa-sign-out" title="退出"></i></a>
+                     <!-- 刷新缓存 -->
+                     <a href="/dashboard/clearcache" class="glyphicon glyphicon-refresh" title="刷新缓存"></a>
+
+                </div>
+            </div>
+        </div>
+        <div class="portal-content">
+            <div class="portal-menu menu-collapse" ng-style="theme.menu.collapse" ng-mouseleave="collapseSubMenu($event, 100, 'menu-container')">
+                <i class="fa fa-list-ul" ng-click="switchMenu()"></i>
+                <div class="menu-main-title" ng-click="switchMenu()">菜单</div>
+                <div class="menu-container">
+                    <div class="menu-list full-content width-half" ng-style="theme.menu.expand">
+                        <div class="menu-item" ng-style="theme.menu.expand.title" ng-click="switchMenu()"><i class="fa fa-list-ul"></i>&nbsp;菜单</div>
+                        <div class="menu-item" ng-repeat="item in menus" ng-mouseenter="expandSubMenu($event, item)"
+                             ng-class="{'menu-item-glass': theme.menu.expand.hover == 'glass'}">
+                            <div class="menu-item-text">{{ item.name }}</div>
+                            <i class="fa fa-angle-right"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-sub-list-container general-transition">
+                    <div class="menu-sub-list" ng-style="theme.menu.expand">
+                        <div class="menu-item" ng-class="{'menu-item-glass': theme.menu.expand.hover == 'glass'}"
+                             ng-repeat="subItem in subList" ng-click="toPage(subItem)">
+                            {{ subItem.name }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="quick-access" ng-style="theme.quickAccess">
+                <div class="quick-access-bar" ng-style="theme.quickAccess.title">我的收藏</div>
+                <div class="quick-access-content" ng-style="theme.quickAccess.content">
+                    <div class="quick-access-content-item" ng-repeat="item in collections">
+                        <div class="quick-access-content-item-icon click-pointer" ng-click="openUrl(item)" ng-mouseenter="showThumbnail(item)" ng-mouseleave="deleteThumbnail(item)">
+
+                        </div>
+                        <div class="quick-access-content-item-text text-not-wrap click-pointer" ng-click="openUrl(item)">
+                            {{ item.name }}
+                        </div>
+                        <div ng-if="item.ifShowThumbnail == '1'" class="thumbnail-tag">
+                            <div class="thumbnail-picture">
+                                <!-- <img src="{{ item.thumbnailpath }}"> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portal-list" ng-style="theme.list">
+                <div class="portal-list-title" ng-style="theme.list.title">
+                    最近访问 <div class="more-link" ng-style="theme.list.title.more"><!-- 查看更多 > --></div>
+                </div>
+                <div class="portal-list-content">
+                    <div class="portal-list-content-item" ng-style="theme.list.item" ng-repeat="item in posts">
+                        <div class="click-pointer" ng-style="theme.list.item.title" ng-click="openUrl(item)">{{ item.title }}</div>
+                        <div class="text-not-wrap" ng-style="theme.list.item.text">标签: {{ item.text }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portal-expansion" ng-style="theme.expansion" ng-class="{'portal-expansion-glass': theme.expansion.theme == 'glass'}">
+                <div class="portal-weather"></div>
+                <div class="portal-calender" id="portalCalender"></div>
+            </div>
+        </div>
+        <div class="menu-content">
+            <div class="full-content-with-relative">
+                <div class="menu-col" ng-style="menuCol.style" ng-repeat="menuCol in portalMenu">
+                    <div class="menu-items" ng-style="theme.list" ng-repeat="menu in menuCol.data">
+                        <div class="menu-item-title" ng-style="theme.list.title">
+                            {{ menu.name }}
+                        </div>
+                        <div class="menu-item-childs">
+                            <div class="menu-child-item" ng-style="theme.list.item" ng-repeat="child in menu.child">
+                                <div class="click-pointer" ng-style="theme.list.item.title" ng-click="toPage(child)">{{ child.name }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endverbatim %}
+<!--<editor-fold desc="静态资源2">-->
+<!-- #region -->
+<script type="text/javascript" src="{% static 'plugin/angular/i18n/angular-locale_zh-cn.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/moment/moment.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/moment/locale/zh-cn.js' %}"></script>
+<script>
+    moment.locale('zh-cn');
+</script>
+<script src="{% static 'js/ngDraggable.js' %}"></script>
+<script src="{% static 'plugin/fullcalendar/fullcalendar.js' %}"></script>
+<script src="{% static 'plugin/fullcalendar/locale/zh-cn.js' %}"></script>
+<script src="{% static 'plugin/angular/angularjs-datepicker/angular-datepicker.min.js' %}"></script>
+<script src="{% static 'js/constant.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/groupselect/group-select.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/multi-select/multi-select.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'system/indexconfig/portal.js' %}?v={{ nowversion }}1"></script>
+<!-- #endregion -->
+<!--</editor-fold>-->
+
+{% endblock %}

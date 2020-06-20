@@ -1,0 +1,18 @@
+<div class="change-loaded-dataset">
+  <div ng-if="userData.length">
+    <h3>已定义的指标</h3><input type="text" class="full-width" placeholder="快速查找指标" ng-keyup="SearchChange($event)">
+    <ul>
+      <li ng-show="dataset.hidden!='true'" ng-repeat="dataset in userData track by dataset.id"
+        ng-class="{selected: Dataset.currentDataset.id === dataset.id}">
+        <a class="dataset" ng-click="selectDataset(dataset)"
+          ng-disabled="Dataset.currentDataset.id === dataset.id">
+          <i class="fa fa-database"></i>
+          <strong>{{dataset.name}}</strong>
+        </a>
+        <span ng-if="dataset.description">{{dataset.description}}</span>
+        <strong ng-if="Dataset.currentDataset === dataset">(已选中)</strong>
+      </li>
+    </ul>
+    <h3>请点击选择</h3>
+  </div>
+</div>

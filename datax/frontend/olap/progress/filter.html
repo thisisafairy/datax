@@ -1,0 +1,44 @@
+{% verbatim %}
+	<div class="form-horizontal">
+		<div class="filter-group" ng-repeat="(groupkey, groupvalue) in form.filters track by groupkey" data-drop="true" ng-model='resultlist' jqyoui-droppable="{multiple:true,onDrop:'dropInGroup(groupkey)'}">
+			<div class="form-group " ng-repeat="(filterkey,filter) in groupvalue.group track by filterkey">
+			    <div class="col-sm-3">
+			      <input type="text" readonly="true"  class="form-control" ng-model="filter.title"  >
+			    </div>
+			    <div class="col-sm-2">
+			      <select class="form-control" ng-model="filter.model">
+			      	<option ng-repeat="filtervalue in form.config.filterlist" value="{{filtervalue.key}}" ng-if="filtervalue.used == 'all' || filtervalue[filter.filtertype]">{{filtervalue.value}}</option>
+			      </select>
+			    </div>
+			    <div class="col-sm-3">
+			      <input type="name" ng-if="filter.filtertype != 'date'" class="form-control" ng-model="filter.value"  >
+			      <!-- <datetimepicker ng-if="filter.filtertype == 'date'" data-datetimepicker-config="{ dropdownSelector: '.dropdown-toggle' }" data-ng-model="filter.value"></datetimepicker> -->
+			      <div class="dropdown" ng-if="filter.filtertype == 'date'">
+					    <a class="dropdown-toggle" id="aaa"  data-toggle="dropdown" data-target=".aaa" href="javascript:void(0);">
+					      <div class="input-group">
+					        <input type="text" id="date" name="date" class="form-control" data-ng-model="filter.value">
+					        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+					      </div>
+					    </a>
+					    <ul class="dropdown-menu"  aria-labelledby="aaa">
+					      <datetimepicker data-on-set-time="endDateOnSetTime(filter.value,groupkey,filterkey)"   data-ng-model="filter.value" 
+					                        data-datetimepicker-config="{ dropdownSelector: '#dropdown' }"></datetimepicker>
+					    </ul>
+				  </div>
+			    </div>
+			    <div class="col-sm-2">
+			      <select class="form-control" ng-model="filter.linkas">
+			      	<option value="or">or</option>
+			      	<option value="and">and</option>
+			      </select>
+			    </div>
+			    <div class="col-sm-1">
+			    	<a href="javascript:void(0);" ng-click="deleteGroup(groupkey,filterkey)">删除</a>
+			    </div>
+		 </div>
+		</div>
+	 <div class="drap-tips col-md-12 text-center" data-drop="true" ng-model='resultlist' jqyoui-droppable="{multiple:true,onDrop:'dropCallback'}">
+		 	将字段拖拽到此处新增筛选分组
+	</div>
+</div>
+{% endverbatim %}

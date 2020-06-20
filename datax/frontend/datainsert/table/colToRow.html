@@ -1,0 +1,251 @@
+<style type="text/css">
+    .pagination {
+        margin: 5px 0;
+    }
+
+    .open-body {
+        height: calc(100% - 46px);
+    }
+
+    .left-block {
+        height: 95%;
+        border-radius: 3px;
+    }
+
+    .right-block {
+        left: 230px;
+        padding-top: 15px;
+    }
+
+    .left-block .left-block-column-list {
+        height: 100%;
+    }
+
+    .config-content {
+        overflow: hidden;
+        height: 100%;
+        width: 200px;
+        float: left;
+    }
+
+    .config-content .panel-default {
+        width: 100%;
+        height: 25%;
+        margin-bottom: 10%;
+    }
+
+    .config-content .col-panel {
+        height: 40%;
+    }
+
+    .config-content .panel-default .panel-footer {
+        height: calc(100% - 50px);
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .config-content .panel-default .panel-body {
+        text-align: center;
+    }
+
+    .col-item {
+        width: 100%;
+        position: relative;
+        margin-bottom: 5px;
+        background-color: #FFFFFF;
+    }
+
+    .col-item:hover {
+        background-color: #FFFFFF;
+    }
+
+    .col-item:hover .item-delete {
+        display: block;
+    }
+
+    .item-delete {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        display: none;
+    }
+
+    .data-content {
+        height: 100%;
+        float: left;
+        width: calc(100% - 200px);
+    }
+
+    .origin-content {
+        height: calc(55% - 40px);
+        width: 100%;
+        padding: 0px 5px 0px 5px;
+    }
+
+    .bar-content {
+        height: 40px;
+        width: 100%;
+    }
+
+    .conversion-content {
+        height: 45%;
+        width: 100%;
+    }
+</style>
+{% verbatim %}
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title">行列转换</h3>
+    <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body open-body">
+    <div class="left-block">
+        <div class="left-card">
+            <div class="datasource-table-list left-block-column-list" >
+                <div class="schema-item cursor-move" ng-repeat="(key, list) in originTable.columns track by key" >
+					<span class="field-item full-width" data-drag="true" data-jqyoui-options="{revert: 'invalid', helper: 'clone'}"
+                          ng-model="originTable.columns" jqyoui-draggable="{index: {{ key }}, placeholder: 'keep'}">
+						<span class="field-row" title="{{ list.title }}">
+							<span class="type-target">
+								<i class="fa fa-columns"></i>
+							</span>
+							<span class="field-name">
+								<span class="field-text">
+									{{ list.title }}
+								</span>
+							</span>
+						</span>
+					</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="right-block">
+        <div class="config-content">
+            <div class="panel panel-default col-panel">
+                <div class="panel-body">
+                    维度列
+                </div>
+                <div class="panel-footer">
+                    <div style="width: 100%; height: 100%;" class="drag-content" data-drop="true" ng-model='dimList'
+                         jqyoui-droppable="{multiple:true,onDrop:'dropCallback(dimList, 1)'}">
+                        <div class="drag-content-table btn btn-default col-item" ng-repeat="(key, item) in dimList track by key">
+                            <span>{{ item.title }}</span>
+                            <div class="item-delete" ng-click="removeItem(key, item, dimList, -1)">
+                                <i class="fa fa-times"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    转换为列头的列
+                </div>
+                <div class="panel-footer">
+                    <div style="width: 100%; height: 100%;" class="drag-content" data-drop="true" ng-model='columnList'
+                         jqyoui-droppable="{multiple:true, onDrop:'dropCallback(columnList, 2)'}">
+                        <div class="drag-content-table btn btn-default col-item" ng-repeat="(key, item) in columnList track by key">
+                            <span>{{ item.title }}</span>
+                            <div class="item-delete" ng-click="removeItem(key, item, columnList, -1)">
+                                <i class="fa fa-times"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    转换成数据的列
+                </div>
+                <div class="panel-footer">
+                    <div style="width: 100%; height: 100%;" class="drag-content" data-drop="true" ng-model='dataList'
+                         jqyoui-droppable="{multiple:true,onDrop:'dropCallback(dataList, 3)'}">
+                        <div class="drag-content-table btn btn-default col-item" ng-repeat="(key, item) in dataList track by key">
+                            <span>{{ item.title }}</span>
+                            <div class="item-delete" ng-click="removeItem(key, item, dataList, -1)">
+                                <i class="fa fa-times"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="data-content">
+            <div class="origin-content">
+                <div class="table-block" style="height: calc(100% - 45px);">
+                    <div class="table-body">
+                        <table class="table sourcedata table-bordered" id="datainsert-table">
+                            <thead>
+                            <tr>
+                                <th ng-dblclick="eidtth(columnvalue,columnkey)" ng-right-click="thrightclick(columnvalue,columnkey)" ng-repeat="(columnkey, columnvalue) in originTable.columns track by columnkey"
+                                    data-field="{{ columnvalue.field }}" ng-if="columnvalue.ifshow == '1'">
+                                    <div class="thline"></div>
+                                    <span ng-if="columnvalue.isedit == '0'">{{ columnvalue.title }}</span>
+                                    <span ng-if="columnvalue.isedit == '1'">
+                                            <input type="text" ng-model="originTable.columns[columnkey].title" ng-focus="focusedit()" ng-blur="onblurth(columnkey)">
+                                        </span>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="(key1, value1) in originTable.data track by key1">
+                                <td title="{{ value1[value2.field] }}" title="{{ value1[value2.field] }}" ng-repeat="(key2, value2) in originTable.columns track by key2"
+                                    ng-if="value2.ifshow == '1'">
+                                    {{ value1[value2.field] }}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="table-pagenation">
+                    <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="originTotal" ng-model="originPage" max-size="5" class="pagination-sm"
+                        boundary-link-numbers="true" rotate="false" ng-change="originPageChanged()"></ul>
+                </div>
+            </div>
+            <div class="bar-content">
+                <div class="form-horizontal">
+                    <div class="col-sm-6">转换后的数据预览:</div>
+                    <div class="col-sm-4">
+                        <label for="title" class="col-sm-4 control-label">别名 <font style="color: red;">*</font> </label>
+                        <input type="text" ng-model="sourceName" class="col-sm-8">
+                    </div>
+                    <div class="col-sm-2">
+                        <button class="btn btn-primary btn-ok" type="button" ng-disabled="disableSave" ng-click="saveData()">保存</button>
+                    </div>
+                </div>
+            </div>
+            <div class="conversion-content">
+                <div class="table-block" style="height: 100%;">
+                    <div class="table-body">
+                        <table class="table sourcedata table-bordered" id="datainsert-table">
+                            <thead>
+                            <tr>
+                                <th ng-dblclick="eidtth(columnvalue,columnkey)" ng-right-click="thrightclick(columnvalue,columnkey)" ng-repeat="(columnkey, columnvalue) in conversionTable.columns track by columnkey"
+                                    data-field="{{ columnvalue.field }}" ng-if="columnvalue.ifshow == '1'">
+                                    <div class="thline"></div>
+                                    <span ng-if="columnvalue.isedit == '0'">{{ columnvalue.title }}</span>
+                                    <span ng-if="columnvalue.isedit == '1'">
+                                            <input type="text" ng-model="originTable.columns[columnkey].title" ng-focus="focusedit()" ng-blur="onblurth(columnkey)">
+                                        </span>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="(key1, value1) in conversionTable.data track by key1">
+                                <td title="{{ value1[value2.field] }}" title="{{ value1[value2.field] }}" ng-repeat="(key2, value2) in conversionTable.columns track by key2"
+                                    ng-if="value2.ifshow == '1'">
+                                    {{ value1[value2.field] }}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endverbatim %}

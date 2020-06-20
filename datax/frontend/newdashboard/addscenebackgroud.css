@@ -1,0 +1,87 @@
+/*页面滑动*/
+html{
+    overflow-y:scroll;
+    overflow-x:scroll;
+}
+/*编辑修改标题*/
+.style-title{
+    text-align: center;
+    margin-top: 3px;
+}
+
+/*左侧样式配置*/
+.echarts-left{
+    width: 28%;
+    margin-left: 1%;
+    overflow-y:scroll;
+    overflow-x:scroll;
+    float: left;
+    height: 750px;
+}
+/*左侧表单*/
+
+label {
+        display: inline-block;
+        width: 100px;
+        text-align: right;
+}
+#styleconfig{
+    margin-top: 10px;
+}
+p{
+    font-size: larger;
+    color: #0c0707;
+}
+
+
+.echarts-show{
+    width: 94%;
+    padding-left: 6%;
+}
+
+/*右侧*/
+.largerEchart{
+    /*height: 750px;*/
+    width: 70%;
+    float: left;
+}
+
+/*右边图示*/
+.echarts-right{
+    height: 350px;
+    width: 100%;
+    float: top;
+    /*padding-left: 40px;*/
+}
+.echarts-top{
+    height: 50px;
+}
+.top-test{
+    width: 50%;
+    height: 100%;
+    float: left;
+}
+.top-filter{
+    float: left;
+    padding-left: 10%;
+    padding-top: 10px;
+}
+
+/*button按钮位置*/
+#button-location{
+    text-align: center;
+    margin: 15px;
+}
+#scenesBgImg{
+    margin-left: -12px;
+}
+#bgselect{
+    width: 30px;
+    float: right;
+    margin-right: 215px;
+}
+.select-config{
+    width: 100%;
+    height: 38px;
+    float: left;
+}

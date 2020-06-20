@@ -1,0 +1,32 @@
+﻿.demo {
+    background-color: #EEEEEE;
+    min-height: 774px;
+}
+.row-fluid .box {
+    background-color: #FFFFFF;
+}
+/*图表背景默认配置项,类名必须是chartsbg，js中获取的时候这样解析的*/
+.chartsbg{
+    border-width:0px;
+    border-style:none;
+    border-color:#e5e5e5;
+    background-color:#ffffff;/*background-color和opacity两个值会配置成rgba(4,33,65,0.5);形式使用*/
+    opacity: 1;
+}
+/*过滤器的样式配置，部分属性需要!important覆盖父类样式,只有配置没有调整功能*/
+.filterFrameStyle{
+	background-color:#ffffff;
+}
+/*文本/导航的样式配置，部分属性需要!important覆盖父类样式,只有配置没有调整功能*/
+.staticFrameStyle{
+	background-color:#ffffff;
+}
+/*告警文本居左显示*/
+.alert {
+    text-align: left;
+    line-height: 20px;
+}
+/*文本/导航大类下的提示框样式配置*/
+.alertFrameStyle{
+    background-color: white;
+}

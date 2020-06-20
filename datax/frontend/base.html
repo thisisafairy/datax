@@ -1,0 +1,107 @@
+{% load staticfiles %}
+<!DOCTYPE html >
+<html lang="en"  >
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>{% block title %}datax{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/admin-lte/css/AdminLTE.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/admin-lte/css/skins/_all-skins.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/admin-lte/css/skins/skin-clean.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/admin-lte/css/skins/skin-theme1.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/admin-lte/css/skins/skin-glass.css' %}">
+    <link rel="stylesheet" href="{% static 'plugin/bootstrap-table/bootstrap-table.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/media.css' %}">
+    <script src="{% static 'plugin/babel-polyfill/polyfill.min.js' %}"></script>
+    <script src="{% static 'plugin/jquery/jquery-2.2.3.min.js' %}"></script>
+    <script src="{% static 'plugin/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'plugin/admin-lte/js/adminlte.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular.js'%}"></script>
+    <script src="{% static 'plugin/angular/angular-ui-router/angular-ui-router.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-ui-router/stateEvents.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-ui-bootstrap/ui-bootstrap-tpls.js'%}"></script>
+    <script src="{% static 'plugin/bootstrap-table/bootstrap-table.js'%}"></script>
+    <script src="{% static 'plugin/lodash/lodash.min.js' %}"></script>
+    <script src="{% static 'plugin/layer/layer.js' %}"></script>
+    <script src="{% static 'plugin/axios/axios.min.js' %}"></script>
+    <script>
+        window.static = '{% static "" %}';
+        $.ajaxSetup({
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));//jnp add post需要
+            }
+        });
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        $(function(){
+            function resizeloading(){
+                var widowheight = $(document).height();
+                var windowwidth = $(document).width();
+                var silderwidth = 0;
+                if($('body').hasClass('sidebar-collapse')){
+                    silderwidth = 40;
+                }
+                else{
+                    silderwidth = 200;
+                } 
+                var height = (widowheight/2-100) + 'px';
+                var width = (windowwidth/2-50) +'px'
+                $(".loading-progress").css({
+                    'left':width,
+                    'top':height
+                });
+            }
+
+            $(window).resize(function(){
+                resizeloading();
+            });
+            resizeloading();
+        })
+        function showLoading(){
+            $(".loading-content").removeClass('hide');
+        }
+        function hideLoading(){
+            $(".loading-content").addClass('hide');
+        }
+  </script>
+</head>
+<body class="hold-transition  sidebar-mini sidebar-collapse">
+<div class="loading-content hide" >
+<div class="loading-bg"></div>
+<div class="loading-progress">
+    <img src="/frontend/plugin/SVG-Loaders/svg-loaders/puff.svg" />
+</div>
+</div>
+<div class="wrapper">
+    {% include 'componets/header.html' %}
+    {% include 'componets/silder.html' %}
+    <div class="content-wrapper" style="position: relative;"> 
+        {% block content %}
+        {% endblock %}
+    </div>
+    {% include 'componets/sidebar.html' %}
+</div>
+
+<script type="text/javascript" src="{% static 'js/main.js'%}"></script>
+</body>
+
+</html>

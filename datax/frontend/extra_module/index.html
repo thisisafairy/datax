@@ -1,0 +1,44 @@
+{% extends 'base.html' %} {% load staticfiles %}
+{% block title %}
+    测试页面
+{% endblock %} {% block content %}
+<!--<editor-fold desc="静态资源">-->
+<!-- #region -->  
+<link rel="stylesheet" href="{% static 'css/common.css' %}?v={{ nowversion }}1">
+<link rel="stylesheet" href="{% static 'extra_module/main.css' %}?v={{ nowversion }}1">
+<script src="{% static 'plugin/ag-grid-community/ag-grid-community.min.js' %}"></script>
+<script src="{% static 'componets/datareport/genDataFunction.js' %}?v={{nowversion}}1"></script>
+<script src="{% static 'componets/datareport/datareport.js' %}?v={{nowversion}}1"></script>
+<!-- #endregion -->
+<!--</editor-fold>-->
+{% verbatim %}
+
+<div class="main-content" ng-app="mainApp" ng-controller="mainController">
+    <div class="content">
+        <p class="hello-text">数据上报功能页</p>
+        <!--<button type="button" class="btn btn-default" ng-click="testGet()">get保存</button>-->
+        <button type="button" class="btn btn-default" ng-click="saveTheChangedData()">保存</button>
+        <table-data-report tableId="tableStructId" limit-search="[]" changed-data="changedData"></table-data-report>
+    </div>
+
+</div>
+
+{% endverbatim %}
+<!--<editor-fold desc="静态资源2">-->
+<!-- #region -->      
+<script type="text/javascript" src="{% static 'plugin/angular/i18n/angular-locale_zh-cn.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'plugin/moment/moment.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/moment/locale/zh-cn.js' %}"></script>
+<script>
+    moment.locale('zh-cn');
+</script>
+<script src="{% static 'js/constant.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'componets/datax-message-box/datax-alert.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'extra_module/main.js' %}?v={{ nowversion }}1"></script>
+{#    <script src="{% static 'dashboard/directives/multi-select.js' %}?v={{ nowversion }}1"></script>#}
+<!-- #endregion -->
+<!--</editor-fold>-->
+
+{% endblock %}

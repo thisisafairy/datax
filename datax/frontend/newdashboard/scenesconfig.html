@@ -1,0 +1,36 @@
+{% extends 'base_portal.html' %} {% load staticfiles %}
+{% block title %}
+场景展示配置
+{% endblock %}
+{% block content %}
+
+{% verbatim %}
+
+<div id="scenesConfig" ng-app="scenesConfigApp" ng-controller="scenesConfigController">
+    <div class="datax-content-box">
+        <div dx-tabs>
+            <div dx-tab-header titles="['移动端', 'pc端', '大屏']"></div>
+            <div dx-tab-body>
+                <div>
+                    <form>
+                        <div class="dx-col-xs-24 dx-col-sm-12">
+                            <div class="dx-col-xs-24 dx-col-sm-6">
+                                主题样式
+                            </div>
+                            <div class="dx-col-xs-24 dx-col-sm-14">
+                                <dx-select items="mbTheme" dx-placeholder="'请选择...'" dx-value="'code'" dx-label="'name'" dx-model="scenesConfig.theme">
+                                </dx-select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div>内容二</div>
+                <div>内容三</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endverbatim %}
+<script src="{% static 'newdashboard/scenesconfig.js' %}"></script>
+{% endblock %}

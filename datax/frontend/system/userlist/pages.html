@@ -1,0 +1,10 @@
+<div>
+  <pre>You are currently on page {{ currentPage }}</pre>
+  <ul uib-pager total-items="totalItems" ng-model="currentPage"></ul>
+
+  <ul>
+      <li ng-repeat="user in userlist">
+          {{ user.username }}
+      </li>
+  </ul>
+</div>

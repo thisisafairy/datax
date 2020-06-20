@@ -1,0 +1,47 @@
+
+.tool-bar {
+  height: 45px;
+  width: calc(100% - 16px);
+  background-color: #ffffff;
+  margin: 8px;
+  padding-top: 6px;
+}
+
+.card-content {
+  height: calc(100% - 80px);
+  width: 100%;
+  padding: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.cart-item {
+  overflow: hidden;
+  float: left;
+  margin: 8px;
+  padding: 6px;
+  background-color: #ffffff;
+  height: 160px;
+  width: calc(50% - 16px);
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+}
+
+.cart-item .left {
+  float: left;
+  width: 40%;
+  height: 148px;
+}
+
+.cart-item .right {
+  float: left;
+  width: 60%;
+  height: 148px;
+}
+
+.log-list {
+  list-style: none;
+  overflow-y: auto;
+  width: 100%;
+  height: 128px;
+}

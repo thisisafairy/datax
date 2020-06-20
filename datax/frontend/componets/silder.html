@@ -1,0 +1,27 @@
+{% load  staticfiles %}
+<aside id="silderApp" class="main-sidebar"  ng-controller="silderController">
+    <section class="sidebar">
+
+      <ul class="sidebar-menu" data-widget="tree">
+        <!--li class="header" ng-click="testClick()">菜单</li-->
+        <li>
+            <a href="/dashboard/index" >
+                <i class="fa fa-home fa-lg"></i>
+                <span>首页</span>
+            </a>
+        </li>
+        <li class=" treeview" ng-repeat="(key, list) in menulist" ng-class="{true: 'active', false: ''}[list.is_active]">
+          <a href="#">
+            <i class="fa " ng-class="list.icon"></i> <span ng-bind="list.name"></span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-right pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li ng-repeat="(key, child) in list.child" ng-class="{true: 'active', false: ''}[child.is_active]"><a ng-href="[: child.url :]" ><i class="fa fa-circle-o"></i><span ng-bind="child.name"></span></a></li>
+          </ul>
+        </li>
+
+      </ul>
+    </section>
+  </aside>

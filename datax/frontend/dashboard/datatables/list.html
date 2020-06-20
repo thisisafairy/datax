@@ -1,0 +1,63 @@
+{% verbatim %}
+<section class="content-header cont-header">
+    <h1 class="cont-header-title user-list-titel">
+        表格列表
+    </h1>
+</section>
+<div class="col-md-12">
+    <div class="box ">
+        <div class="box-body">
+            <div class="col-md-6">
+                <a class="btn btn-default" href="#/add/">
+                    <i class="fa fa-plus"></i> 新增表格
+                </a>
+                <a class="btn btn-default" href="/dashboard/reportdesign" target="_blank">
+                    <i class="fa fa-plus"></i> 新增单页报表
+                </a>
+                <a class="btn btn-default" ng-click="getdata(1)">
+                    <i class="fa fa-search"></i> 重新加载
+                </a>
+            </div>
+            <div class="col-md-offset-2 col-md-4">
+                <div class="form-group">
+                    <div class="col-sm-6 cont-body-tabinput">
+                        <input type="text" ng-model="searchkey" ng-change="search()" class="form-control cont-bodyfrom-input" placeholder="搜索名称">
+                    </div>
+                    <!-- <button class="btn btn-search" type="button" ><i class="fa fa-search icon-fa"></i>查询</button> -->
+                </div>
+            </div>
+            <!--<div class="col-md-offset-6 col-md-3">
+                <input type="text" class="form-control" placeholder="搜索">
+            </div>-->
+            <div class="col-md-12 ">
+                <table class="table table-bordered table-hover" id="olap-table">
+                    <thead>
+                        <tr>
+                            <th data-field="name" width="15%">表格名称</th>
+                            <th data-field="desc" width="15%">描述</th>
+                            <th data-field="quency" width="15%">执行类型</th>
+                            <th data-field="setting" width="35%">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(key, list) in lists">
+                            <td>{{ list['name'] }}</td>
+                            <td>{{ list['remark'] }}</td>
+                            <td>{{ list['kind'] }}</td>
+                            <td>
+                                <a ng-show="!list['version'] || list['version'] < 2" href="#/add/{{ list['id'] }}" class="btn btn-primary editable-table-button btn-xs btn-buttons">编辑</a>
+                                <a ng-show="list['version'] && list['version'] > 2" target="_blank" href="/dashboard/reportdesign?id={{ list['id'] }}" class="btn btn-primary editable-table-button btn-xs btn-buttons">编辑</a>
+                                <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="removeRow(list['id'])">删除</button>
+                                <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="preview(list['json'])">预览</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-12">
+                <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-sm" boundary-link-numbers="true" rotate="false" ng-change="pageChanged()"></ul>
+            </div>    
+        </div>
+    </div>
+</div>
+{% endverbatim %}

@@ -1,0 +1,118 @@
+<style type="text/css">
+    .select-content {
+        position: absolute;
+        width: 400px;
+        height: 0px;
+        display: block;
+        background-color: #ffffff;
+        z-index: 999;
+        overflow: hidden;
+        transition: height 0.5s;
+        -moz-transition: height 0.5s; /* Firefox 4 */
+        -webkit-transition: height 0.5s; /* Safari and Chrome */
+        -o-transition: height 0.5s; /* Opera */  
+    }
+
+    .url-content:hover > .select-content{
+        height: 280px;
+    }
+
+    .url-input:focus + .select-content{
+        height: 0px;
+    }
+</style>
+<div class="modal-header open-header">
+    <h3 class="modal-title open-header-title" id="modal-title">模板编辑</h3>
+    {# 弹出框的关闭按钮 #}
+    <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body open-body">
+    <form action="#" method="post" id="editNode" class="form-horizontal" name="myForm">
+        <div class="form-group">
+            <label></label>
+            <input type="hidden" name="id" ng-model='module.id'>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label form-lable-modal">名称
+                <font style="color:red"> * </font>
+            </label>
+            <div class="col-sm-10 form-input-add">
+                <input type="text" name="name" required ng-model='module.name' class="form-control" maxlength="30">
+            </div>
+        </div>
+        <!--<div class="form-group">
+            <label class="col-sm-2 control-label form-lable-modal">代码
+                <font style="color:red"> * </font>
+            </label>
+            <div class="col-sm-10 form-input-add">
+                <input type="text" name="key" required ng-model='module.key' class="form-control" maxlength="30">
+            </div>
+        </div>-->
+        <div class="form-group">
+            <label class="col-sm-2 control-label form-lable-modal">主题或场景
+                <font style="color:red"> * </font>
+            </label>
+            <div class="col-sm-10 form-input-add url-content">
+                <input type="text" name="url" required ng-model='module.url' class="form-control url-input" maxlength="150">
+                <div class="select-content">
+                    <div style="float:left;width:200px;">
+                        <p class="form-lable-p">选择场景</p>
+                        <select style="width:200px; height: 260px;" name="allusers" class="filtered" id="allusers" multiple="multiple" ng-model="selscenes"
+                            ng-options="scene.name group by scene.kind for scene in scenes" ng-change="changeScene()">
+                        </select>
+                    </div>
+                    <div style="float:left;width:200px;">
+                        <p class="form-lable-p">选择主题</p>
+                        <select style="width:200px; height: 260px;" multiple="multiple" size="0" ng-model="selthemes"
+                            ng-options="theme.name for theme in themes" ng-change="changeTheme()">
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label form-lable-modal">排序</label>
+            <div class="col-sm-10 form-input-add">
+                <input type="number" name="orderby" ng-model='module.orderby' class="form-control" maxlength="30">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label form-lable-modal">图标</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="icon" name="icon" ng-model="module.icon" title="{{ module.icon }}">
+            </div>
+            <div class="col-sm-4">
+                <div class="col-sm-6 btn btn-default" style="position: relative;">上传图片
+                    <input style="width: 100%; position: absolute; top: 0; opacity: 0;" type="file" 
+                         maxlength="30" id="menuIcon" custom-on-change="iconUpload">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label form-lable-modal">说明</label>
+            <div class="col-sm-10 form-input-add">
+                <input type="text" placeholder="多个请用逗号分隔" name="desc" ng-model='module.desc' class="form-control" maxlength="30">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label form-lable-modal">父节点代码</label>
+            <!--<div class="col-sm-10 form-input-add">
+                <input type="text" name="parent_key" readonly="readonly" ng-model='module.parent_key' class="form-control">
+            </div>-->
+            <div class="col-sm-10 form-input-add">
+                <select name="parent_key" class="form-control" id="parent_key" ng-model="module.parent_key"
+                    ng-options="pmenu.key as pmenu.name for pmenu in preParentMenu">
+                </select>
+            </div>
+        </div>
+
+
+        <div class="modal-footer footer-btn">
+            <button class="btn btn-primary btn-ok" type="button" ng-disabled="myForm.name.$invalid || 
+            myForm.key.$invalid || myForm.url.$invalid" ng-click="ok()">保存</button>
+            <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+        </div>
+    </form>
+</div>

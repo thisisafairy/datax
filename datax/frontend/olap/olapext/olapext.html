@@ -1,0 +1,331 @@
+{% extends 'base.html' %} {% load staticfiles %} {% block title %}OLAP扩展{% endblock %} {% block content %}
+<!-- <link rel="stylesheet" href="{% static 'node_modules/admin-lte/plugins/select2/select2.min.css' %}"> -->
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-bootstrap-datetimepicker/css/datetimepicker.css' %}" /> 
+<link rel="stylesheet" href="{% static 'olap/olapext/olapext.css' %}?v={{nowversion}}1" /> 
+{% verbatim %}
+<div ng-app="olapExt" ng-controller="olapExtController">
+    <div resize ng-style="style()">
+        <div class="mian-olap">
+            <div class="labeltitle">olap扩展字段</div>
+            <div class="mian-olap-select">
+                <div class="select-olap trianglestyle" style="background: white;" ng-mouseleave="closeSelect()">
+                    <input type="text" ng-model="mianOlapName" class="form-control mian-olap-name" style="width: 92%;border: none;" placeholder="请选择主olap" readonly="readonly"
+                        ng-click="openSelectBox($event)">
+                    <select class="select-obj" size="5" ng-model="mainOlapId" ng-change="changeMainOlap()" 
+                        ng-options="olap.id as olap.name for olap in olapList"></select>
+                </div>
+            </div>
+            <div class="main-olap-leader">
+                默认字段：
+            </div>
+            <div class="main-olap-col">
+                <div class="olap-item" ng-repeat="col in mainOlapInfos.olapColumns">
+                    <span title="{{ col.title }}">{{ col.title }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="ext-col-content">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-sm-2 text-left" style="min-width: 155px;">
+                        <button class="btn btn-default" ng-click="addExtCol('default')">新增直接关联字段</button>
+                    </div>
+                    <div class="col-sm-2 text-left" style="min-width: 155px;">
+                        <button class="btn btn-default" ng-click="addCalcCol('')">新增计算关联字段</button>
+                    </div>
+                    <div class="col-sm-3 text-left" style="min-width: 145px;">
+                        <button class="btn btn-default" ng-click="saveExtCol('')">保存</button>
+                        <button class="btn btn-default" ng-click="previewExpOlap()">预览</button>
+                    </div>
+
+                    <div class="col-sm-2 text-left" style="float: right;min-width: 125px;">
+                        <button popover-placement="bottom-right" uib-popover-html="moduleInfo" type="button" class="btn btn-default">注意事项：</button>
+                    </div>
+                </div>
+                <div class="form-group" ng-repeat="extCol in extCols track by $index">
+                    <label for="title" class="col-sm-1 control-label" style="min-width: 97px">子olap：</label>
+                    <div class="col-sm-2 select-olap" ng-mouseleave="closeSelect()">
+                        <input type="text" ng-click="openSelectBox($event)" ng-model="extCol.olapName" class="form-control" readonly="readonly" placeholder="请选择子olap">
+                        <select class="select-obj" size="5" ng-model="extCol.olapId" ng-change="changeExtOlap(extCol)" 
+                            ng-options="olap.id as olap.name for olap in olapList"><option value="">---请选择子olap---</option></select>
+                    </div>
+                    <label for="title" class="col-sm-1 control-label" style="min-width: 120px">子olap的列：</label>
+                    <div class="col-sm-2">
+                        <input type="text" ng-click="selectCol(extCol)" ng-model="extCol.olapColName" class="form-control" readonly="readonly" placeholder="请选择子olap的列">
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" ng-model="extCol.colName" class="form-control" placeholder="请输入自定义列名">
+                    </div>
+                    <label for="title" class="col-sm-1 control-label" style="min-width: 143px">新增字段的类型：</label>
+                    <div class="col-sm-1">
+                        <select ng-model="extCol.fieldType" class="form-control" style="min-width: 93px">
+                            <option value="">---请选择子数据类型---</option>
+                            <option value="varchar(1000)">字符类型(长度1000)</option>
+                            <option value="varchar(700)">字符类型(长度700)</option>
+                            <option value="varchar(500)">字符类型(长度500)</option>
+                            <option value="varchar(300)">字符类型(长度300)</option>
+                            <option value="int4">数值类型(整数)</option>
+                            <option value="float8">数值类型(浮点)</option>
+                            <option value="bool">Bool类型</option>
+                            <option value="timestamp">日期类型(timestamp)</option>
+                            <option value="text">文本类型(text)</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-1">
+                        <button class="btn btn-default" ng-click="deleteCol(extCols, $index, 'default')">删除</button>
+                    </div>
+                </div>
+                <div class="form-group" ng-repeat="extCol in extCalcCols track by $index">
+                    <label for="title" class="col-sm-1 control-label" style="min-width: 100px">计算字段：</label>
+                    <div class="col-sm-2">
+                        <input type="text" ng-model="extCol.colName" class="form-control" placeholder="请输入自定义列名">
+                    </div>
+                    <div class="col-sm-1">
+                        <button class="btn btn-default" ng-click="addCalcCol(extCol)">编辑</button>
+                    </div>
+                    <div class="col-sm-1">
+                        <button class="btn btn-default" ng-click="deleteCol(extCalcCols, $index, 'calc')">删除</button>
+                    </div>
+                </div>
+
+                <div class="previewcontent" ng-if="isPreview">
+                    <div class="close-preview" ng-click="closePreview();">x</div>
+                    <div class="table-block">
+                        <div class="table-body">
+                            <table class="table sourcedata table-bordered" id="datainsert-table">
+                                <thead>
+                                    <tr>
+                                        <th ng-repeat="thtitle in rowtitle track by $index">
+                                            <span>{{ thtitle }}</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="trvalue in previewlists">
+                                        <td ng-repeat="previewcol in previewcolumns">
+                                            <span> {{ trvalue[previewcol] }}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="table-pagenation">
+                        <ul uib-pagination next-text='下一页 ' previous-text='上一页' total-items="totalItems" ng-model="currentPage" max-size="5" class="pagination-md"
+                            boundary-link-numbers="true" rotate="false" ng-change="pageChanged(currentPage)"></ul>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/ng-template" id="calc_col.html">
+        <div class="modal-header open-header">
+            <h3 class="modal-title open-header-title">增加计算字段</h3>
+            <!--  弹出框的关闭按钮  -->
+            <button type="button" ng-click="ok()" class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>     
+        <div class="modal-body open-body">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-sm-1"></div>
+                    <label for="title" class="col-sm-2 control-label" style="min-width: 97px; text-align:left; ">计算公式：</label>
+                    <div class="col-sm-9 form-input-add">
+                        <input type="text" class="form-control" ng-model="extColObj.displayCalcFormula">
+                    </div>
+                </div>
+                <!-- <div class="form-group">
+                    <div class="col-sm-1"></div>
+                    <label for="title" class="col-sm-2 control-label" style="min-width: 97px; text-align:left; ">计算公式：</label>
+                    <div class="col-sm-9 form-input-add">
+                        <input type="text" class="form-control" ng-model="extColObj.calcFormula">
+                    </div>
+                </div> -->
+                <div class="form-group">
+                    <div class="col-sm-1"></div>
+                    <a href="javascript:void(0)" class="btn btn-default" ng-click="addCalcCol('');">新增计算字段</a>
+                    <a href="javascript:void(0)" class="btn btn-default" ng-click="addCalcCol('base');">新增基础数值</a>
+                </div>
+                <div class="form-group" ng-repeat="col in extColObj.cols track by $index">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-2 form-input-add">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                左括号
+                              <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                              <li><a href="#" ng-click="operationBrackets(col, 'add', 'lBrackets', '(')">添加</a></li>
+                              <li><a href="#" ng-click="operationBrackets(col, 'sub', 'lBrackets', '(')">删除</a></li>
+                            </ul>
+                          </div>
+                    </div>
+                    <div ng-if="col.olapId == '-1' || col.olapId == -1" class="col-sm-4 form-input-add">
+                        <input type="text" class="form-control" placeholder="请输入数值" ng-model="col.col" ng-change="changeBaseVal(col)">
+                    </div>
+                    <div ng-if="col.olapId != '-1' && col.olapId != -1" class="col-sm-4 form-input-add olap-col-select">
+                        <input type="text" class="form-control" placeholder="选择子olap指标" ng-model="col.colName">
+                        <div class="olap-col-content">
+                            <div style="float:left;width:180px;">
+                                <p class="form-lable-p">所有olap</p>
+                                <select style="width:180px;height:200px;" class="filtered" ng-model="col.olapId"
+                                    size="7" ng-change="changeOlap(col)" ng-options="olap.id as olap.name for olap in olapList">
+                                    <option value="">---选择olap---</option>
+                                </select>
+                            </div>
+                            <div style="float:left;width:150px;">
+                                <p class="form-lable-p">指标名</p>
+                                <select style="width:150px;height:200px;" size="7" ng-change="changeCol(col)" 
+                                    ng-model="col.col" ng-options="olapCol.column as olapCol.title for olapCol in col.cols">
+                                    <option value="">---选择指标---</option>
+                                </select>
+                            </div>
+                            <div style="float:left;width:350px;">
+                                <a href="javascript:void(0)" class="btn btn-default" ng-click="addJoinCol(col);">&nbsp;&nbsp;新增和主olap的关联维度</a><br>
+                                <div style="width: 100%;" ng-repeat="($index, jCol) in col.joinCol track by $index">
+                                    <div class="col-sm-4 form-input-add">
+                                        <select class="form-control" ng-model="jCol.mainCol">
+                                            <option value="" selected="selected" disabled="disabled">-主olap字段-</option>
+                                            <option value="{{ maincol.column }}" ng-repeat="maincol in mainOlapInfos.olapColumns">{{ maincol.title }}</option>
+                                        </select>
+                                    </div>                            
+                                    <div class="col-sm-4 form-input-add">
+                                        <select class="form-control" ng-model="jCol.joinCol">
+                                            <option value="" selected="selected" disabled="disabled">-子olap字段-</option>
+                                            <option value="{{ olapCol.column }}" ng-repeat="olapCol in col.cols">{{ olapCol.title }}</option>
+                                        </select>
+                                    </div>  
+                                    <div class="col-sm-2 form-input-add">
+                                        <a href="javascript:void(0)" class="btn btn-default" ng-click="show=!show">扩展</a>
+                                        <div ng-init="show=true" class="col-join-ext" ng-if="show">
+                                            <div class="col-sm-12">
+                                                子olap关联字段计算操作：
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <select class="form-control" ng-model="jCol.colOper">
+                                                    <option value="">---</option>
+                                                    <option value="+">+</option>
+                                                    <option value="-">-</option>
+                                                    <option value="*">x</option>
+                                                    <option value="/">÷</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-7">
+                                                <input class="form-control" type="number" ng-model="jCol.colCalc"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2 form-input-add">
+                                        <a href="javascript:void(0)" class="btn btn-default" ng-click="delJoinCol(col, $index);">删除</a>
+                                    </div>                          
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 form-input-add">
+                        <select class="form-control" ng-model="col.calcType">
+                            <option value="">连接符</option>
+                            <option value="+">+</option>
+                            <option value="-">-</option>
+                            <option value="*">*</option>
+                            <option value="/">÷</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2 form-input-add">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              右括号
+                              <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" ng-click="operationBrackets(col, 'add', 'rBrackets', ')')">添加</a></li>
+                                <li><a href="#" ng-click="operationBrackets(col, 'sub', 'rBrackets', ')')">删除</a></li>
+                            </ul>
+                          </div>
+                    </div>
+                    <div class="col-sm-1 form-input-add">
+                        <a href="javascript:void(0)" class="btn btn-default" ng-click="delCalcCol($index);">删除</a>
+                    </div>
+                </div>
+            </form>
+        </div>  
+        <div class="modal-footer footer-btn">
+            <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">确定</button>
+            <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+        </div>
+    </script>
+    <script type="text/ng-template" id="select_col.html">
+        <div class="modal-header open-header">
+            <h3 class="modal-title open-header-title">选择列与关联字段</h3>
+            <!--  弹出框的关闭按钮  -->
+            <button type="button" ng-click="ok()"  class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body open-body">
+            <div class="select-default-col">
+                <div style="float: left;width: calc(100% - 15px);margin-bottom: 5px;">
+                    <select style="width: calc(100% - 10px);" size="7" ng-model="extColObj.olapCol" ng-change="colChange()"
+                    ng-options="col.column as col.title for col in extColObj.olapCols.olapColumns"><option value="">---请选择指标---</option>
+                    </select>
+                </div>
+                <a href="javascript:void(0)" class="btn btn-default" ng-click="addJoinRow();">&nbsp;&nbsp;新增关联字段</a><br>
+                <div style="float: left;width: calc(100% - 15px); margin-top:5px; margin-bottom: 5px;">
+                    <div style="width: 100%; margin-bottom: 5px; height: 34px;" ng-repeat="(cindex, col) in extColObj.joinCol track by cindex">
+                        <div class="col-sm-4 form-input-add">
+                            <select class="form-control" ng-model="col.mainCol">
+                                <option value="">---主olap字段---</option>
+                                <option value="{{ maincol.column }}" ng-repeat="maincol in mainOlapInfos.olapColumns">{{ maincol.title }}</option>
+                            </select>
+                        </div>                            
+                        <div class="col-sm-4 form-input-add">
+                            <select class="form-control" ng-model="col.joinCol">
+                                <option value="">---子olap关联字段---</option>
+                                <option value="{{ olapCol.column }}" ng-repeat="olapCol in extColObj.olapCols.olapColumns">{{ olapCol.title }}</option>
+                            </select>
+                        </div>  
+                        <div class="col-sm-2 form-input-add">
+                            <a href="javascript:void(0)" class="btn btn-default" ng-click="show=!show">扩展</a>
+                            <div ng-init="show=true" class="col-join-ext" ng-if="show">
+                                <div class="col-sm-12">
+                                    子olap关联字段计算操作：
+                                </div>
+                                <div class="col-sm-4">
+                                    <select class="form-control" ng-model="col.colOper">
+                                        <option value="">---</option>
+                                        <option value="+">+</option>
+                                        <option value="-">-</option>
+                                        <option value="*">x</option>
+                                        <option value="/">÷</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-7">
+                                    <input class="form-control" type="number" ng-model="col.colCalc"/>
+                                </div>
+                            </div>
+                        </div>                          
+                        <div class="col-sm-2 form-input-add">
+                            <a href="javascript:void(0)" class="btn btn-default" ng-click="delJoinRow(cindex);">删除</a><br>
+                        </div>                          
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer footer-btn">
+            <button class="btn btn-warning btn-cancel" type="button" ng-click="reset()">重置</button>
+            <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">确定</button>
+        </div>
+    </script>
+</div>
+{% endverbatim %}
+<!-- <script src="{% static 'node_modules/admin-lte/plugins/select2/select2.min.js' %}"></script> -->
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/angular/i18n/angular-locale_zh-cn.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/moment/moment.js' %}"></script>
+<script type="text/javascript" src="{% static 'plugin/moment/locale/zh-cn.js' %}"></script>
+<script>
+    moment.locale('zh-cn');
+</script>
+<script src="{% static 'plugin/angular/angular-bootstrap-datetimepicker/js/datetimepicker.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-bootstrap-datetimepicker/js/datetimepicker.templates.js' %}"></script>
+<script src="{% static 'olap/olapext/olapext.js' %}?v={{nowversion}}1"></script>
+<script src="{% static 'js/utils.js' %}?v={{nowversion}}1"></script>
+{% endblock %}

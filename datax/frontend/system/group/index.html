@@ -1,0 +1,214 @@
+{% extends 'base_177.html' %} {% load staticfiles %} {% block title %}角色/组管理{% endblock %} {% block content %}
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-material/angular-material.min.css' %}" />
+<div>
+
+    <section class="content-header cont-header">
+        <h1 class="cont-header-title">
+            角色/组管理
+        </h1>
+    </section>
+
+    <section class="content cont-body" ng-app="grouplist">
+        <div ng-controller="roleManagerListCtrl" class="row" id="roleManagerListCtrl">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="btn-group box-header group-list-header">
+                        <button type="button" ng-click="add()" class="btn  btn-usermanage">
+                                    <i class="fa fa-plus icon-fa"></i>新增
+                                </button> 
+                    </div>
+                    <div class="roleManager-list-idsearch col-md-offset-6 col-md-3">
+                        <div class="form-group">
+                            <!--<label for="firstname" class="col-sm-2 control-label cont-body-label">角色名</label>-->
+                            <div class="col-sm-6 cont-body-tabinput">
+                                <input type="text" class="form-control cont-bodyfrom-input" id="name" ng-model="param.name" ng-change="queryList(1)" placeholder="搜索名称">
+                            </div>
+                            <!--<button class="btn btn-search" type="button" ng-click=""><i class="fa fa-search icon-fa"></i>查询</button>-->
+                        </div>
+                    </div>
+                    <div class="box-body bx-body">
+                        <div class="dataTables_wrapper form-inline dt-bootstrap">
+                            <table class="table table-bordered table-hover" id="gridData">
+                                <thead class="table-head">
+                                    <tr>
+                                        <th style="text-align: center;">角色/组名称</th>
+                                        <th style="text-align: center;min-width: 373px;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in pagination.data">
+                                        <td style="text-align: center;" ng-bind="item.name"></td>
+                                        <td>
+                                            <div class="buttons" style="text-align: center;">
+                                                <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="editInfo(item)">编辑</button>
+                                                <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="personSet(item)">相关人员</button>
+                                                <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="permissionSet(item,'grouppermiss')">后台管理菜单权限</button>
+                                                <button class="btn btn-primary editable-table-button btn-xs btn-buttons" ng-click="permissionSet(item,'portalmpermiss')">门户菜单权限</button>
+                                                <button class="btn btn-danger editable-table-button btn-xs btn-buttons" ng-click="removeRow(item)">删除</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="dataTables_info">
+                                        <label>每页显示条数：
+                                                <select  data-ng-model="count"
+                                                    name="count" id="count" ng-change="queryList(1)">
+                                                    <option class="form-control" value="7">7</option>
+                                                    <option class="form-control" value="10" selected="selected">10</option>
+                                                    <option class="form-control" value="20">20</option>
+                                                    <option class="form-control" value="50">50</option>
+                                                </select>
+                                            </label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-7">
+                                    <div class="dataTables_paginate paging_simple_numbers right">
+                                        <ul style="margin: 0px;"  uib-pagination total-items="totalItems" first-text="«" rotate="false" last-text="»" previous-text="上一页"
+                                            next-text="下一页" ng-change="queryList(page)" ng-model="page" items-per-page="count"
+                                            class="pagination-sm" boundary-links="true" boundary-link-numbers="true" max-size="currentPageNum">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script type="text/ng-template" id="myModalContent.html">
+                <div class="modal-header open-header" id="myModalContent">
+                    <h3 class="modal-title open-header-title">角色/组维护</h3>
+                    {# 弹出框的关闭按钮 #}
+                    <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body open-body">
+                    <form class="form-horizontal" id="dataform" name="dataform">
+                        <div class="form-group">
+                            <label for="firstname" class="col-sm-2 control-label">角色/组名</label>
+                            <div class="col-sm-10 form-input">
+                                <input type="text" id="id" name="id" style="display:none;" ng-model="group.id">
+                                <input type="text" class="form-control" id="name" name="name" ng-model="group.name" placeholder="请输入角色/组名">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer footer-btn">
+                    <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+                    <button class="btn btn-cancel" type="button" ng-click="cancel()">取消</button>
+                </div>
+            </script>
+            <script type="text/ng-template" id="myModalSetP.html">
+                <div class="modal-header open-header">
+                    <h3 class="modal-title open-header-title">组用户信息</h3>
+
+                    <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body open-body">
+                    <form class="form-horizontal" id="userform" name="userform">
+                        <div class="form-group">
+                            <label for="firstname" class="col-sm-2 control-label form-lable">角色/组名</label>
+                            <div class="col-sm-10 form-input">
+                                <input type="text" id="id" name="id" style="display:none;" ng-model="group.id">
+                                <input type="text" disabled class="form-control" id="name" name="name" ng-model="name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label form-lable">相关人员</label>
+                            <div class="col-sm-10 form-input">
+                                <div style="float:left;width:200px;">
+                                    <p class="form-lable-p">系统人员</p>
+                                    <select style="width:200px;height:200px;" name="allusers" class="filtered" id="allusers" multiple="multiple" ng-model="selusers"
+                                        ng-options="user.username for user in allusers">
+                            </select>
+                                </div>
+                                <div style="float:left;width:50px;padding-left: 5px;margin-top: 58px;">
+                                    <br>
+                                    <div><a title=">>" href="#" id="id_user_add_link" ng-click="add()"> 添加<span class="glyphicon glyphicon-arrow-right"></span></a></div><br>
+                                    <div><a title="<<" href="#" id="id_user_remove_link" ng-click="remove()"> 移除<span class="glyphicon glyphicon-arrow-left"></span></a></div>
+                                </div>
+                                <div style="float:left;width:200px;">
+                                    <p class="form-lable-p">已选人员</p>
+                                    <select style="width:200px;height:200px;" id="selusers" multiple="multiple" size="0" name="selusers" ng-model="seledusers"
+                                        ng-options="user.username for user in users">
+                            </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!--<div class="form-group" >
+                    <div style="float:left">
+                    </div>
+                </div>-->
+                    </form>
+                </div>
+                <div class="modal-footer footer-btn">
+                    <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+                    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+                </div>
+            </script>
+            <script type="text/ng-template" id="myModalSetPermission.html">
+                <div class="modal-header open-header">
+                    <h3 class="modal-title open-header-title">权限信息</h3>
+                    {# 弹出框的关闭按钮 #}
+                    <button type="button" ng-click="cancel()" class="close open-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body open-body">
+                    <form class="form-horizontal" id="userform" name="userform">
+                        <div class="form-group">
+                            <label for="firstname" class="col-sm-2 control-label form-lable">角色/组名</label>
+                            <div class="col-sm-10 form-input">
+                                <input type="text" id="id" name="id" style="display:none;" ng-model="group.id">
+                                <input type="text" disabled class="form-control" id="name" name="name" ng-model="name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label form-lable">模块</label>
+                            <div class="col-sm-10 form-input">
+                                <div style="float:left;width:200px;">
+                                    <p class="form-lable-p">所有模块</p>
+                                    <select style="width:200px;height:200px;" name="allusers" class="filtered" id="allusers" multiple="multiple" ng-model="selusers"
+                                        ng-options="user.name group by user.parentname for user in allusers">
+                            </select>
+                                </div>
+                                <div style="float:left;width:50px;padding-left: 5px;margin-top: 58px;">
+                                    <br>
+                                    <div><a title=">>" href="#" id="id_user_add_link" ng-click="add()"> 添加<span class="glyphicon glyphicon-arrow-right"></span></a></div><br>
+                                    <div><a title="<<" href="#" id="id_user_remove_link" ng-click="remove()"> 移除<span class="glyphicon glyphicon-arrow-left"></span></a></div>
+                                </div>
+                                <div style="float:left;width:200px;">
+                                    <p class="form-lable-p">已授权模块</p>
+                                    <select style="width:200px;height:200px;" id="selusers" multiple="multiple" size="0" name="selusers" ng-model="seledusers"
+                                        ng-options="user.name for user in users">
+                            </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!--<div class="form-group" >
+                    <div style="float:left">
+                    </div>
+                </div>-->
+                    </form>
+                </div>
+                <div class="modal-footer footer-btn">
+                    <button class="btn btn-primary btn-ok" type="button" ng-click="ok()">保存</button>
+                    <button class="btn btn-warning btn-cancel" type="button" ng-click="cancel()">取消</button>
+                </div>
+            </script>
+        </div>
+
+
+    </section>
+</div>
+<script src="{% static 'plugin/angular/angular-aria/angular-aria.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-animate/angular-animate.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-messages/angular-messages.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-material/angular-material.min.js' %}"></script>
+
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+<script src="{% static 'system/group/index.js' %}?v={{ nowversion }}1"></script>
+
+{% endblock %}

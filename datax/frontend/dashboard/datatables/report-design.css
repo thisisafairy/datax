@@ -1,0 +1,1018 @@
+
+.design-content {
+    width: 100%;
+    height: 100%;
+}
+
+.left-block {
+    width: 220px;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    z-index: 300;
+}
+
+.left-block .olap-switch {
+    width: 60px;
+    position: absolute;
+    left: -60px;
+    padding: 5px;
+    top: 10px;
+    color: rgba(255, 255, 255, 1);
+    background-color: rgba(25, 25, 25, 1);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, .2);
+    text-align: center;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.olap-switch .fa-caret-right {
+    display: none;
+}
+
+.left-block .switch-on {
+    width: 20px;
+    left: -20px;
+}
+
+.switch-on .fa-caret-right {
+    display: block !important;
+    color: rgba(255, 255, 255, 1);
+    padding: 0;
+}
+
+.switch-on span {
+    display: none;
+}
+
+.left-block .left-card {
+    margin-top: 100px;
+    overflow-y: auto;
+}
+
+.right-block {
+    width: 100%;
+    height: 100%;
+    left: 0;
+    margin: 0;
+    z-index: 200;
+}
+
+.design-content .table-tools {
+    width: 100%;
+    height: 120px;
+    padding: 0;
+    /*overflow: hidden;*/
+    position: relative;
+}
+
+.right-block .functional-area {
+    /*overflow: hidden;*/
+    height: 118px;
+    background-color: rgba(243, 243, 243, 1);
+    padding: 2px 10px 2px 0;
+    user-select: none;
+}
+
+.right-block .functional-area > div > .region-title {
+    position: absolute;
+    width: calc(100% - 18px);
+    bottom: 5px;
+    text-align: center;
+}
+
+.right-block .functional-area > div {
+    position: relative;
+    /*overflow: hidden;*/
+    display: block;
+    height: 100%;
+    float: left;
+    border-right: 1px solid rgba(170, 170, 170, 1);
+}
+
+.report-btn {
+    float: left;
+    background-color: rgba(0, 0, 0 , 0);
+    border: none;
+    display: block;
+    overflow: hidden;
+    position: relative;
+}
+
+.report-btn > div{
+    float: left;
+}
+
+.report-btn:hover {
+    background-color: rgba(198, 198, 198, 1);
+}
+
+.report-btn-hover {
+    background-color: rgba(198, 198, 198, 1);
+}
+
+.btn-drop-down {
+    overflow: unset;
+}
+
+.drop-down-panel {
+    position: absolute;
+    top: 100%;
+    left: -3px;
+    height: 0;
+    width: 0;
+    padding: 3px;
+    background-color: rgba(0, 0, 0, 0);
+    overflow: hidden;
+    display: none;
+    text-align: left;
+    z-index: 2000;
+    transition: height 0.5s;
+    -moz-transition: height 0.5s; /* Firefox 4 */
+    -webkit-transition: height 0.5s; /* Safari and Chrome */
+    -o-transition: height 0.5s; /* Opera */
+}
+
+.drop-down-box {
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 4px;
+    list-style: none;
+    padding: 3px 0 3px 0;
+}
+
+.drop-down-box li {
+    padding: 5px 10px 5px 10px;
+    line-height: 22px;
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(0,0,0,.65);
+    white-space: nowrap;
+    transition: background-color 0.3s;
+    position: relative;
+}
+
+.drop-down-box-contain-icon > li > div {
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 25px;
+    height: 25px;
+}
+
+.drop-down-box li:hover {
+    background-color: rgba(200, 200, 200, 1);
+}
+
+.btn-drop-down:hover > .drop-down-panel {
+    display: block;
+    height: auto;
+    min-width: 100%;
+    max-width: 300px;
+    width: auto;
+
+}
+
+/* region 功能面板按钮*/
+
+.btn-arrow-down {
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    z-index: 1000;
+}
+
+
+.functional-area > div .btn-icon {
+    background: url("/frontend/image/ico/report-design-icon.png") no-repeat;
+}
+
+/* 粘贴 */
+.functional-area .clipboard-region .btn-paste {
+    width: 40px;
+    height: 62px;
+}
+
+.functional-area .clipboard-region .btn-paste .btn-icon {
+    background-position: -5px -1px;
+    height: 38px;
+    width: 40px;
+}
+
+/* 剪切 */
+.functional-area .clipboard-region .btn-cut {
+    width: 70px;
+    height: 25px;
+}
+
+.functional-area .clipboard-region .btn-cut .btn-icon {
+    background-position: -5px -40px;
+    height: 25px;
+    width: 25px;
+}
+
+/* 复制 */
+.functional-area .clipboard-region .btn-copy {
+    width: 70px;
+    height: 25px;
+}
+
+.functional-area .clipboard-region .btn-copy .btn-icon {
+    background-position: -30px -40px;
+    height: 25px;
+    width: 25px;
+}
+
+/* 格式刷 */
+.functional-area .clipboard-region .btn-format-brush {
+    width: 70px;
+    height: 25px;
+}
+
+.functional-area .clipboard-region .btn-format-brush .btn-icon {
+    background-position: -55px -40px;
+    height: 25px;
+    width: 25px;
+}
+
+/* 字体选择 */
+.functional-area .font-region .btn-font-family {
+    width: 150px;
+    height: 30px;
+}
+
+/* 字号选择 */
+.functional-area .font-region .btn-font-size {
+    width: 50px;
+    height: 30px;
+}
+
+.functional-area .font-region .btn-font-size-add,
+.functional-area .font-region .btn-font-size-sub {
+    width: 25px;
+    height: 30px;
+    position: relative;
+}
+
+.functional-area .font-region .btn-font-size-add .btn-icon,
+.functional-area .font-region .btn-font-size-sub .btn-icon {
+    width: 25px;
+    height: 25px;
+    background-position: -160px -40px;
+}
+
+.functional-area .font-region .btn-font-size-add .fa,
+.functional-area .font-region .btn-font-size-sub .fa {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+}
+
+/* 加粗 */
+.functional-area .font-region .btn-font-bold {
+    width: 30px;
+    height: 25px;
+}
+
+.functional-area .font-region .btn-font-bold .btn-icon {
+    width: 25px;
+    height: 25px;
+    background-position: -83px -40px;
+}
+
+/* 斜体 */
+.functional-area .font-region .btn-font-italic {
+    width: 30px;
+    height: 25px;
+}
+
+.functional-area .font-region .btn-font-italic .btn-icon {
+    width: 20px;
+    height: 25px;
+    background-position: -100px -40px;
+}
+
+/* 下划线 */
+.functional-area .font-region .btn-font-underline {
+    width: 40px;
+    height: 25px;
+}
+
+.functional-area .font-region .btn-font-underline .btn-icon {
+    width: 20px;
+    height: 25px;
+    background-position: -120px -40px;
+}
+
+/* 边框 */
+.functional-area .font-region .btn-cell-border {
+    width: 58px;
+    height: 25px;
+    position: relative;
+    border-left: rgba(211, 211, 211, 1) 1px solid;
+    border-right: rgba(211, 211, 211, 1) 1px solid;
+}
+
+.functional-area .font-region .btn-cell-border .btn-icon {
+    width: 25px;
+    height: 25px;
+    background-position: -5px -65px;
+}
+
+.functional-area .font-region .btn-cell-border .btn-icon {
+    width: 25px;
+    height: 25px;
+    background-position: -5px -65px;
+}
+
+.functional-area .font-region .btn-cell-border .border-line-up {
+    width: 25px;
+    height: 25px;
+    background-position: -30px -65px;
+}
+
+.functional-area .font-region .btn-cell-border .border-line-down {
+    width: 25px;
+    height: 25px;
+    background-position: -5px -65px;
+}
+
+.functional-area .font-region .btn-cell-border .border-line-left {
+    width: 25px;
+    height: 25px;
+    background-position: -58px -65px;
+}
+
+.functional-area .font-region .btn-cell-border .border-line-right {
+    width: 25px;
+    height: 25px;
+    background-position: -85px -65px;
+}
+
+.functional-area .font-region .btn-cell-border .border-line-none {
+    width: 25px;
+    height: 25px;
+    background-position: -115px -65px;
+}
+
+.functional-area .font-region .btn-cell-border .border-line-all {
+    width: 25px;
+    height: 25px;
+    background-position: -140px -65px;
+}
+
+.functional-area .font-region .btn-cell-border .border-line-out {
+    width: 25px;
+    height: 25px;
+    background-position: -168px -65px;
+}
+
+/* 背景色 */
+.functional-area .font-region .btn-background-color{
+    width: 45px;
+    height: 30px;
+    position: relative;
+}
+
+.functional-area .font-region .btn-background-color .btn-icon {
+    width: 25px;
+    height: 25px;
+    background-position: -182px -40px;
+}
+
+/* 字体颜色 */
+.functional-area .font-region .btn-font-color{
+    width: 45px;
+    height: 30px;
+    position: relative;
+}
+
+.functional-area .font-region .btn-font-color .btn-icon {
+    width: 25px;
+    height: 25px;
+    background-position: -160px -40px;
+}
+
+.functional-area .font-region .btn-font-color .fa {
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    z-index: 10;
+}
+
+.functional-area .number-region .btn-decimal-point-sub .btn-icon {
+    width: 30px;
+    height: 25px;
+    background-position: -295px -115px;
+}
+
+/* 上对齐 */
+.functional-area .alignment-region .btn-vertical-up {
+    width: 30px;
+    height: 30px;
+}
+
+.functional-area .alignment-region .btn-vertical-up .btn-icon {
+    width: 30px;
+    height: 30px;
+    background-position: -10px -90px;
+}
+
+/* 垂直居中 */
+.functional-area .alignment-region .btn-vertical-center {
+    width: 30px;
+    height: 30px;
+}
+
+.functional-area .alignment-region .btn-vertical-center .btn-icon {
+    width: 30px;
+    height: 30px;
+    background-position: -35px -90px;
+}
+
+/* 下对齐 */
+.functional-area .alignment-region .btn-vertical-down {
+    width: 30px;
+    height: 30px;
+}
+
+.functional-area .alignment-region .btn-vertical-down .btn-icon {
+    width: 30px;
+    height: 25px;
+    background-position: -65px -90px;
+}
+
+/* 换行 */
+.functional-area .alignment-region .btn-cell-warp {
+    width: 125px;
+    height: 30px;
+}
+
+.functional-area .alignment-region .btn-cell-warp .btn-icon {
+    width: 30px;
+    height: 25px;
+    background-position: -170px -115px;
+}
+
+.btn-vertical-up, .btn-vertical-center, .btn-vertical-down, .btn-cell-warp {
+    margin-bottom: 10px;
+}
+
+/* 左对齐 */
+.functional-area .alignment-region .btn-horizontally-left {
+    width: 30px;
+    height: 30px;
+}
+
+.functional-area .alignment-region .btn-horizontally-left .btn-icon {
+    width: 30px;
+    height: 30px;
+    background-position: -95px -90px;
+}
+
+/* 水平居中 */
+.functional-area .alignment-region .btn-horizontally-center {
+    width: 30px;
+    height: 30px;
+}
+
+.functional-area .alignment-region .btn-horizontally-center .btn-icon {
+    width: 30px;
+    height: 30px;
+    background-position: -120px -90px;
+}
+
+/* 右对齐 */
+.functional-area .alignment-region .btn-horizontally-down {
+    width: 30px;
+    height: 30px;
+}
+
+.functional-area .alignment-region .btn-horizontally-down .btn-icon {
+    width: 30px;
+    height: 25px;
+    background-position: -150px -90px;
+}
+
+/* 合并单元格 */
+.functional-area .alignment-region .btn-merge-cells {
+    width: 125px;
+    height: 30px;
+}
+
+.functional-area .alignment-region .btn-merge-cells .btn-icon {
+    width: 30px;
+    height: 25px;
+    background-position: -230px -90px;
+}
+
+.functional-area .alignment-region .btn-merge-cells .drop-down-panel .cell-merge-center {
+    width: 30px;
+    height: 25px;
+    background-position: -232px -90px;
+}
+
+.functional-area .alignment-region .btn-merge-cells .drop-down-panel .cell-merge-cross {
+    width: 30px;
+    height: 25px;
+    background-position: -260px -90px;
+}
+
+.functional-area .alignment-region .btn-merge-cells .drop-down-panel .cell-merge-normal {
+    width: 30px;
+    height: 25px;
+    background-position: -288px -90px;
+}
+
+.functional-area .alignment-region .btn-merge-cells .drop-down-panel .cell-merge-cancel {
+    width: 30px;
+    height: 25px;
+    background-position: -316px -90px;
+}
+
+
+.number-region {
+    padding: 10px 9px 0 9px;
+}
+
+/* 单元格文本类型 */
+.functional-area .number-region .btn-cell-format {
+    width: 150px;
+    height: 30px;
+    margin-bottom: 10px;
+}
+
+.functional-area .number-region .btn-cell-format select {
+    width: 100%;
+    height: 30px;
+}
+
+/* 货币符号 */
+.functional-area .number-region .btn-currency-symbol {
+    width: 30px;
+    height: 30px;
+}
+
+.functional-area .number-region .btn-currency-symbol .btn-icon {
+    width: 30px;
+    height: 25px;
+    background-position: -200px -115px;
+}
+
+/* 百分比 */
+.functional-area .number-region .btn-percentage {
+    width: 30px;
+    height: 30px;
+}
+
+.functional-area .number-region .btn-percentage .btn-icon {
+    width: 30px;
+    height: 25px;
+    background-position: -245px -115px;
+}
+
+/* 千位分隔 */
+.functional-area .number-region .btn-financial-count {
+    width: 30px;
+    height: 30px;
+}
+
+.functional-area .number-region .btn-financial-count .btn-icon {
+    width: 20px;
+    height: 25px;
+    background-position: -225px -115px;
+}
+
+/* 增加小数点位数 */
+.functional-area .number-region .btn-decimal-point-add {
+    width: 30px;
+    height: 30px;
+}
+
+.functional-area .number-region .btn-decimal-point-add .btn-icon {
+    width: 20px;
+    height: 25px;
+    background-position: -270px -115px;
+}
+
+/* 减少小数点位数 */
+.functional-area .number-region .btn-decimal-point-sub {
+    width: 30px;
+    height: 30px;
+}
+
+.btn-select-font-family, .btn-select-font-size, .btn-font-size-add, .btn-font-size-sub {
+    margin-bottom: 10px;
+}
+
+/* 单元格样式 */
+.functional-area .style-region .btn-cell-style {
+    width: 70px;
+    height: 60px;
+    margin-left: 15px;
+}
+
+.functional-area .style-region .btn-cell-style .btn-icon {
+    width: 45px;
+    height: 40px;
+    background-position: -5px -140px;
+    margin-left: 13px;
+}
+
+.cell-region {
+    padding: 10px 9px 0 9px;
+    text-align: center;
+}
+
+/* 插入行、列 */
+.functional-area .cell-region .btn-cell-insert {
+    width: 50px;
+    height: 75px;
+}
+
+.functional-area .cell-region .btn-cell-insert .btn-icon {
+    width: 45px;
+    height: 40px;
+    background-position: -50px -140px;
+}
+
+/* 删除行、列 */
+.functional-area .cell-region .btn-cell-del {
+    width: 50px;
+    height: 75px;
+}
+
+.functional-area .cell-region .btn-cell-del .btn-icon {
+    width: 45px;
+    height: 40px;
+    background-position: -98px -140px;
+}
+
+/* 单元格格式 */
+.functional-area .cell-region .btn-cell-scheme {
+    width: 50px;
+    height: 75px;
+}
+
+.functional-area .cell-region .btn-cell-scheme .btn-icon {
+    width: 45px;
+    height: 40px;
+    background-position: -146px -140px;
+}
+
+.edit-region {
+    padding: 10px 9px 0 9px;
+}
+
+/* 函数 */
+.functional-area .edit-region .btn-function {
+    width: 100px;
+    height: 20px;
+    margin-left: 15px;
+    margin-bottom: 5px;
+}
+
+.functional-area .edit-region .btn-function .btn-icon {
+    width: 30px;
+    height: 30px;
+    background-position: -2px -210px;
+}
+
+/* 填充 */
+.functional-area .edit-region .btn-filling {
+    width: 100px;
+    height: 20px;
+    margin-left: 15px;
+    margin-bottom: 5px;
+}
+
+.functional-area .edit-region .btn-filling .btn-icon {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    background-position: -2700px -2100px;
+}
+
+/* 清除 */
+.functional-area .edit-region .btn-clear {
+    width: 100px;
+    height: 20px;
+    margin-left: 15px;
+}
+
+.functional-area .edit-region .btn-clear .btn-icon {
+    width: 30px;
+    height: 30px;
+    background-position: -137px -210px;
+}
+
+/* endregion */
+
+@media screen and (min-width: 1601px) {
+    .right-block .functional-area {
+        min-width: 1250px;
+    }
+
+    .right-block .functional-area .clipboard-region {
+        width: 150px;
+        padding: 10px 10px 10px 15px;
+    }
+
+    .clipboard-region .btn-paste {
+        margin: 0 10px 0 0;
+    }
+
+    .right-block .functional-area .font-region {
+        width: 270px;
+        padding: 10px 9px 0 9px;
+    }
+
+    .right-block .functional-area .alignment-region {
+        width: 235px;
+        padding: 10px 9px 0 9px;
+    }
+
+    .right-block .functional-area .number-region {
+        width: 170px;
+    }
+
+    .right-block .functional-area .style-region {
+        width: 350px;
+    }
+
+    .btn-cell-style {
+        display: none;
+    }
+
+    .right-block .functional-area .cell-region {
+        width: 170px;
+    }
+
+    .right-block .functional-area .edit-region {
+        width: 160px;
+    }
+}
+
+@media screen and (max-width: 1600px) {
+    .right-block .functional-area {
+        min-width: 1350px;
+    }
+
+    .right-block .functional-area .clipboard-region {
+        width: 150px;
+        padding: 10px 10px 10px 15px;
+    }
+
+    .clipboard-region .btn-paste {
+        margin: 0 10px 0 0;
+    }
+
+    .right-block .functional-area .font-region {
+        width: 270px;
+        padding: 10px 9px 0 9px;
+    }
+
+    .right-block .functional-area .alignment-region {
+        width: 235px;
+        padding: 10px 9px 0 9px;
+    }
+
+    .right-block .functional-area .number-region {
+        width: 170px;
+    }
+
+    .right-block .functional-area .style-region {
+        width: 120px;
+        padding: 10px 9px 0 9px;
+    }
+
+    .btn-cell-style {
+        margin-left: 20px;
+    }
+
+    .right-block .functional-area .cell-region {
+        width: 170px;
+    }
+
+    .right-block .functional-area .edit-region {
+        width: 160px;
+    }
+}
+
+@media screen and (max-width: 1366px) {
+    .right-block .functional-area {
+        min-width: 1010px;
+    }
+
+    .right-block .functional-area .clipboard-region {
+        width: 110px;
+    }
+
+    .btn-cut, .btn-copy, .btn-format-brush {
+        width: 30px !important;
+    }
+
+    .btn-cut .btn-text, .btn-copy .btn-text, .btn-format-brush .btn-text {
+        display: none;
+    }
+
+    .right-block .functional-area .font-region {
+        width: 270px;
+    }
+
+    .right-block .functional-area .alignment-region {
+        width: 165px;
+    }
+
+    .btn-cell-warp, .btn-merge-cells {
+        width: 55px !important;
+    }
+
+    .btn-cell-warp .btn-text, .btn-merge-cells .btn-text {
+        display: none;
+    }
+
+    .right-block .functional-area .number-region {
+        width: 120px;
+    }
+
+    .btn-cell-format {
+        width: 100px !important;
+    }
+
+    .btn-decimal-point-add, .btn-decimal-point-sub {
+        display: none;
+    }
+
+    .right-block .functional-area .style-region {
+        width: 120px;
+    }
+
+    .right-block .functional-area .cell-region {
+        width: 100px;
+    }
+
+    .right-block .functional-area .edit-region {
+        width: 160px;
+    }
+}
+
+.drag-cover {
+    background-color: rgba(221, 221, 221, 1) !important;
+}
+
+.olap-list {
+    height: 500px;
+    position: relative;
+}
+
+.design-content .page-operation-bar {
+    padding: 5px;
+}
+
+.design-content .group-select-content {
+    width: 210px;
+    height: 32px;
+    top: 50px;
+    left: 5px;
+    position: absolute;
+    z-index: 100;
+}
+
+.design-content .drag-item {
+    margin: 0 5px 3px 5px;
+    position: relative;
+}
+
+.design-content .drag-item:hover {
+    cursor: move;
+}
+
+.field-item {
+    width: 210px;
+}
+
+.field-item:hover {
+    cursor: move;
+}
+
+.left-block .left-block-column-list > div {
+    margin: 0 0 3px 4px;
+}
+
+.clone-item .field-item {
+    background-color: rgba(215, 215, 215, 1);
+    margin: 0 0 4px 0;
+}
+
+.function-content {
+    width: 800px;
+    height: 650px;
+}
+
+.custom-header {
+    padding: 4px;
+    position: relative;
+    user-select: none;
+}
+
+.custom-header .nav-tabs li {
+    cursor: pointer;
+}
+
+.custom-header button {
+    position: absolute;
+    right: 30px;
+    top: 15px;
+    z-index: 100000;
+    cursor: pointer;
+}
+
+.function-content .modal-body {
+    height: 535px;
+    overflow: hidden;
+}
+
+.function-content .function-edit {
+    width: 100%;
+    height: 260px;
+    float: left;
+    margin-bottom: 20px;
+}
+
+.function-content .function-input {
+    width: 100%;
+    height: 100%;
+}
+
+.function-content .function-type-list {
+    width: 240px;
+    height: 240px;
+    float: left;
+    display: block;
+}
+
+.function-content .function-name-list {
+    width: 240px;
+    height: 240px;
+    float: left;
+    display: block;
+}
+
+.function-content .function-description {
+    width: 260px;
+    height: 240px;
+    float: left;
+    display: block;
+}
+
+.function-content .function-description div {
+    width: 200px;
+    height: 220px;
+    padding: 8px 5px;
+    border: 1px solid rgba(204, 204, 204, 1);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.datax-select-list {
+    width: 200px;
+    height: 220px;
+}
+
+  /* to make scrollbars always visible */
+  .dropdown-menu.ps-container > .ps-scrollbar-x-rail,
+  .dropdown-menu.ps-container > .ps-scrollbar-y-rail {
+    opacity: 0.6;
+  }
+
+.cell-region {
+    display: none !important;
+}
+
+.report-preview {
+    width: 98%;
+    height: 98%;
+    max-height: 98%;
+    top: -110%;
+    left: 1%;
+    display: block;
+}
+
+/* 全局配置 */
+.equally-distributed-2 {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 470px;
+}
+
+.equally-distributed-2 .form-group .form-control {
+    width: 60px !important;
+    display: inline-block !important;
+}
+
+.equally-distributed-2 .form-group multi-select {
+    width: 130px !important;
+    display: inline-block !important;
+}

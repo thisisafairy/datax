@@ -1,0 +1,19 @@
+body {
+    background-color: #E2E2E2;
+}
+
+.carousel-control {
+    background: transparent !important;
+}
+
+.carousel-indicators {
+    position: fixed !important;
+}
+
+.carousel-control{
+    position: fixed !important;
+}
+
+.dataTables_wrapper {
+    /*margin: 0 15px;*/
+}

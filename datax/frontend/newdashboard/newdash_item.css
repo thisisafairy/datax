@@ -1,0 +1,420 @@
+/* #region  gridster组件 */
+input[type='checkbox'] {
+    cursor: pointer;
+}
+
+.btn-default {
+    color: inherit;
+}
+
+.parent-content {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+._720kb-datepicker-calendar {
+    min-width: 150px;
+}
+
+.md-datepicker-input {
+    color: inherit;
+}
+
+
+.selectdemoSelectHeader {
+    /* Please note: All these selectors are only applied to children of elements with the 'selectdemoSelectHeader' class */
+}
+
+.selectdemoSelectHeader .demo-header-searchbox {
+    border: none;
+    outline: none;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+}
+
+.selectdemoSelectHeader .demo-select-header {
+    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(0, 0, 0, 0.14), 0 0 0 0 rgba(0, 0, 0, 0.12);
+    padding-left: 10.667px;
+    height: 35px;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: auto;
+}
+
+.selectdemoSelectHeader md-content._md {
+    max-height: 240px;
+}
+
+.select-single,
+.select-multiple {
+    position: absolute;
+    z-index: 20000;
+    list-style: none;
+    /*width: 75%;*/
+    background-color: #FFFFFF;
+    box-shadow: 0 0 6px 0 rgba(0, 0, 0, .1), 0 10px 12px 0 rgba(170, 180, 205, .4);
+    border: rgb(169, 169, 169) 1px solid;
+    display: none;
+}
+
+.md-select-value {
+    color: inherit !important;
+}
+
+.filter-label {
+    padding-left: 10px;
+}
+
+md-option {
+    height: 30px !important;
+}
+
+.select-multiple {
+    width: 95%;
+}
+
+.select-single ul,
+.select-multiple div {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.select-single ul li {
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+}
+
+.select-single ul li a {
+    text-decoration: none;
+    padding: 0 15px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #333;
+}
+
+.select-single ul li a:hover {
+    color: rgba(8, 14, 26, 0.9);
+    background-color: rgba(232, 235, 235, .7);
+    text-decoration: none;
+}
+
+.multiple-select-item {
+    color: #333;
+    min-width: 80px;
+    max-width: 160px;
+    height: 30px;
+    display: inline-block;
+    margin: 3px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.multiple-select-filter-input {
+    width: 100%;
+    display: block;
+    height: 30px;
+    margin: 3px;
+}
+
+.multiple-select-filter-input input {
+    height: 100%;
+    width: calc(100% - 20px);
+    padding: 3px;
+    color: #333;
+}
+
+.select-mian-panel:hover>.multi-select-delete-icon {
+    display: block
+}
+
+.multi-select-delete-icon {
+    position: absolute;
+    top: 50%;
+    margin: -8px 0 0 -8px;
+    right: 27%;
+    font-size: 16px;
+    color: rgba(0, 0, 0, .65);
+    display: none;
+    z-index: 110111;
+}
+
+.multi-select-delete-icon:hover {
+    display: block;
+    cursor: pointer;
+}
+
+.table-col-resize-content {
+    width: 240px;
+    z-index: 100000;
+    background-color: rgba(255, 255, 255, 1);
+    color: rgba(0, 0, 0, .95);
+    border: rgba(210, 210, 210, 1) 1px solid;
+    border-radius: 6px;
+    -webkit-box-shadow: 0px 0px 13px 2px rgba(0, 0, 0, 0.27);
+    -moz-box-shadow: 0px 0px 13px 2px rgba(0, 0, 0, 0.27);
+    box-shadow: 0px 0px 13px 2px rgba(0, 0, 0, 0.27);
+}
+
+
+.drop-option {
+    width: 90px;
+    position: absolute;
+    top: 35px;
+    right: 15px;
+    background-color: rgba(255, 255, 255, 1);
+    color: rgba(0, 0, 0, 1);
+    z-index: 100;
+    display: none;
+}
+
+.drop-option .option-row {
+    font-size: 14px;
+}
+
+.drop-option .option-row div {
+    display: inline-block;
+}
+
+.drop-option .option-row div:first-child {
+    height: 14px;
+    width: 18px;
+}
+
+.component-link-option {
+    background: url('/frontend/image/newdash/icon.png') no-repeat -38px -62px
+}
+
+.component-base-option {
+    background: url('/frontend/image/newdash/icon.png') no-repeat -65px -62px
+}
+
+.component-style-option {
+    background: url('/frontend/image/newdash/icon.png') no-repeat -90px -62px
+}
+
+.component-text-option {
+    background: url('/frontend/image/newdash/icon.png') no-repeat -117px -62px
+}
+
+.component-remove-option {
+    background: url('/frontend/image/newdash/icon.png') no-repeat -169px -62px
+}
+
+.chart-tools {
+    position: absolute;
+    z-index: 99999999;
+    display: none;
+    cursor: pointer;
+}
+
+.release-link {
+    top: 17px;
+    right: 60px;
+}
+
+.chart-enlarge {
+    top: 15px;
+    right: 40px;
+}
+
+.parent-content:hover .chart-tools {
+    display: block;
+}
+
+.rich-text-content img {
+    width: 100%;
+}
+
+.embedded-frame {
+    border: none;
+}
+
+.parent-content:hover .hover-show {
+    display: block;
+}
+
+.chart-label {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    cursor: pointer;
+}
+
+.chart-label i {
+    font-size: 16px;
+}
+
+.chart-label-text {
+    overflow: hidden;
+    display: block;
+    min-width: 336px;
+    max-width: 466px;
+    min-height: 90px;
+    max-height: 500px;
+    z-index: 9999999;
+    padding: 0px;
+    background-color: rgba(255, 255, 255, 1);
+    color: #333;
+    position: absolute;
+    border: rgba(210, 210, 210, 1) 1px solid;
+    border-radius: 8px;
+    -webkit-box-shadow: 0px 0px 13px 2px rgba(0, 0, 0, 0.27);
+    -moz-box-shadow: 0px 0px 13px 2px rgba(0, 0, 0, 0.27);
+    box-shadow: 0px 0px 13px 2px rgba(0, 0, 0, 0.27);
+    transition: opacity 0.3s;
+    -moz-transition: opacity 0.3s;
+    /* Firefox 4 */
+    -webkit-transition: opacity 0.3s;
+    /* Safari and Chrome */
+    -o-transition: opacity 0.3s;
+    /* Opera */
+}
+
+.chart-label-arrow {
+    display: none;
+    width: 20px;
+    height: 20px;
+    z-index: 99999999;
+    position: absolute;
+    left: 61px;
+    background-color: rgba(255, 255, 255, 1);
+    -webkit-box-shadow: -5px 5px 13px -2px rgba(0, 0, 0, 0.27);
+    -moz-box-shadow: -5px 5px 13px -2px rgba(0, 0, 0, 0.27);
+    box-shadow: -5px 5px 13px -2px rgba(0, 0, 0, 0.27);
+    transition: opacity 0.3s;
+    -moz-transition: opacity 0.3s;
+    /* Firefox 4 */
+    -webkit-transition: opacity 0.3s;
+    /* Safari and Chrome */
+    -o-transition: opacity 0.3s;
+    /* Opera */
+    transform: rotate(45deg);
+}
+
+.show-area {
+    position: relative;
+    height: calc(100% - 50px);
+    min-height: 50px;
+    max-height: 450px;
+    width: 100%;
+    display: inline-block;
+    padding: 5px 10px 5px 10px;
+    overflow: auto;
+}
+
+.reply-area {
+    position: relative;
+    display: inline-block;
+    height: 40px;
+    width: 100%;
+    padding: 5px 20px 5px 10px;
+}
+
+.show-area .reply-texts {
+    display: inline-block;
+    width: 100%;
+    height: 60px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(210, 210, 210, 1);
+}
+
+.reply-texts div {
+    float: left;
+    overflow: hidden;
+}
+
+.reply-texts .comments-area-header {
+    width: 100%;
+    height: 25px;
+}
+
+.reply-texts .comments-area-header .header-name {
+    width: 50%;
+    text-align: left;
+}
+
+.reply-texts .comments-area-header .header-time {
+    width: 50%;
+    text-align: right;
+}
+
+.reply-texts .comments-area-content {
+    width: 100%;
+    height: 25px;
+    position: relative;
+}
+
+.comments-area-content:hover .hover-show {
+    display: block;
+}
+
+.reply-texts .comments-area-content div {
+    line-height: 2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 95%;
+}
+
+.reply-texts .comments-area-content input {
+    line-height: 1;
+}
+
+.reply-texts .comments-area-content .fa-edit {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 30px;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.reply-texts .comments-area-content .fa-trash-o {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 10px;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.reply-show-edit {
+    display: inline-block;
+    width: 100px;
+    cursor: pointer;
+    line-height: 2.5;
+}
+
+.reply-edit-area {
+    display: inline-block;
+    width: 100%;
+    display: none;
+    overflow: auto;
+}
+
+.chart-label-text input {
+    outline: none;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    width: calc(100% - 60px);
+}
+
+.reply-edit-area div {
+    cursor: pointer;
+    text-align: right;
+    width: 50px;
+    display: inline-block;
+}
+
+/* #endregion */

@@ -1,0 +1,49 @@
+
+{% extends 'base_177.html' %}
+{% load staticfiles %}
+{% block title %}业务类型管理{% endblock %}
+
+{% block content %}
+        <link rel="stylesheet" href="{% static 'plugin/angular/angular-ui-grid/ui-grid.css' %}">
+        <link rel="stylesheet" href="{% static 'plugin/angular/angular-material/angular-material.min.css' %}" />
+	<div>
+	    <section class="content-header cont-header">
+	        <h1 class="cont-header-title user-list-titel">
+	           业务类型管理
+	        </h1>
+	    </section>
+	    <section class="content mod-content">
+        <div  ng-app="typeapp" ng-controller="typeController"  class="row" id="typeapp">
+            <div class="col-xs-12">
+                <div class="box">
+                     <div class="box-header charttype-header">
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <button class="btn btn-default btn-usermanage" ng-click="cumulative(0,0,'无')">
+                                    <span class="glyphicon glyphicon-plus"></span> 新增
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body bx-body">
+                        <div class="dataTables_wrapper form-inline dt-bootstrap">
+                            <div id="grid1" ui-grid="gridOptions" ui-grid-tree-view class="grid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </section>
+    </div>
+    <script src="{% static 'plugin/angular/angular-aria/angular-aria.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-animate/angular-animate.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-messages/angular-messages.min.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-material/angular-material.min.js' %}"></script>
+
+    <script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+    <script src="{% static 'plugin/angular/angular-ui-grid/ui-grid.js' %}"></script>
+    <script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+    <script src="{% static 'plugin/angular/angular-dragdrop/angular-dragdrop.js' %}"></script>
+    <script src="{% static 'system/charttype/index.js' %}?v={{ nowversion }}1"></script>
+{% endblock %}

@@ -1,0 +1,600 @@
+
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static 'css/add.css'  %}">
+{% verbatim %}
+<style type="text/css">
+
+.table-body th {
+    position: relative;
+}
+
+.thline {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 5px;
+    background: transparent;
+    cursor: e-resize;
+}
+.cellWidth{
+    min-width: 200px;
+}
+.sourceselect {
+    width: 62.6% !important;
+    margin-right: 0px!important;
+}
+.tableTitleStyle{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 200px;
+    height: 20px;
+    display: block;
+}
+.tableHideLongCh{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.drag-content-table{
+    border-right-width: 3px;
+    border-right-color: #528be1;
+    border-right-style: solid;
+}
+.addPageToolbarStyle{
+    width: 100%;
+}
+.rightPanelStyle{/*控制toolbar右边显示*/
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 227px;
+}
+.rightPanelStyle .radioGroup{
+    display: inline-block;
+}
+.radioGroup .radioDiv{
+    display: inline-block;
+}
+.secondRadio{
+    padding-left: 7px;
+}
+.radioGroup .radioFont{
+    width: 33px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.singleRelation{
+    cursor: pointer;
+}
+.sourceDBConnInfo{
+    top: 86px;
+    right: -120px;
+    width: 116px;
+    padding: 8px !important;
+    padding-bottom: 15px !important;
+}
+.pageCodeStyle{/*可点击页码样式*/
+    min-width: 20.42px;
+}
+/*表格显示数据样式*/
+/* 表格容器样式，用flex布局可保证table内容能铺满剩余空间 */
+.sti-tbl-container {
+    height : 100%;
+    overflow : hidden;
+    display : flex;
+    flex-direction: column;
+}
+/* 设置表格的布局方式，用于宽度对齐 */
+.sti-tbl-body>table, .sti-tbl-header>table {
+    table-layout: fixed;
+}
+/* 设置表格内容容器，用于铺满整个剩余空间 */
+.sti-tbl-container .sti-tbl-body {
+    flex-grow : 1;
+    overflow-y : scroll;
+}
+
+.mask-panel {
+    background-color: rgba(213,217,220,.74);
+    position: fixed;
+    overflow: hidden;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    -webkit-overflow-scrolling: touch;
+    outline: 0;
+}
+
+.datasource-save-content {
+    position: fixed;
+    width: 330px;
+    height: 200px;
+    top: 10%;
+    left: 0px;
+    right: 0px;
+    margin-left:auto;
+    margin-right:auto;
+    background: #ffffff;
+    z-index: 1001;
+    color: #444444;
+    border-radius: 4px;
+    -webkit-box-shadow: 0px 0px 13px 2px rgba(0,0,0,0.27);
+    -moz-box-shadow: 0px 0px 13px 2px rgba(0,0,0,0.27);
+    box-shadow: 0px 0px 13px 2px rgba(0,0,0,0.27);
+}
+
+h4 {
+    font-size: 16px;
+}
+
+
+.datasource-save-content .confirm-title {
+    height: 30px;
+    width: 100%;
+    padding-left: 10px;
+    line-height: 30px;
+    border-bottom: #c0c0c0 1px solid;
+}
+
+.datasource-save-content .confirm-title .back-save-panel {
+    position: absolute;
+    right: 10px;
+    top: 6px;
+    font-size: 25px;
+}
+
+.datasource-save-content .confirm-title .back-save-panel:hover {
+    cursor: pointer;
+}
+
+/*
+.datasource-save-content .confirm-content {
+    padding: 30px 0px 10px 20px;
+}*/
+.confirm-content .col-md-3 {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.datasource-save-content .confirm-content .btn {
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+.datasource-save-content .col-md-12 {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.menu-array{
+    height: inherit;
+    text-align: center;
+    color:#666666;
+    cursor: pointer;
+}
+.menu-array:hover{
+    background-color: #f4f4f4;
+}
+.menu-array:hover .iconset{/*实现鼠标移动到div上切换icon为绿色*/
+    background-position-x: -20px;
+}
+.menu-array:hover .menu-text{/*实现鼠标移动到div上切换文本为绿色*/
+    color: #75b1d3;
+}
+
+.inbox{
+    margin-top: 20px;
+}
+.icon-style{
+    font-size: 20px;
+}
+.menu-text{
+    font-size: 14px;
+    color: #666666;
+}
+/*这里的css类用于保存弹出框下的可点击div样式修饰*/
+/*如果放到其他css文件里，由于加载速度问题页面的icon会卡顿再显示完整，故还是放到此页面较好*/
+.iconset{
+    background: url("/frontend/image/ico/menuIconList.png") no-repeat;
+    width: 20px;
+    line-height: 20px;
+    /*display: inline-block;*/
+}
+.icon_gray_edit{
+    background-position: 0px 0px;
+    width: 20px;
+    height: 20px;
+    margin-left: calc(50% - 10px);
+    margin-bottom: 10px;
+}
+.icon_gray_add{
+    background-position: 0px -30px;
+    width: 20px;
+    height: 20px;
+    margin-left: calc(50% - 10px);
+    margin-bottom: 10px;
+}
+.icon_gray_list{
+    background-position: 0px -60px;
+    width: 20px;
+    height: 20px;
+    margin-left: calc(50% - 10px);
+    margin-bottom: 10px;
+}
+.icon_gray_next{
+    background-position: 0px -90px;
+    width: 20px;
+    height: 20px;
+    margin-left: calc(50% - 10px);
+    margin-bottom: 10px;
+}
+.alertTextStyle{
+    padding-left: 50px;
+}
+</style>
+<div class="datainsert main-block full-width" ng-style="style()" resize>
+	<div class="step-progress" ng-if="ajaxing||ajaxdone||ajaxerror">
+		<img src="/frontend/plugin/SVG-Loaders/svg-loaders/oval1.svg" ng-if="ajaxing">
+		<img src="/frontend/plugin/SVG-Loaders/svg-loaders/check.svg" ng-if="!ajaxing&&ajaxdone">
+		<img src="/frontend/plugin/SVG-Loaders/svg-loaders/error.svg" ng-if="!ajaxing&&ajaxerror">
+	</div>
+	<div class="contextmenu" ng-class="{true:'avtive-contextmenu'}[show_menu]" id="contextmenu">
+		<ul>
+			<li>
+				<span>{{ contextmenu_item.table }}</span>
+			</li>
+			<li ng-click="hide_table()">
+				<span>隐藏</span>
+			</li>
+			<li ng-click="rename_table()">
+				<span>重命名</span>
+			</li>
+			<li ng-click="table_structure()">
+				<span>查看结构</span>
+			</li>
+			<li ng-if="((contextmenu_item.table).indexOf('excel')==0 || (contextmenu_item.table).indexOf('csv')==0)" ng-click="uploadExistFile(contextmenu_item.table)">
+				<span>上传数据</span>
+			</li>
+            <li ng-click="delete_table(contextmenu_item)">
+				<span>删除表</span>
+			</li>
+		</ul>
+	</div>
+	<div class="datasource left-block">
+		<div class="left-card">
+			<div class="more-btn-group extendmenu  hide renameAll-{{ draged.length==0 }}">
+				<ul>
+					<li ng-click="showall();">显示隐藏表</li>
+					<li ng-click="saveChange();">保存表修改</li>
+					<li ng-click="renameAll();" ng-if="draged.length==0 && !advance">批量修改</li>
+					<li ng-click="advancemodel(true)" ng-if="!advance && editShow">高级模式</li>
+					<li ng-click="advancemodel(false)" ng-if="advance && editShow">普通模式</li>
+				</ul>
+			</div>
+            <div class="sourceDBConnInfo extendmenu  hide">
+				<ul>
+					<li ng-click="startConfig(selDBType,'edit')">修改连接信息</li>
+					<li ng-click="refreshTablesBySrc();">刷新该连接的表</li>
+				</ul>
+			</div>
+
+			<div id="connect-panel" class="datasource-connect extendmenu hide ">
+                <p class="panel-title">请选择数据库类型</p>
+				<ul>
+					<li ng-click="startConfig('mysql','add')"><img src="../frontend/image/ico/mysql.png"><p>MySql</p></li>
+                    <li ng-click="startConfig('mssql','add')"><img src="../frontend/image/ico/sqlserver.png"><p>SQL Server</p></li>
+					<li ng-click="startConfig('oracle','add')"><img src="../frontend/image/ico/oracle.png"><p>Oracle</p></li>
+					<li ng-click="startConfig('pgsql','add')"><img src="../frontend/image/ico/postgresql.png"><p>PostGresql</p></li>
+					<li ng-click="startConfig('odbc','add')"><img src="../frontend/image/ico/odbc.png"><p>ODBC</p></li>
+					<li ng-click="startConfig('excel','add')"><img src="../frontend/image/ico/excel.png"><p>excel</p></li>
+					<li ng-click="startConfig('txt','add')"><img src="../frontend/image/ico/txt.png"><p>txt</p></li>
+					<li ng-click="startConfig('csv','add')"><img src="../frontend/image/ico/csv.png"><p>csv</p></li>
+					<li ng-click="startConfig('json','add')"><img src="../frontend/image/ico/json.png"><p>json</p></li>
+					<li ng-click="startConfig('xml','add')"><img src="../frontend/image/ico/xml.png"><p>xml</p></li>
+				</ul>
+			</div>
+			<!-- <div class="left-block-header datasource-header">
+				<div class="col-md-6">数据库链接</div>
+				<div class="col-md-4  datasource-new">
+					<div ng-click="showContent();" class="btn btn-default">
+						<i class="fa fa-plus icon-fa"></i>新建数据源</div>
+				</div>
+			</div> -->
+			<div class="datasource-select left-select">
+                <div class="addBtn smallbtn" ng-click=" showContent($event);">
+					<i class="add" title="数据源接入"></i>
+                    数据源接入
+				</div>
+				<div class="full-width" ng-mousemove="editsource(true);" ng-mouseleave="editsource(false);">
+					<p class="saveData"><i class="save" title="已接入的数据"></i>已接入的数据源</p>
+                    <div class="select-data">
+                        <select class="form-control" ng-model="selectedSource" id="sourceselect"  ng-class="{true:'col-md-8 sourceselect',false:'col-md-12'}[showedit && selDBType!='已导入数据']"  ng-change="getTable();"  ng-options="source.id as source.database group by source.database_type for source in sources ">
+
+                        </select>
+                        <!--<div id="editbtn" class="btn btn-default"  ng-if="selDBType!='已导入数据'" ng-click="startConfig(selDBType,'edit')" ng-class="{true:'col-md-offset-1 col-md-3 ',false:'hide'}[showedit]">
+	                        修改
+                        </div>-->
+                        <div id="editbtn" class="btn btn-default"  ng-if="selDBType!='已导入数据'" ng-click="sourceDBConnPanelShow($event);" ng-class="{true:'col-md-offset-1 col-md-3 ',false:'hide'}[showedit]">
+	                        修改
+                        </div>
+                    </div>
+				</div>
+			</div>
+			<!-- <div class="datasource-line "></div> -->
+			<div class="datasource-table-header left-block-list-header">
+
+				<span><i class="table" title="数据源的相关表"></i>数据源相关表</span>
+				<div class="modelbtn smallbtn" ng-if="selectedSource !=null && selectedSource.length > 0 && selectedSource !='0'" ng-click="showMoreBtn($event);">
+					<i class="fa fa-ellipsis-h" title="高级"></i>
+				</div>
+				<div class="search smallbtn" ng-click="onsearch = !onsearch">
+					<i class="fa fa-search" title="查询"></i>
+				</div>
+			</div>
+                 <div class="datasource-table-search left-block-list-search" ng-if="onsearch">
+					<input type="text" ng-model="searched" ng-change="dosearch(searched)" placeholder="输入表名称">
+				</div>
+			<div class="datasource-table-list left-block-column-list" ng-class="{showList:!onsearch,hiddenList:onsearch}">
+                <div class="schema-item cursor-move" ng-if="items.length >0">
+                    <span class="field-item full-width" data-drag="true" data-jqyoui-options="{revert: 'invalid', helper: 'clone'}"
+                     ng-model="userDefinedSqlDemo" jqyoui-draggable="{index: -1, placeholder: 'keep'}">
+                        <span class="field-row">
+                            <span class="type-target">
+                                <i class="glyphicon glyphicon-cog"></i>
+                            </span>
+                            <span class="field-name">自定义sql</span>
+                            </span>
+                    </span>
+                </div>
+				<div class="schema-item cursor-move" ng-repeat="(key, list) in items track by key" ng-if="list.ifshow =='1'">
+                    <span class="field-item full-width" data-drag="true" data-jqyoui-options="{revert: 'invalid', helper: 'clone'}"
+					 ng-model="items" jqyoui-draggable="{index: {{ key }}, placeholder: 'keep'}" ng-dblclick="toSql(list);" ng-right-click="rightclick(list,key)">
+						<span class="field-row" title="{{ list.tablename }}">
+							<span class="type-target">
+								<i class="fa fa-table"></i>
+							</span>
+							<span class="field-name">
+								<span class="field-text">
+									{{ list.tablename }}
+								</span>
+							</span>
+							<div class="edit-name" ng-if="list.isedit == '1'">
+								<input type="text" ng-model="list.tablename" ng-blur="onblurname(key)" class="edit-input">
+							</div>
+						</span>
+					</span>
+				</div>
+			</div>
+            <div id="tablePagenation" class="btn-group" ng-if="items.length >0">
+                <ul class="pagination">
+                    <li>
+                        <a ng-click="Previous()">
+                            <span>上一页</span>
+                        </a>
+                    </li>
+                    <li ng-repeat="page in pageList" ng-class="{active: isActivePage(page)}" >
+                        <a class="pageCodeStyle" ng-click="selectPage(page)" >{{ page }}</a>
+                    </li>
+                    <li>
+                        <a ng-click="Next()">
+                            <span>下一页</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+		</div>
+	</div>
+    <div id="toolbar" class="addPageToolbarStyle">
+        <!--<button  ng-if="advance" type="button" title="执行sql" ng-click="excuce()" class="btn btn-default">
+            <i class="fa fa-database"></i>执行sql
+        </button>-->
+        <button type="button" title="保存" ng-disabled="datagrid.columns.length<= 0" ng-click="save()" class="btn btn-default">
+            <i class="fa fa-floppy-o"></i>保存
+        </button>
+        <button type="btton" title="列设置" ng-disabled="datagrid.columns.length<= 0" ng-click="setColumn()" class="btn btn-default">
+            <i class="fa fa-bars"></i>列设置
+        </button>
+        <span id="alertText" class="alertTextStyle" ng-if="datagrid.columns.length > 0 && selDBType != 'odbc' && advance ">
+            <span style="color: red">注意：计算字段或函数计算字段需要使用AS给定别名！</span>
+        </span>
+        <div class="rightPanelStyle" ng-if="datagrid.columns.length > 0 && selDBType != 'odbc' && !advance ">
+            <span style="font-size: 18px">连接:</span>
+            <div class="radioGroup">
+                <div class="radioDiv" title="直接创建图表组件!">
+                    <span class="radioFont">实时</span><input type="radio" name="conntype" value="0" ng-model="config.conntype">
+                </div>
+                <div class="radioDiv secondRadio" title="先创建olap再创建图表组件!">
+                    <span class="radioFont">数据提取</span><input type="radio" name="conntype" value="1" ng-model="config.conntype">
+                </div>
+            </div>
+        </div>
+    </div>
+	<div class="datacontent right-block insert-block"  ng-class="{showSave:datagrid.columns.length> 0,hiddenSave:datagrid.columns.length<= 0}">
+
+		<div class="datacontent-top " style="overflow-x: scroll">
+            <div ng-if="!advance" id="dropPanels">
+                <svg id="svgTag" xmlns="" xmlns:xlink="" style="height: 100%;width: 100%;position: absolute;">
+                    <path id="path" d="" style="stroke:#c0c0c0;
+                                             fill:none;" stroke="#c0c0c0" stroke-width="2" stroke-dasharray="0"/>
+
+                    <div  class="drag-content dropFieldClass" data-drop="true" ng-model="draged" jqyoui-droppable="{multiple:false,onDrop:'dropCallback'}">
+                        <div class="relationsStyles"><!--存放关联图标-->
+                        </div>
+                        <div class="drag-content-table" ng-repeat="(key, item) in draged track by key" render-finish tableRealName="{{item.table}}" title="{{ item.tablename }}">
+                            <span ng-click="openFieldSelectDialog(item.table,key)">{{ item.tablename }}</span>
+                            <div class="drag-option drag-option-delete" ng-click="removeitem($event,item)">
+                                <i class="fa fa-times"></i>
+                            </div>
+
+                            <div class="drag-option drag-option-edit" ng-if="item.sqlDesign==1" ng-click="editSql(item)">
+                                <i class="fa fa-wrench"></i>
+                            </div>
+                            <!--<div class="drag-option drag-option-edit" ng-if="key!=0" ng-click="edititem(key)">
+                                <i class="fa fa-wrench"></i>
+                            </div>-->
+                        </div>
+                    </div>
+                </svg>
+            </div>
+
+			<div ng-if="advance">
+				<div class="alert alert-danger alert-dismissible" ng-if="sqlerror">
+					<button type="button" class="close" ng-click="closeerror()">×</button>
+					<p>{{ sqlerrormsg }}</p>
+				</div>
+				<div class="col-md-12 sqlInputField">
+					<textarea ui-codemirror="editorOptions" ng-change="getsql()" ng-model="customsql"></textarea>
+				</div>
+			</div>
+		</div>
+		<div class="datacontent-bottom" id="content-bottom">
+			<div class="contextmenu" id="th-contextmenu" ng-class="{true:'avtive-contextmenu'}[show_th_menu]">
+				<ul>
+					<li>
+						<span>{{ contextmenu_th_item.field }}</span>
+					</li>
+					<li ng-click="hide_th()">
+						<span>隐藏</span>
+					</li>
+					<li ng-click="rename_th()">
+						<span>重命名</span>
+					</li>
+					<li ng-click="editcolumn('edit')">
+						<span>编辑字段</span>
+					</li>
+					<li ng-click="editcolumn('add')">
+						<span>添加字段</span>
+					</li>
+                    <li ng-if="isDateCol" ng-click="splitDateCol()">
+                        <span>拆分年月日</span>
+                    </li>
+				</ul>
+			</div>
+			<div id="datatoolbar" class="datatoolbarstyle">
+				<button ng-if="advance" type="button" title="执行sql" ng-click="excuce()" class="btn btn-default dataToolBarStyle">
+					<i class="fa fa-database"></i>
+				</button>
+				<!--<button type="button" title="保存" ng-disabled="datagrid.columns.length<= 0" ng-click="save()" class="btn btn-default">
+					<i class="fa fa-floppy-o"></i>
+				</button>
+				<button type="btton" title="列设置" ng-disabled="datagrid.columns.length<= 0" ng-click="setColumn()" class="btn btn-default">
+					<i class="fa fa-bars"></i>
+				</button>-->
+                <div class="inputRowNumDivStyle">
+                    <div class="conbinationButStyle"><input type="text" id="showRowCnt" class="rowNumsStyle" value="100"><button class="rowDtBtnStyle" ng-click="getRowData()"><span class="glyphicon glyphicon-arrow-right butIconStyle"></span></button></div><span style="padding-left: 5px">行</span>
+                </div>
+			</div>
+			<div class="table-block" tableheight ng-style="nstyle()">
+				<div class="table-body">
+					<!--<table class="table sourcedata table-bordered" id="datainsert-table">
+						<thead>
+							<tr>
+								<th ng-dblclick="eidtth(columnvalue,columnkey)" ng-right-click="thrightclick(columnvalue,columnkey)" ng-repeat="(columnkey, columnvalue) in datagrid.columns track by columnkey"
+								 data-field="{{ columnvalue.field }}" ng-if="columnvalue.ifshow == '1'" title="{{ columnvalue.title }}">
+									<div class="thline"></div>
+									<span ng-if="columnvalue.isedit == '0' && !advance">#{{ columnvalue.field.split('__')[0].replace('userdefinedsql','自定义sql') }}</span>
+									<span class="tableTitleStyle" ng-if="columnvalue.isedit == '0'">{{ columnvalue.title }}</span>
+									<span ng-if="columnvalue.isedit == '1'">
+										<input type="text" ng-model="datagrid.columns[columnkey].title" ng-focus="focusedit()" ng-blur="onblurth(columnkey)">
+									</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody class="tbodyStyle">
+							<tr ng-repeat="(key1, value1) in datagrid.data track by key1">
+								<td title="{{ value1[value2.field] }}" title="{{ value1[value2.field] }}" ng-repeat="(key2, value2) in datagrid.columns track by key2"
+								 ng-if="value2.ifshow == '1'">
+									{{ value1[value2.field] }}
+								</td>
+							</tr>
+						</tbody>
+					</table>-->
+
+                    <div class="sti-tbl-container" ng-style="tableBoxWidth">
+                        <div class="sti-tbl-header" style="padding-right:17px;">
+                            <table class="table table-bordered" style="margin-bottom: 0px;border-bottom-style: none;">
+                                <tr>
+                                    <th class="cellWidth" ng-dblclick="eidtth(columnvalue,columnkey)" ng-right-click="thrightclick(columnvalue,columnkey)" ng-repeat="(columnkey, columnvalue) in datagrid.columns track by columnkey"
+                                     data-field="{{ columnvalue.field }}" ng-if="columnvalue.ifshow == '1'" title="{{ columnvalue.title }}" index="{{ columnkey }}">
+                                        <div class="thline"></div>
+                                        <span ng-if="columnvalue.isedit == '0' && !advance">#{{ columnvalue.field.split('__')[0].replace('userdefinedsql','自定义sql') }}</span>
+                                        <span class="tableTitleStyle" ng-if="columnvalue.isedit == '0'">{{ columnvalue.title }}</span>
+                                        <span ng-if="columnvalue.isedit == '1'">
+                                            <input type="text" ng-model="datagrid.columns[columnkey].title" ng-focus="focusedit()" ng-blur="onblurth(columnkey)">
+                                        </span>
+                                    </th>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="sti-tbl-body">
+                            <table class="table table-bordered tableShowData">
+                                <tbody>
+                                    <tr ng-repeat="(key1, value1) in datagrid.data track by key1">
+                                        <td class="tableHideLongCh" title="{{ value1[value2.field] }}" title="{{ value1[value2.field] }}" ng-repeat="(key2, value2) in datagrid.columns track by key2"
+                                         ng-if="value2.ifshow == '1'">
+                                            {{ value1[value2.field] }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+				</div>
+			</div>
+		</div>
+    </div>
+</div>
+<script type="text/javascript">
+$(function(){
+function move(){
+   var pos1 = getElCoordinate($('.item1')[0])
+   let relationship= getElCoordinate($('#relationship')[0])
+   var pos2 = getElCoordinate($('.item2')[0])
+
+   var startS = getPos(pos1, relationship).start
+   var endS = getPos(pos1, relationship).end
+   var startE = getPos(relationship, pos2).start
+   var endE = getPos(relationship, pos2).end
+   dt='M'+ startS.x+','+ startS.y
+   dt+=' L'+endS.x+','+endS.y
+   dt+=' M'+startE.x+','+startE.y
+   dt+=' L'+endE.x+','+endE.y
+   $('#path').attr('d',dt)
+}
+//move();
+function getPos(pos1, pos2){
+  //分四种情况
+  let x1,y1,x2,y2;
+  x1 = pos1.left;
+  y1 = pos1.top + pos1.height/2;
+  x2 = pos2.left+pos2.width;
+  y2 = pos2.top + pos2.height / 2;
+  return {
+      start :{x:x1,y:y1},
+      end : {x:x2,y:y2}
+  }
+}
+//获取元素左上角相对于某一元素的的位置
+function getElCoordinate(dom) {
+    let t = dom.offsetTop;
+    let l = dom.offsetLeft;
+    let w = dom.offsetWidth;
+    let h = dom.offsetHeight;
+    dom = dom.offsetParent;
+    while (!$(dom).hasClass('wrap')) {
+        t += dom.offsetTop;
+        l += dom.offsetLeft;
+        dom = dom.offsetParent;
+    }; return {
+        top: t,
+        left: l,
+        width:w,
+        height:h
+    };
+}
+   })
+</script>
+{% endverbatim %}

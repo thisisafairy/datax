@@ -1,0 +1,22 @@
+<div class="datax-group-select group-select-full-content {{ componentStyle }}" ng-class="contentClass">
+    <div class="group-select-input">
+        <input type="text" ng-model="selectValue" ng-click="openSelectPanel()" ng-change="changeFilterValue()"
+        class="group-select-value" ng-class="valueClass" placeholder="请选择数据">
+        <i class="fa fa-times-circle group-select-delete-icon" ng-click="deleteSelect()"></i>
+        <i class="fa fa-angle-down group-select-icon" ng-class="iconClass" ng-click="openSelectPanel()"></i>
+    </div>
+    <div class="group-select-panel" ng-class="panelClass">
+        <div class="full-content" style="position: relative">
+            <ul>
+                <li ng-repeat="group in list" ng-show="!group.hide">
+                    <div class="item-group-title">{{ group.name }}</div>
+                    <ul class="item-group-list">
+                        <li class="item-group-list-item" ng-click="getSelect(row)" ng-class="{'row-checked':row['checked']}"
+                         ng-if="!row.hide" ng-repeat="row in group.child">{{ row[displayField] }}</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+

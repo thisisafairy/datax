@@ -1,0 +1,110 @@
+{% extends 'base_177.html' %} {% load staticfiles %} {% block title %}测试页面{% endblock %} {% block content %}
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-bootstrap-datetimepicker/css/datetimepicker.css' %}" />
+<link rel="stylesheet" href="{% static 'plugin/angular/angular-material/angular-material.min.css' %}" />
+<link rel="stylesheet" href="{% static 'plugin/datax-font/iconfont.css' %}" />
+<link rel="stylesheet" href="{% static 'css/common.css' %}" />
+<link rel="stylesheet" href="{% static 'system/test/test-css.css' %}" />
+<link rel="stylesheet" href="{% static 'components/datax-ui/datax-ui.min.css' %}" />
+<link rel="stylesheet" href="{% static 'componets/multi-select/multi-select.css' %}" />
+{% verbatim %}
+
+<div ng-app="testPage" class="app-main-content" ng-controller="testPageController" id="testPageController">
+    <div>{{title}}</div>
+                <button class="btn btn-default" ng-click="test1Method()">测试方法一</button>
+                <button class="btn btn-default" ng-click="test2Method()">测试方法2</button>
+                <button class="btn btn-default" ng-click="testGetMethod($event)">get方法</button>
+                <button class="btn btn-default" ng-click="testPostMethod($event)">post方法</button>
+                <button class="btn btn-default" ng-click="showDialog($event)">自定义弹窗</button>
+
+                <!-- <multi-select  items="vegetables" value-field="'name'" display-field="'name'" value="searchTerm" multiple="false" filter="false"></multi-select> -->
+                <!-- <div style="display: block; width: 600px;">
+                <dx-table columns="columns" data="data" height="300"></dx-table>
+            </div> -->
+                <dx-transfer items="checkList" result="checkResultList" dx-label="'name'" change="changeTransfer(ev)"
+                    titles="['源', '目标']"></dx-transfer>
+                <div>
+                    <dx-checkbox checked="isCheck">2333</dx-checkbox>
+                </div>
+                <div style="width: 200px; display: inline-block; background-color: rgb(255, 255, 255)">
+
+                    <dx-radio-group dx-model="radioModel">
+                        <label dx-radio value="2333">2333</label>
+                        <label dx-radio value="5666">5666</label>
+                        <label dx-radio value="9000">9000</label>
+                    </dx-radio-group>
+                    radio 的值: {{ radioModel }}
+                </div>
+                <div style="width: 200px; display: inline-block; background-color: rgb(255, 255, 255)">
+                    <dx-date-picker dx-model="dateModel"></dx-date-picker>
+                </div>
+                <div style="width: 200px; display: inline-block;">
+                    <dx-select items="checkList" dx-placeholder="'请选择...'" dx-group="'dept'" dx-value="'code'"
+                        dx-label="'name'" dx-model="dxSelectValue" multiple="true"></dx-select>
+                </div>
+                <div style="width: 200px; display: inline-block;">
+                    <input type="text" class="datax-input">
+                </div>
+                <div style="width: 400px; display: inline-block; background-color: rgb(255, 255, 255)">
+                    <div dx-tabs>
+                        <div dx-tab-header titles="['tab1', 'tab2', 'tab3']"></div>
+                        <div dx-tab-body>
+                            <div>内容一</div>
+                            <div>内容二</div>
+                            <div>内容三</div>
+                        </div>
+                    </div>
+                </div>
+                <button dx-button type="default" icon="list" click="test1Method();">测试方法一</button>
+                <button dx-tooltip tooltip-text="'盘锦港荣兴港区东作业区二港池支航道工程方案设计合同'" class="datax-btn datax-btn-primary"
+                    click="test1Method();">纯css版</button>
+                <div dx-button-group>
+                    <button dx-button type="dashed" click="test1Method();">测试方法一</button>
+                    <button dx-button type="danger" click="test1Method();">测试方法一</button>
+                    <button dx-button type="default" disabled="true" click="test1Method();">测试方法一</button>
+                </div>
+                <button dx-tooltip tooltip-text="'盘锦港荣兴港区东作业区二港池支航道工程方案设计合同'" tooltip-trigger="'click'"
+                    class="datax-btn datax-btn-primary">自定义弹窗</button>
+                <div class="sk-circle">
+                    <div class="sk-circle1 sk-child"></div>
+                    <div class="sk-circle2 sk-child"></div>
+                    <div class="sk-circle3 sk-child"></div>
+                    <div class="sk-circle4 sk-child"></div>
+                    <div class="sk-circle5 sk-child"></div>
+                    <div class="sk-circle6 sk-child"></div>
+                    <div class="sk-circle7 sk-child"></div>
+                    <div class="sk-circle8 sk-child"></div>
+                    <div class="sk-circle9 sk-child"></div>
+                    <div class="sk-circle10 sk-child"></div>
+                    <div class="sk-circle11 sk-child"></div>
+                    <div class="sk-circle12 sk-child"></div>
+                </div>
+                <div style="visibility: hidden">
+                    <div class="md-dialog-container" id="myDialog">
+                        <md-dialog layout-padding>
+                            <h2>Pre-Rendered Dialog</h2>
+                            <p>
+                                This is a pre-rendered dialog, which means that <code>$mdDialog</code> doesn't compile
+                                its
+                                template on each opening.
+                                <br /><br />
+                                The Dialog Element is a static element in the DOM, which is just visually hidden.<br />
+                                Once the dialog opens, we just fetch the element from the DOM into our dialog and upon
+                                close
+                                we restore the element back into its old DOM position.
+                            </p>
+                        </md-dialog>
+                    </div>
+                </div>
+</div>
+
+{% endverbatim %}
+<script src="{% static 'plugin/angular/angular-aria/angular-aria.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-animate/angular-animate.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-messages/angular-messages.js' %}"></script>
+<script src="{% static 'plugin/angular/angular-material/angular-material.js' %}"></script>
+<script src="{% static 'plugin/lodash/lodash.min.js' %}"></script>
+<script src="{% static 'js/utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'components/utils/datax-utils.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'components/datax-ui/datax-ui.min.js' %}?v={{ nowversion }}1"></script>
+<script src="{% static 'system/test/test-function.js' %}?v={{nowversion}}1"></script>
+{% endblock %}

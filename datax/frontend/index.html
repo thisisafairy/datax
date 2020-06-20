@@ -1,0 +1,67 @@
+{% extends 'base.html' %} {% load staticfiles %} {% block title %}欢迎光临首页{% endblock %} {% block content %}
+<link rel="stylesheet" href="{% static 'system/indexconfig/index.config.css' %}"> {% verbatim %}
+<style type="text/css">
+</style>
+<div ng-app="index" ng-controller="indexController">
+    
+    <div class="main-panel">
+        <div class="title-panel">
+            <!-- 标题 -->
+            <!-- 标题编辑框 -->
+            <p class="page-title" >{{ title }}</p>
+        </div>
+        <div class="cols-content clearfix" resize>
+            <!-- 列 -->
+            <div class="col "  ng-repeat="(key, col) in cols track by key">
+                <div class="col-panel ">
+                    <div class="col-title full-width" ng-style="colTitleStyles[key]">{{ col.title }}</div>
+                    <!-- 模块列表 -->
+                    <div class="col-datas full-width">
+                        <div class="module-data" ng-click="openModulePage(module.moduleUrl);" ng-repeat="(moduleKey, module) in col.modules track by moduleKey">
+                            <!-- <a href="{{ module.moduleUrl }}" target="_black"> -->
+                                <div class="module-icon" >
+                                    <img ng-if="module.moduleIcon" ng-src="{{ module.moduleIcon }}">
+                                    <img ng-if="!module.moduleIcon" ng-src="{{ defaultIcon }}">
+                                </div>
+                                <!-- 模块标题 -->
+                                <div class="module-detail">
+                                    <div class="module-title">{{ module.moduleName }}</div>
+                                    <!-- 模块说明 -->
+                                    <div class="module-desc">{{ module.moduleDesc }}</div>
+                                </div>
+                                <!-- 模块说明图片 -->
+                                <div class="module-pic-desc" ng-if="module.modulePicDesc.length > 2">
+                                    <img ng-if="module.modulePicDesc" ng-src="{{ module.modulePicDesc }}">
+                                </div>
+                            <!-- </a> -->
+                            <!-- 模块ICON -->
+                            
+                        </div>
+                    </div>
+                </div>
+                <!-- 列标题 -->
+
+                <div class="col-arrow ">
+                    <!-- 安全管控图片 -->
+                    <img src="/frontend/image/ico/safe_control.png" class="safety" ng-if="key == 3">
+                    <img src="/frontend/image/ico/index_arrow.png" class="arraw">
+                </div>
+            </div>
+            <!-- phone,pad,pc,tv图片 -->
+            <div class="last-step">
+                <img ng-src="{{ device }}" ng-repeat="device in showDevices">
+            </div>
+        </div>
+        <!-- 箭头 -->
+        <!-- <div class="arrow-content" ng-style="positionColStyle">
+                    <div class="col-arrow" ng-repeat="(key, col) in cols track by key">
+                        <img src="/frontend/image/ico/index_arrow.png">
+                    </div>
+                </div> -->
+    </div>
+</div>
+
+{% endverbatim %}
+<script src="{% static 'plugin/jquery/jquery-ui/jquery-ui.js' %}"></script>
+<script src="{% static 'system/indexconfig/index.config.js' %}"></script>
+<script src="{% static 'index.js' %}"></script> {% endblock %}
