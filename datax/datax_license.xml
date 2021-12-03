@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<licenses>
+    <license-group release="1.0">
+        <license key="bB5Thy3VebfKJkz6cxLVw3Yaeh2K0i4xUmOt1LbD6WK1aXu4f37NbzLHLjdznj1jU3CBJILHmMKVoYX2xQvFjsxEKxGwHvv3wLWyxeZqOr9HWwNsD9jWpows/304rJn5VYY6WWBldz77cfZSRjYw5iJE/t9nsMG1xd2OKQN6LwM=">
+            <license-element key="cpus" value="unlimited"/>
+            <license-element key="db" value="unlimited"/>
+            <license-element key="os" value="unlimited"/>
+        </license>
+    </license-group>
+</licenses>
