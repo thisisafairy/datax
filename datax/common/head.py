@@ -24,34 +24,34 @@ import os
 # 'user': 'postgres'
 # 'pwd': 'sasa'
 
-# DEFAULT_DB_INFO         = {
-#       'ip':             '127.0.0.1:5432'
-#     , 'db':             'datax_cost'
-#     , 'kind':           'pgsql'
-#     , 'user':           'postgres'
-#     , 'pwd':            '1qaz@WSX'
-# }
-# DATAXEXTENSION_DB_INFO  = {
-#     'ip':             '127.0.0.1:5432'
-#     , 'db':             'datax_extension_cost'
-#     , 'kind':           'pgsql'
-#     , 'user':           'postgres'
-#     , 'pwd':            '1qaz@WSX'
-# }
 DEFAULT_DB_INFO         = {
-    'ip':             '47.100.198.97:54321'
+      'ip':             '127.0.0.1:5432'
     , 'db':             'datax_cost'
     , 'kind':           'pgsql'
     , 'user':           'postgres'
-    , 'pwd':            '123!@#'
+    , 'pwd':            '1qaz@WSX'
 }
 DATAXEXTENSION_DB_INFO  = {
-    'ip':             '47.100.198.97:54321'
+    'ip':             '127.0.0.1:5432'
     , 'db':             'datax_extension_cost'
     , 'kind':           'pgsql'
     , 'user':           'postgres'
-    , 'pwd':            '123!@#'
+    , 'pwd':            '1qaz@WSX'
 }
+# DEFAULT_DB_INFO         = {
+#     'ip':             '47.101.148.27:5432'
+#     , 'db':             'jinneng_datax_cbmx'
+#     , 'kind':           'pgsql'
+#     , 'user':           'postgres'
+#     , 'pwd':            '123!@#'
+# }
+# DATAXEXTENSION_DB_INFO  = {
+#     'ip':             '47.101.148.27:5432'
+#     , 'db':             'jinneng_datax_extension_cbmx'
+#     , 'kind':           'pgsql'
+#     , 'user':           'postgres'
+#     , 'pwd':            '123!@#'
+# }
 
 # 匹配日期的正则表达式
 REGEX_FOR_DATE          = '(\d{2}|\d{4})((?:\-)|(?:/))([0]{1}\d{1}|[1]{1}[0-2]{0,1})((?:\-)|(?:/))([0-2]{0,1}\d{0,1}|[3]{1}[0-1]{0,1})(?:\s)?([0-1]{1}\d{0,1}|[2]{1}[0-3]{1})?(?::)?([0-5]{1}\d{1}){0,1}(?::)?([0-5]{1}\d{1,2}){0,1}'

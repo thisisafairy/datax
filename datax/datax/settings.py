@@ -124,26 +124,26 @@ WSGI_APPLICATION = 'datax.wsgi.application'
 # 'HOST': '127.0.0.1',
 # 'PORT': '5432',
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'datax_cost',
-#         'USER': 'postgres',
-#         'PASSWORD': '1qaz@WSX',
-#         'HOST': '127.0.0.1',
-#         'PORT': '5432',
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'datax_cost',
         'USER': 'postgres',
-        'PASSWORD': '123!@#',
-        'HOST': '47.100.198.97',
-        'PORT': '54321',
+        'PASSWORD': '1qaz@WSX',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'jinneng_datax_cbmx',
+#         'USER': 'postgres',
+#         'PASSWORD': '123!@#',
+#         'HOST': '47.101.148.27',
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
